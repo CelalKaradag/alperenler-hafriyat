@@ -1,0 +1,62 @@
+---
+import { defaultPriceFactors } from '../data/services';
+import { mapsUrl, site, whatsappUrl } from '../data/site';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import TopoArt from './TopoArt.astro';
+import QuoteWizard from './QuoteWizard.astro';
+---
+
+<section class="section section-dark on-dark" aria-labelledby="teklif-baslik">
+  <div class="container quote reveal">
+    <div>
+      <div class="section-head">
+        <p class="eyebrow">Fiyat teklifi</p>
+        <h2 id="teklif-baslik">Fiyatı ne belirler?</h2>
+      </div>
+      <p class="lead">
+        Her sahanın koşulları farklıdır; bu yüzden fiyat, işi öğrendikten sonra verilir. Aşağıdaki
+        bilgiler teklif için yeterlidir.
+      </p>
+      <ul class="factor-list">
+        {
+          defaultPriceFactors.map((factor) => (
+            <li>
+              <Icon name="check" />
+              <span>{factor}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="contact-quote">
+      <TopoArt class="topo-art--soft" seed={3} />
+      <p class="contact-quote-label">Teklif için arayın</p>
+      <p class="contact-quote-phone"><a href={site.phone.href}>{site.phone.display}</a></p>
+      <address>{site.address}</address>
+      <p>
+        <a class="text-link" href={mapsUrl} target="_blank" rel="noopener noreferrer">
+          Google Maps'te göster<span class="visually-hidden"> (yeni sekmede açılır)</span>
+        </a>
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+        {
+          whatsappUrl && (
+            <WhatsAppButton class="btn btn-wa btn-lg" href={whatsappUrl} />
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="container wizard-row reveal">
+    <div class="wizard-intro">
+      <p class="eyebrow">Teklif Al</p>
+      <h3>Teklif mesajınızı hazırlayın</h3>
+      <p class="lead">İşin türünü ve yerini seçin; mesajınız hazır olsun.</p>
+    </div>
+    <QuoteWizard />
+  </div>
+</section>

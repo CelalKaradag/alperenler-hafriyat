@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import QuoteWizard from '../components/QuoteWizard.astro';
+import TopoArt from '../components/TopoArt.astro';
+import { defaultPriceFactors } from '../data/services';
+import { site } from '../data/site';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout
+  title={`Teklif Al | ${site.name}`}
+  description={`${site.legalName} için fiyat teklifi isteyin: işin türünü ve yerini yazın, mesajınız hazır olsun. Telefon: ${site.phone.display}.`}
+>
+  <section class="page-head on-dark">
+    <TopoArt class="topo-art--soft" seed={4} />
+    <div class="container narrow">
+      <p class="eyebrow">Teklif Al</p>
+      <h1>Fiyat teklifi isteyin</h1>
+      <p class="lead">
+        Üç kısa soruyu yanıtlayın, mesajınız hazır olsun. İsterseniz doğrudan arayabilirsiniz.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-paper">
+    <div class="container quote-page">
+      <QuoteWizard />
+      <aside class="quote-aside">
+        <h2>Fiyatı ne belirler?</h2>
+        <ul class="factor-list factor-list--light">
+          {
+            defaultPriceFactors.map((factor) => (
+              <li>
+                <Icon name="check" />
+                <span>{factor}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

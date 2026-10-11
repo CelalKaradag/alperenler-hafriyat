@@ -1,0 +1,20 @@
+---
+import { stats } from '../data/stats';
+import Icon from './Icon.astro';
+---
+
+{
+  stats.length > 0 && (
+    <section class="stats" aria-label="Rakamlarla firma">
+      <ul class="container stats-grid">
+        {stats.map((stat) => (
+          <li class="stat">
+            {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
+            <span class="stat-value">{stat.value}</span>
+            <span class="stat-label">{stat.label}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

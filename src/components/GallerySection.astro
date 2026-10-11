@@ -1,0 +1,45 @@
+---
+import { gallery } from '../data/gallery';
+import { publicFileExists } from '../utils/assets';
+
+// Dosyası public/ altında olmayan öğeler hiç render edilmez (kırık görsel/video olmaz).
+const items = gallery.filter((item) => publicFileExists(item.src));
+---
+
+{
+  items.length > 0 && (
+    <section class="section section-light" aria-labelledby="galeri-baslik">
+      <div class="container reveal">
+        <div class="section-head">
+          <p class="eyebrow">Galeri</p>
+          <h2 id="galeri-baslik">Saha Görselleri</h2>
+        </div>
+        <ul class="gallery-grid">
+          {items.map((item) => (
+            <li class="gallery-item">
+              {item.type === 'image' ? (
+                <figure>
+                  <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+                  {item.caption && <figcaption>{item.caption}</figcaption>}
+                </figure>
+              ) : (
+                <figure>
+                  <video
+                    controls
+                    preload="none"
+                    playsinline
+                    poster={publicFileExists(item.poster) ? item.poster : undefined}
+                    aria-label={item.title}
+                  >
+                    <source src={item.src} />
+                  </video>
+                  {item.caption && <figcaption>{item.caption}</figcaption>}
+                </figure>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

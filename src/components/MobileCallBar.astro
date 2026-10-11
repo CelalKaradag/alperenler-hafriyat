@@ -1,0 +1,9 @@
+---
+import { site, whatsappUrl } from '../data/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<div class="call-bar" role="region" aria-label="Hızlı iletişim">
+  <a class="btn btn-primary" href={site.phone.href}>{whatsappUrl ? 'Ara' : 'Hemen Ara'}</a>
+  {whatsappUrl && <WhatsAppButton class="btn btn-wa" href={whatsappUrl} />}
+</div>

@@ -1,0 +1,194 @@
+---
+import { visibleServices } from '../data/services';
+import { site, whatsappUrl } from '../data/site';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+
+// WhatsApp numarası tanımlıysa wa.me tabanı; mesajı betik ekler (hiçbir veri sunucuya gitmez).
+const waBase = site.whatsappNumber ? `https://wa.me/${site.whatsappNumber.replace(/\D/g, '')}` : '';
+// Onaylı/görünür hizmet yoksa 1. adım serbest metin alanıdır.
+const textOnly = visibleServices.length === 0;
+---
+
+<div
+  class="wizard"
+  data-quote-wizard
+  data-mode={textOnly ? 'text' : 'choice'}
+  data-wa-base={waBase}
+>
+  <!-- JavaScript yoksa görünen sade kutu -->
+  <div class="wizard-fallback">
+    <p>Teklif için bize doğrudan yazabilir veya arayabilirsiniz.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+      {whatsappUrl && <WhatsAppButton class="btn btn-dark btn-lg" href={whatsappUrl} />}
+    </div>
+  </div>
+
+  <div class="wizard-app" data-wizard-app hidden>
+    <div class="wizard-progress">
+      <p class="wizard-count" aria-live="polite">Adım <span data-current>1</span>/3</p>
+      <div class="wizard-bar" aria-hidden="true">
+        <span data-segment></span>
+        <span data-segment></span>
+        <span data-segment></span>
+      </div>
+    </div>
+
+    <fieldset class="wizard-step" data-step>
+      <legend tabindex="-1">İş türü</legend>
+      {
+        textOnly ? (
+          <>
+            <label class="wizard-label" for="wizard-job-text">
+              Hangi iş için teklif istiyorsunuz?
+            </label>
+            <input
+              class="wizard-input"
+              id="wizard-job-text"
+              type="text"
+              data-job-text
+              maxlength="120"
+              autocomplete="off"
+            />
+          </>
+        ) : (
+          <>
+            <div class="choice-grid">
+              {visibleServices.map((service) => (
+                <label class="choice">
+                  <input type="radio" name="job" value={service.title} />
+                  <span class="choice-body">
+                    <Icon name={service.icon} />
+                    <span>{service.title}</span>
+                  </span>
+                </label>
+              ))}
+              <label class="choice">
+                <input type="radio" name="job" value="__diger" />
+                <span class="choice-body">
+                  <Icon name="message" />
+                  <span>Diğer / emin değilim</span>
+                </span>
+              </label>
+            </div>
+            <div class="wizard-other" data-job-text-wrap hidden>
+              <label class="wizard-label" for="wizard-job-text">
+                İşi kısaca yazın (isteğe bağlı)
+              </label>
+              <input
+                class="wizard-input"
+                id="wizard-job-text"
+                type="text"
+                data-job-text
+                maxlength="120"
+                autocomplete="off"
+              />
+            </div>
+          </>
+        )
+      }
+      <p class="wizard-error" role="alert" data-error hidden></p>
+      <div class="wizard-actions">
+        <button class="btn btn-dark" type="button" data-action="next">İleri</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step hidden>
+      <legend tabindex="-1">İşin yeri</legend>
+      <label class="wizard-label" for="wizard-place">İlçe ve mahalle</label>
+      <input
+        class="wizard-input"
+        id="wizard-place"
+        name="place"
+        type="text"
+        maxlength="120"
+        autocomplete="off"
+        placeholder="İlçe ve mahalle adını yazın"
+      />
+      <p class="wizard-error" role="alert" data-error hidden></p>
+      <div class="wizard-actions">
+        <button class="btn btn-outline-dark" type="button" data-action="back">Geri</button>
+        <button class="btn btn-dark" type="button" data-action="next">İleri</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step hidden>
+      <legend tabindex="-1">Ayrıntılar</legend>
+      <label class="wizard-label" for="wizard-note">Kısa açıklama (isteğe bağlı)</label>
+      <textarea class="wizard-input" id="wizard-note" name="note" rows="3" maxlength="500"></textarea>
+
+      <fieldset class="wizard-sub">
+        <legend>Zaman (isteğe bağlı)</legend>
+        <div class="pill-group">
+          <label class="pill">
+            <input type="radio" name="time" value="" checked />
+            <span>Belirtmek istemiyorum</span>
+          </label>
+          <label class="pill">
+            <input type="radio" name="time" value="Acil" />
+            <span>Acil</span>
+          </label>
+          <label class="pill">
+            <input type="radio" name="time" value="Bu hafta" />
+            <span>Bu hafta</span>
+          </label>
+          <label class="pill">
+            <input type="radio" name="time" value="Esnek" />
+            <span>Esnek</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <p class="wizard-error" role="alert" data-error hidden></p>
+      <div class="wizard-actions">
+        <button class="btn btn-outline-dark" type="button" data-action="back">Geri</button>
+        <button class="btn btn-dark" type="button" data-action="next">Mesajı hazırla</button>
+      </div>
+    </fieldset>
+
+    <div class="wizard-result" data-result hidden>
+      <h3 tabindex="-1" data-focus>Mesajınız hazır</h3>
+      <blockquote class="wizard-preview" data-preview></blockquote>
+      <div class="btn-row">
+        {
+          waBase && (
+            <a
+              class="btn btn-wa-dark"
+              data-wa-link
+              href={waBase}
+              target="_blank"
+              rel="noopener"
+              aria-label="WhatsApp'tan gönder (yeni sekmede açılır)"
+            >
+              <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 3.2a8.8 8.8 0 0 0-7.5 13.4L3.2 20.8l4.3-1.1A8.8 8.8 0 1 0 12 3.2z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M9 8.2c-.4.4-.6 1-.3 1.8.7 1.9 2.2 3.4 4.2 4.2.8.3 1.4.1 1.8-.3l.5-.7c.2-.3.1-.6-.2-.8l-1.3-.7c-.3-.1-.6 0-.8.2l-.3.3c-1.1-.4-2-1.3-2.4-2.4l.3-.3c.2-.2.3-.5.2-.8l-.7-1.3c-.2-.3-.5-.4-.8-.2z"
+                  fill="currentColor"
+                />
+              </svg>
+              WhatsApp'tan gönder
+            </a>
+          )
+        }
+        <a class="btn btn-primary" href={site.phone.href}>Hemen Ara</a>
+        <button class="btn btn-outline-dark" type="button" data-action="edit">Düzenle</button>
+      </div>
+    </div>
+
+    <p class="wizard-note">
+      {
+        waBase
+          ? "Bilgileriniz kaydedilmez, mesaj WhatsApp'ta size gösterilir, siz gönderirsiniz."
+          : 'Bilgileriniz kaydedilmez ve hiçbir yere gönderilmez.'
+      }
+    </p>
+  </div>
+</div>

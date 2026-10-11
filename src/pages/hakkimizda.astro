@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title={`Hakkımızda | ${site.name}`}
+  description={`${site.legalName} hakkında kısa bilgi ve iletişim yolları. Merkezimiz Yeşilyurt / Malatya.`}
+>
+  <section class="page-head on-dark">
+    <div class="container narrow">
+      <p class="eyebrow">Hakkımızda</p>
+      <h1>{site.legalName}</h1>
+    </div>
+  </section>
+
+  <section class="section section-light">
+    <div class="container narrow prose">
+      <h2>Kimiz?</h2>
+      <p>
+        {site.legalName}, Malatya'nın Yeşilyurt ilçesinde, Koyunoğlu Mahallesi'ndeki adresinden
+        çalışır. İş talepleri telefonla alınır; ihtiyaç önce konuşulur, sonra netleştirilir.
+      </p>
+
+      <h2>Bize nasıl ulaşırsınız?</h2>
+      <p>
+        En hızlı yol telefondur. Adresimiz ve harita bağlantısı iletişim sayfasında yer alır.
+      </p>
+
+      <dl class="facts">
+        <div>
+          <dt>Firma</dt>
+          <dd>{site.legalName}</dd>
+        </div>
+        <div>
+          <dt>Telefon</dt>
+          <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
+        </div>
+        <div>
+          <dt>Adres</dt>
+          <dd>{site.address}</dd>
+        </div>
+      </dl>
+
+      <div class="btn-row">
+        <a class="btn btn-dark" href="/iletisim/">İletişim Bilgileri</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

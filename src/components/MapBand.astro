@@ -1,0 +1,50 @@
+---
+import { mapsDirectionsUrl, mapsUrl, site, whatsappUrl } from '../data/site';
+import MapCard from './MapCard.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<!--
+  Tam genişlik (full-bleed) harita şeridi + üstünde yüzen iletişim kartı.
+  Masaüstü/tablet (48em üstü): kart haritanın üstünde, container'ın sol kenarına hizalı.
+  Mobil: harita (~260 px), kart haritanın ALTINDA normal akışta.
+-->
+<section class="map-band on-dark" aria-label="Konum ve iletişim">
+  <div class="map-band-stage">
+    <MapCard />
+
+    <div class="container map-band-overlay">
+      <div class="map-info">
+        <p class="eyebrow">Konum &amp; İletişim</p>
+        <p class="map-info-name">{site.legalName}</p>
+        <address>{site.address}</address>
+        <div class="map-info-divider" aria-hidden="true"></div>
+        <p class="map-info-phone"><a href={site.phone.href}>{site.phone.display}</a></p>
+        {
+          whatsappUrl && (
+            <p class="map-info-wa">
+              <WhatsAppButton href={whatsappUrl} />
+            </p>
+          )
+        }
+        <div class="map-info-actions">
+          <a
+            class="btn btn-primary"
+            href={mapsDirectionsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Yol tarifi al<span class="visually-hidden"> (yeni sekmede açılır)</span>
+          </a>
+          <a class="btn btn-outline-light" href={mapsUrl} target="_blank" rel="noopener noreferrer">
+            Google Maps'te aç<span class="visually-hidden"> (yeni sekmede açılır)</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container map-band-note">
+    <p class="map-note">Harita Google tarafından sağlanır.</p>
+  </div>
+</section>

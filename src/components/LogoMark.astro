@@ -1,0 +1,25 @@
+---
+// GEÇİCİ işaret: firma logosu gelince değiştirilecek (bkz. README).
+// Üç iç içe eş yükselti çizgisinden oluşan tepe; aynı zamanda "A" harfini andırır. Tek renk (sarı).
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class:list={['logo-mark', className]}
+  viewBox="0 0 32 32"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d="M3 27 16 5l13 22"></path>
+  <path d="M8.5 27 16 14l7.5 13"></path>
+  <path d="M13.5 27 16 22.5l2.5 4.5"></path>
+</svg>

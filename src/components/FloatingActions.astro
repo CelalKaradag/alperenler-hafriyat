@@ -1,0 +1,23 @@
+---
+import { whatsappUrl } from '../data/site';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<!--
+  Masaüstü (48em üstü) yüzen düğmeler. Mobilde yok (alt çubuk var).
+  Görünürlüğü src/scripts/floating-actions.js yönetir: WhatsApp hero görünürken gizli,
+  "yukarı çık" sayfa yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
+-->
+<div class="floating-actions" data-floating>
+  <button class="to-top" type="button" data-to-top aria-label="Sayfanın başına çık">
+    <Icon name="arrowUp" />
+  </button>
+  {
+    whatsappUrl && (
+      <WhatsAppButton class="wa-float" href={whatsappUrl}>
+        <span class="wa-float-label" aria-hidden="true">WhatsApp ile yazın</span>
+      </WhatsAppButton>
+    )
+  }
+</div>

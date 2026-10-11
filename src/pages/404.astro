@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopoArt from '../components/TopoArt.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title={`Sayfa bulunamadı | ${site.name}`}
+  description="Aradığınız sayfa bulunamadı. Ana sayfaya dönebilir veya bizi arayabilirsiniz."
+  footerCta={false}
+>
+  <section class="section section-dark on-dark not-found">
+    <TopoArt seed={7} />
+    <div class="container narrow not-found-inner">
+      <p class="nf-code" aria-hidden="true">404</p>
+      <h1>Sayfa bulunamadı</h1>
+      <p class="lead">Aradığınız sayfa kazılmış olabilir.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="/">Ana Sayfa</a>
+        <a class="btn btn-outline-light btn-lg" href={site.phone.href}>Hemen Ara</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

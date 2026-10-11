@@ -1,0 +1,39 @@
+---
+import { visibleFaqs } from '../data/faq';
+
+interface Props {
+  /** Bölüm zemini: arkasındaki bölümden ayrışsın diye */
+  tone?: 'light' | 'paper';
+}
+
+const { tone = 'light' } = Astro.props;
+---
+
+{
+  visibleFaqs.length > 0 && (
+    <section class:list={['section', `section-${tone}`]} aria-labelledby="sss-baslik">
+      <div class="container reveal">
+        <div class="section-head">
+          <p class="eyebrow">SSS</p>
+          <h2 id="sss-baslik">Sık sorulan sorular</h2>
+        </div>
+        <div class="faq-list">
+          {visibleFaqs.map((item) => (
+            <details class="faq-item">
+              <summary>
+                <span class="faq-question">
+                  {item.question}
+                  {!item.onaylandi && <span class="draft-badge">TASLAK</span>}
+                </span>
+                <span class="faq-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="faq-answer">
+                <p>{item.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

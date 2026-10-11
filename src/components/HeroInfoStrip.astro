@@ -1,0 +1,30 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+---
+
+<section class="info-strip on-dark" aria-label="Hızlı bilgi">
+  <ul class="container info-grid">
+    <li class="info-item">
+      <Icon class="info-icon" name="phone" />
+      <div>
+        <span class="info-label">Telefon</span>
+        <a class="info-value" href={site.phone.href}>{site.phone.display}</a>
+      </div>
+    </li>
+    <li class="info-item">
+      <Icon class="info-icon" name="pin" />
+      <div>
+        <span class="info-label">Adres</span>
+        <span class="info-value">Yeşilyurt / Malatya</span>
+      </div>
+    </li>
+    <li class="info-item">
+      <Icon class="info-icon" name="quote" />
+      <div>
+        <span class="info-label">Fiyat teklifi</span>
+        <a class="info-value" href={site.phone.href}>Teklif için arayın</a>
+      </div>
+    </li>
+  </ul>
+</section>

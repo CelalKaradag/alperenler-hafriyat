@@ -1,0 +1,49 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+
+const steps = [
+  {
+    number: '01',
+    icon: 'phone',
+    title: 'Bizi arayın',
+    text: `${site.phone.display} numarasından bize ulaşın.`,
+  },
+  {
+    number: '02',
+    icon: 'message',
+    title: 'İşi anlatın',
+    text: 'İşin türünü, sahanın yerini ve ihtiyacınızı kısaca anlatın.',
+  },
+  {
+    number: '03',
+    icon: 'quote',
+    title: 'Teklifinizi alın',
+    text: 'Paylaştığınız bilgilere göre fiyat teklifi hazırlanır.',
+  },
+] as const;
+---
+
+<section class="section section-paper" aria-labelledby="calisma-baslik">
+  <div class="container reveal">
+    <div class="section-head">
+      <p class="eyebrow">Süreç</p>
+      <h2 id="calisma-baslik">Nasıl çalışıyoruz?</h2>
+    </div>
+    <ol class="steps">
+      {
+        steps.map((step) => (
+          <li class="step">
+            <div class="step-head">
+              <span class="step-number" aria-hidden="true">{step.number}</span>
+              <span class="step-line" aria-hidden="true"></span>
+            </div>
+            <Icon class="step-icon" name={step.icon} />
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

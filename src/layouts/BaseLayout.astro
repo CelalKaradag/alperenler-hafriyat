@@ -1,0 +1,65 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileCallBar from '../components/MobileCallBar.astro';
+import FloatingActions from '../components/FloatingActions.astro';
+import { publicFileExists } from '../utils/assets';
+
+interface Props {
+  title: string;
+  description: string;
+  /** true: header, sayfanın ilk bölümü (hero) üstünde şeffaf başlar */
+  overHero?: boolean;
+  /** false: footer'daki harita şeridini gizler (sayfada zaten büyük harita varsa) */
+  footerMap?: boolean;
+  /** false: footer'daki "Projeniz için teklif alın" şeridini gizler (ana sayfada iletişim bölümü var) */
+  footerCta?: boolean;
+  /** true: site yayına çıksa bile sayfa noindex kalır */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  overHero = false,
+  footerMap = true,
+  footerCta = true,
+  noindex = false,
+} = Astro.props;
+
+// Dosya yoksa etiket basılmaz (README: apple-touch-icon.png)
+const hasAppleIcon = publicFileExists('/apple-touch-icon.png');
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#14161a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {hasAppleIcon && <link rel="apple-touch-icon" href="/apple-touch-icon.png" />}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <SEO title={title} description={description} noindex={noindex} />
+    <slot name="head" />
+    <!-- Sayfa geçişleri (Astro View Transitions). Hareket azaltma açıkken animasyon yok (global.css). -->
+    <ClientRouter />
+  </head>
+  <body class:list={[overHero && 'over-hero']}>
+    <Header />
+    <main id="icerik" tabindex="-1">
+      <slot />
+    </main>
+    <Footer map={footerMap} cta={footerCta} />
+    <FloatingActions />
+    <MobileCallBar />
+    <script>
+      import '../scripts/page-init.js';
+    </script>
+  </body>
+</html>

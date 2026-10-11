@@ -1,0 +1,131 @@
+---
+import { site, whatsappUrl } from '../data/site';
+import { publicFileExists } from '../utils/assets';
+import TopoArt from './TopoArt.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  /** "Aşağı kaydır" göstergesinin gideceği bölüm, örn. "#firma" */
+  scrollTarget?: string;
+}
+
+const { scrollTarget = '#icerik' } = Astro.props;
+
+// Dosya kontrolü build/dev sırasında yapılır; olmayan dosya için hiçbir etiket basılmaz,
+// tarayıcıda 404 isteği oluşmaz. Sıra önemlidir: her boyutta webm önce, mp4 yedek.
+const variants = [
+  { src: '/videos/hero-1080.webm', type: 'video/webm', wide: true },
+  { src: '/videos/hero-1080.mp4', type: 'video/mp4', wide: true },
+  { src: '/videos/hero-720.webm', type: 'video/webm', wide: false },
+  { src: '/videos/hero-720.mp4', type: 'video/mp4', wide: false },
+].filter((variant) => publicFileExists(variant.src));
+const hasVideo = variants.length > 0;
+
+const posterSrc = '/images/hero-poster.jpg';
+const photoSrc = '/images/hero.jpg';
+const poster = publicFileExists(posterSrc) ? posterSrc : null;
+const backdrop = poster ?? (publicFileExists(photoSrc) ? photoSrc : null);
+const hasMedia = hasVideo || backdrop !== null;
+
+// <video> için tür tanımlı olmayan, standart dışı öznitelikler
+const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true };
+---
+
+{poster && <link rel="preload" as="image" href={poster} />}
+
+<section
+  class:list={['hero', 'on-dark', hasMedia ? 'hero--media' : 'hero--plain']}
+  style={backdrop ? `--hero-image: url(${backdrop})` : undefined}
+>
+  {
+    hasVideo && (
+      <div class="hero-media" data-hero-media data-sources={JSON.stringify(variants)} aria-hidden="true">
+        {/* JavaScript kapalıyken: tek video + native loop. JS açıkken videoları betik oluşturur. */}
+        <noscript>
+          <video
+            class="hero-video is-visible"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            tabindex="-1"
+            aria-hidden="true"
+            {...videoExtras}
+          >
+            {variants.map((variant) => (
+              <source
+                src={variant.src}
+                type={variant.type}
+                media={variant.wide ? '(min-width: 48em)' : '(max-width: 47.99em)'}
+              />
+            ))}
+          </video>
+        </noscript>
+      </div>
+    )
+  }
+  {hasMedia && <div class="hero-overlay" aria-hidden="true" />}
+  {!hasMedia && <TopoArt />}
+
+  <div class="container hero-inner">
+    <p class="eyebrow">Malatya · Yeşilyurt</p>
+    <h1>{site.name}</h1>
+    <p class="hero-sub">
+      {site.legalName}, Malatya'nın Yeşilyurt ilçesinde faaliyet gösteriyor. İşinizin ihtiyacını
+      anlatmak için doğrudan bizi arayabilirsiniz.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+      {
+        whatsappUrl ? (
+          <WhatsAppButton class="btn btn-outline-light btn-lg" href={whatsappUrl} />
+        ) : (
+          <a class="btn btn-outline-light btn-lg" href="/iletisim/">İletişim</a>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    hasVideo && (
+      <button
+        class="hero-toggle"
+        type="button"
+        data-hero-toggle
+        aria-pressed="false"
+        aria-label="Arka plan videosunu durdur"
+        hidden
+      >
+        <svg class="hero-toggle-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor" />
+        </svg>
+        <svg class="hero-toggle-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M7 4l13 8-13 8z" fill="currentColor" />
+        </svg>
+        <span class="hero-toggle-pause" aria-hidden="true">Durdur</span>
+        <span class="hero-toggle-play" aria-hidden="true">Oynat</span>
+      </button>
+    )
+  }
+
+  <a class="hero-scroll" href={scrollTarget} aria-label="Aşağı kaydır">
+    <svg
+      class="hero-scroll-arrow"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </a>
+</section>
+
+<script>
+  import '../scripts/hero-video.js';
+</script>

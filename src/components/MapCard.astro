@@ -1,0 +1,65 @@
+---
+import { hasMapCoords, mapsEmbedUrl, mapsUrl, site } from '../data/site';
+import TopoArt from './TopoArt.astro';
+---
+
+<!--
+  Harita alanı (MapBand içinde kullanılır). Görünür alana yaklaşınca (src/scripts/map-card.js,
+  IntersectionObserver) Google Maps iframe'i kendiliğinden yüklenir; yüklenene kadar bu kart bekleme
+  ekranıdır. Başlangıçta HTML'de iframe YOK. Yüklenemezse kart kalır (iletişim kartındaki
+  "Google Maps'te aç" düğmesi her zaman görünür). Save-Data açıksa otomatik yükleme yapılmaz;
+  "Haritayı göster" düğmesi çıkar.
+-->
+<div
+  class="map-card"
+  data-map-card
+  data-embed={mapsEmbedUrl}
+  data-title={`${site.name} konumu`}
+>
+  <div class="map-slot" data-map-slot></div>
+
+  <div class="map-stage">
+    <TopoArt class="topo-art--soft" seed={5} density="low" />
+    <div class="map-center">
+      <span class="map-pin" aria-hidden="true">
+        <span class="map-pulse"></span>
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path
+            d="M12 22s7-6.2 7-12.2A7 7 0 0 0 5 9.8C5 15.8 12 22 12 22z"
+            fill="currentColor"></path>
+          <circle cx="12" cy="9.8" r="2.6" fill="#14161a"></circle>
+        </svg>
+      </span>
+      <!-- Yalnızca Save-Data açıkken görünür (otomatik yükleme yok): tıkla-yükle -->
+      <a
+        class="btn btn-primary map-show"
+        data-map-show
+        href={mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+      >
+        Haritayı göster
+      </a>
+    </div>
+  </div>
+
+  <!--
+    Koordinat tanımlıysa Google iğnesi çıkmaz (embed'de q yok); kendi sarı iğnemiz serbest alanın
+    tam ortasına konur, iğnenin ucu merkezdedir. Yalnızca harita yüklenince görünür.
+  -->
+  {
+    hasMapCoords && (
+      <span class="map-center-pin" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path
+            d="M12 22s7-6.2 7-12.2A7 7 0 0 0 5 9.8C5 15.8 12 22 12 22z"
+            fill="#f5b400"
+            stroke="#14161a"
+            stroke-width="1"></path>
+          <circle cx="12" cy="9.8" r="2.6" fill="#14161a"></circle>
+        </svg>
+      </span>
+    )
+  }
+</div>

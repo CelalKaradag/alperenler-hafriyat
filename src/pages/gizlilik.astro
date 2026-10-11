@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+
+// Firma tarafından doldurulacak alanlar (uydurma bilgi yok)
+const TODO = '[firma tarafından doldurulacak]';
+const isDraft = import.meta.env.DEV;
+---
+
+<BaseLayout
+  noindex
+  title={`Gizlilik ve Çerezler | ${site.name}`}
+  description={`${site.legalName} web sitesinde kişisel veri toplanıp toplanmadığı, harita ve tarayıcı tercihleri hakkında kısa bilgilendirme.`}
+>
+  <section class="page-head on-dark">
+    <div class="container narrow">
+      <p class="eyebrow">Bilgilendirme</p>
+      <h1>Gizlilik ve Çerezler</h1>
+    </div>
+  </section>
+
+  <section class="section section-light">
+    <div class="container narrow prose legal">
+      {
+        isDraft && (
+          <p class="draft-notice" role="note">
+            <span class="draft-badge">TASLAK</span> Hukuki metin taslağı – firma/uzman onaylamalı
+          </p>
+        )
+      }
+
+      <h2>Özet</h2>
+      <p>
+        Bu sitede form, üyelik veya yorum alanı yoktur. Site, ziyaretçilerden kişisel veri toplamaz
+        ve saklamaz.
+      </p>
+      <p>
+        Siteyi barındıran hizmet sağlayıcı, teknik nedenlerle standart sunucu kayıtları tutabilir.
+        Sağlayıcı ve ayrıntılar: <mark class="todo">{TODO}</mark>
+      </p>
+
+      <h2>Teklif sihirbazı</h2>
+      <p>
+        Teklif sihirbazına yazdığınız bilgiler kaydedilmez ve herhangi bir sunucuya gönderilmez.
+        Hazırlanan mesaj, siz "WhatsApp'tan gönder"e bastığınızda kendi cihazınızdaki WhatsApp'ta
+        açılır; göndermek tamamen sizin tercihinizdir. WhatsApp'a ilettiğiniz mesaj, WhatsApp'ın
+        kendi koşullarına tabidir.
+      </p>
+
+      <h2>Telefon ve WhatsApp</h2>
+      <p>
+        Bizi aramak veya WhatsApp'tan yazmak istediğinizde iletişim, telefonunuz üzerinden doğrudan
+        gerçekleşir. İletişim için telefon: <a href={site.phone.href}>{site.phone.display}</a>
+      </p>
+
+      <h2>Harita</h2>
+      <p>
+        Konum haritası Google tarafından sağlanır. Harita ekranınıza yaklaştığında Google'ın
+        sunucularından yüklenir; bu sırada Google, kendi gizlilik koşullarına göre veri
+        işleyebilir. Bu konuda Google'ın gizlilik koşulları geçerlidir.
+      </p>
+
+      <h2>Tarayıcınızda saklanan tercih</h2>
+      <p>
+        Bu site kendisi çerez kullanmaz. Yalnızca ana sayfadaki arka plan videosunu durdurup
+        oynatma tercihiniz, cihazınızın tarayıcı deposunda saklanır. Bu bilgi yalnızca sizin
+        cihazınızda kalır, bize gönderilmez ve tarayıcı ayarlarınızdan silebilirsiniz.
+      </p>
+
+      <h2>Firma bilgileri</h2>
+      <dl class="facts">
+        <div>
+          <dt>Firma</dt>
+          <dd>{site.legalName}</dd>
+        </div>
+        <div>
+          <dt>Ticari unvan</dt>
+          <dd><mark class="todo">{TODO}</mark></dd>
+        </div>
+        <div>
+          <dt>Vergi no</dt>
+          <dd><mark class="todo">{TODO}</mark></dd>
+        </div>
+        <div>
+          <dt>KVKK veri sorumlusu</dt>
+          <dd><mark class="todo">{TODO}</mark></dd>
+        </div>
+        <div>
+          <dt>Adres</dt>
+          <dd>{site.address}</dd>
+        </div>
+        <div>
+          <dt>Telefon</dt>
+          <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
+        </div>
+        <div>
+          <dt>Son güncelleme</dt>
+          <dd><mark class="todo">{TODO}</mark></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+import type { Service } from '../data/services';
+import { publicFileExists } from '../utils/assets';
+import Icon from './Icon.astro';
+
+interface Props {
+  service: Service;
+  /** 1'den başlayan sıra; "01", "02" ... olarak gösterilir */
+  index: number;
+}
+
+const { service, index } = Astro.props;
+const image = publicFileExists(service.image) ? service.image : null;
+const number = String(index).padStart(2, '0');
+---
+
+<article class="service-card">
+  {
+    image && (
+      <div class="service-card-media">
+        <img src={image} alt="" loading="lazy" decoding="async" />
+      </div>
+    )
+  }
+  <div class="service-card-body">
+    <div class="service-card-top">
+      <span class="service-card-number" aria-hidden="true">{number}</span>
+      <Icon class="service-card-icon" name={service.icon} />
+    </div>
+    {!service.onaylandi && <span class="draft-badge">TASLAK</span>}
+    <h3>
+      <a href={`/hizmetler/${service.slug}/`}>{service.title}</a>
+    </h3>
+    <p>{service.summary}</p>
+    <span class="service-card-more" aria-hidden="true">
+      Detay<Icon name="arrow" />
+    </span>
+  </div>
+</article>

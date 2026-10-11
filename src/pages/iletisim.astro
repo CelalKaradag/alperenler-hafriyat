@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, whatsappUrl } from '../data/site';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import MapBand from '../components/MapBand.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { localBusinessSchema } from '../utils/schema';
+---
+
+<BaseLayout
+  title={`İletişim | ${site.name}`}
+  description={`${site.legalName} telefon ve adres bilgileri: ${site.phone.display}, ${site.address}.`}
+  footerMap={false}
+>
+  <JsonLd slot="head" data={localBusinessSchema(Astro.site)} />
+
+  <section class="page-head on-dark">
+    <div class="container narrow">
+      <p class="eyebrow">İletişim</p>
+      <h1>Bize ulaşın</h1>
+    </div>
+  </section>
+
+  <section class="section section-light">
+    <div class="container contact-grid">
+      <div class="contact-card">
+        <h2>Telefon</h2>
+        <p class="contact-value"><a href={site.phone.href}>{site.phone.display}</a></p>
+        {
+          whatsappUrl && (
+            <div class="btn-row">
+              <WhatsAppButton class="btn btn-dark" href={whatsappUrl} />
+            </div>
+          )
+        }
+      </div>
+
+      <div class="contact-card">
+        <h2>Adres</h2>
+        <address class="contact-value">{site.address}</address>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sayfanın kendi haritası (footer'daki harita bu sayfada gizli) -->
+  <MapBand />
+</BaseLayout>

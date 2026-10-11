@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import Icon from '../../components/Icon.astro';
+import TopoArt from '../../components/TopoArt.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { approvedFaqs } from '../../data/faq';
+import { faqSchema, serviceSchema } from '../../utils/schema';
+import { defaultPriceFactors, visibleServices, type Service } from '../../data/services';
+import { site, whatsappLink, whatsappServiceMessage } from '../../data/site';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+
+// /hizmetler/ (liste) ve /hizmetler/<slug>/ (detay) tek dosyada üretilir.
+// Görünür hizmet yoksa (yayında onaylı hizmet yok) hiçbir sayfa üretilmez.
+export function getStaticPaths() {
+  if (visibleServices.length === 0) return [];
+  return [
+    { params: { slug: undefined }, props: { service: null } },
+    ...visibleServices.map((item) => ({ params: { slug: item.slug }, props: { service: item } })),
+  ];
+}
+
+const { service } = Astro.props as { service: Service | null };
+const others = service ? visibleServices.filter((item) => item.slug !== service.slug) : [];
+const factors = service?.priceFactors ?? defaultPriceFactors;
+// Hizmete özel hazır mesaj; WhatsApp numarası yoksa null
+const waLink = service ? whatsappLink(whatsappServiceMessage(service.title)) : null;
+
+const title = service
+  ? `${service.seoName} Malatya | ${site.name}`
+  : `Hizmetler | ${site.name}`;
+const description = service
+  ? service.summary
+  : `${site.legalName} hizmetleri: hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya'da ihtiyacınızı konuşmak için arayın.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <Fragment slot="head">
+    {service?.onaylandi && <JsonLd data={serviceSchema(service, Astro.site)} />}
+    {!service && approvedFaqs.length > 0 && <JsonLd data={faqSchema(approvedFaqs)} />}
+  </Fragment>
+  {
+    service ? (
+      <>
+        <section class="page-head on-dark">
+          <TopoArt class="topo-art--soft" seed={2} />
+          <div class="container narrow">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+              <ol>
+                <li><a href="/">Ana Sayfa</a></li>
+                <li><a href="/hizmetler/">Hizmetler</a></li>
+                <li aria-current="page">{service.seoName}</li>
+              </ol>
+            </nav>
+            <h1>{service.title}</h1>
+            <p class="lead">{service.summary}</p>
+            {!service.onaylandi && <p><span class="draft-badge">TASLAK</span></p>}
+          </div>
+        </section>
+
+        <section class="section section-light">
+          <div class="container detail-grid">
+            <div class="prose">
+              {service.detail.map((paragraph) => <p>{paragraph}</p>)}
+
+              <h2>Bu hizmet ne zaman gerekir?</h2>
+              <ul class="check-list">
+                {
+                  service.whenNeeded.map((item) => (
+                    <li>
+                      <Icon name="check" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+
+              <h2>Fiyatı neler belirler?</h2>
+              <p>
+                Fiyat, işin koşullarına göre belirlenir. Teklif için aşağıdaki bilgilerin paylaşılması
+                yeterlidir:
+              </p>
+              <ul class="check-list">
+                {
+                  factors.map((item) => (
+                    <li>
+                      <Icon name="check" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+
+            <aside class="call-card on-dark" aria-label="Teklif için arayın">
+              <Icon name="phone" />
+              <h2>Teklif için arayın</h2>
+              <p>İşi anlatın, ihtiyacınıza göre teklif hazırlayalım.</p>
+              <a class="btn btn-primary btn-lg" href={site.phone.href}>
+                {site.phone.display}
+              </a>
+              {
+                waLink && (
+                  <WhatsAppButton class="btn btn-wa btn-lg call-card-wa" href={waLink} />
+                )
+              }
+            </aside>
+          </div>
+        </section>
+
+        {
+          others.length > 0 && (
+            <section class="section section-paper" aria-labelledby="diger-baslik">
+              <div class="container">
+                <div class="section-head">
+                  <p class="eyebrow">Hizmetler</p>
+                  <h2 id="diger-baslik">Diğer hizmetler</h2>
+                </div>
+                <ul class="link-list">
+                  {others.map((item) => (
+                    <li>
+                      <a href={`/hizmetler/${item.slug}/`}>
+                        <Icon name={item.icon} />
+                        <span>{item.title}</span>
+                        <Icon class="link-list-arrow" name="arrow" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )
+        }
+      </>
+    ) : (
+      <>
+        <section class="page-head on-dark">
+          <TopoArt class="topo-art--soft" seed={1} />
+          <div class="container narrow">
+            <p class="eyebrow">Hizmetler</p>
+            <h1>Neler yapıyoruz?</h1>
+            <p class="lead">
+              Hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya'da ihtiyacınızı anlatmak için
+              bizi arayabilirsiniz.
+            </p>
+          </div>
+        </section>
+
+        <section class="section section-light">
+          <div class="container">
+            <div class="card-grid">
+              {visibleServices.map((item, i) => (
+                <ServiceCard service={item} index={i + 1} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <FaqSection tone="paper" />
+      </>
+    )
+  }
+</BaseLayout>

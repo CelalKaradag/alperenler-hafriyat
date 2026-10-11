@@ -1,0 +1,90 @@
+---
+import { navItems } from '../data/nav';
+import { visibleServices } from '../data/services';
+import { site, whatsappUrl } from '../data/site';
+import LogoMark from './LogoMark.astro';
+import MapBand from './MapBand.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  /** false: harita şeridi gösterilmez (iletişim sayfası kendi şeridini taşır) */
+  map?: boolean;
+  /** false: üstteki "Projeniz için teklif alın" şeridi gösterilmez (ana sayfada iletişim bölümü var) */
+  cta?: boolean;
+}
+
+const { map = true, cta = true } = Astro.props;
+const year = new Date().getFullYear();
+const hasServices = visibleServices.length > 0;
+---
+
+<footer class="site-footer on-dark">
+  {
+    cta && (
+      <section class="footer-cta" aria-labelledby="footer-cta-baslik">
+        <div class="container footer-cta-inner">
+          <div>
+            <h2 id="footer-cta-baslik">Projeniz için teklif alın</h2>
+            <p>İhtiyacınızı anlatın, işin koşullarına göre teklif hazırlayalım.</p>
+          </div>
+          <div class="btn-row">
+            <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+            {whatsappUrl && <WhatsAppButton class="btn btn-wa btn-lg" href={whatsappUrl} />}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {map && <MapBand />}
+
+  <div class:list={['container', 'footer-cols', hasServices && 'footer-cols--services']}>
+    <div class="footer-brand">
+      <p class="brand" aria-hidden="true">
+        <LogoMark class="brand-mark" />
+        <span class="brand-text">
+          <span class="brand-top">ALPERENLER</span>
+          <span class="brand-bottom">HAFRİYAT</span>
+        </span>
+      </p>
+      <p class="footer-legal">
+        {site.legalName}, Yeşilyurt / Malatya. İhtiyacınızı konuşmak için bizi arayabilirsiniz.
+      </p>
+    </div>
+
+    <nav aria-label="Alt menü">
+      <h2 class="footer-title">Sayfalar</h2>
+      <ul class="footer-list">
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    {
+      hasServices && (
+        <nav aria-label="Hizmetler">
+          <h2 class="footer-title">Hizmetler</h2>
+          <ul class="footer-list footer-list--services">
+            {visibleServices.map((service) => (
+              <li>
+                <a href={`/hizmetler/${service.slug}/`}>{service.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© {year} {site.legalName}</p>
+    <a href="/gizlilik/">Gizlilik ve Çerezler</a>
+  </div>
+
+  <p class="footer-mark" aria-hidden="true">ALPERENLER</p>
+</footer>

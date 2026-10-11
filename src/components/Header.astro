@@ -1,0 +1,141 @@
+---
+import { navItems } from '../data/nav';
+import { site } from '../data/site';
+import LogoMark from './LogoMark.astro';
+
+const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => {
+  const path = href.replace(/\/+$/, '') || '/';
+  return path === '/' ? current === '/' : current === path || current.startsWith(`${path}/`);
+};
+---
+
+<header class="site-header on-dark" transition:persist="site-header">
+  <a class="skip-link" href="#icerik">İçeriğe geç</a>
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label={`${site.name} – Ana Sayfa`}>
+      <LogoMark class="brand-mark" />
+      <span class="brand-text">
+        <span class="brand-top">ALPERENLER</span>
+        <span class="brand-bottom">HAFRİYAT</span>
+      </span>
+    </a>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      hidden
+    >
+      <span class="nav-toggle-label">Menü</span>
+    </button>
+
+    <nav id="site-nav" class="site-nav" aria-label="Ana menü">
+      <ul>
+        {
+          navItems.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a class="header-phone" href={site.phone.href}>
+      <span class="header-phone-label">Bizi arayın</span>
+      <span class="header-phone-number">{site.phone.display}</span>
+    </a>
+    <a class="btn btn-primary header-call" href={site.phone.href}>Hemen Ara</a>
+  </div>
+
+  <!--
+    Satır içi (inline) betik: sayfa çizilmeden çalışır, böylece menü ve şeffaf header
+    yanıp sönmez. JavaScript kapalıysa hiçbir şey eklenmez: menü açık, header koyu kalır.
+    Header sayfa geçişlerinde korunduğu (transition:persist) için betik yalnızca bir kez çalışır.
+  -->
+  <script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var header = document.querySelector('.site-header');
+    if (!header || header.getAttribute('data-nav-ready')) return;
+    var toggle = header.querySelector('.nav-toggle');
+    var nav = header.querySelector('#site-nav');
+    var label = toggle && toggle.querySelector('.nav-toggle-label');
+    if (!toggle || !nav || !label) return;
+    header.setAttribute('data-nav-ready', '1');
+
+    root.classList.add('js');
+    header.classList.add('js-nav');
+    toggle.hidden = false;
+
+    var desktop = window.matchMedia('(min-width: 48em)');
+
+    function setOpen(open, returnFocus) {
+      header.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      label.textContent = open ? 'Kapat' : 'Menü';
+      if (!open && returnFocus) toggle.focus();
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true', false);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false, true);
+      }
+    });
+
+    nav.addEventListener('click', function (event) {
+      if (event.target.closest && event.target.closest('a')) setOpen(false, false);
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!header.contains(event.target)) setOpen(false, false);
+    });
+
+    if (desktop.addEventListener) {
+      desktop.addEventListener('change', function () {
+        setOpen(false, false);
+      });
+    }
+
+    // Kaydırınca şeffaftan koyu yüzeye geçiş
+    var ticking = false;
+    function update() {
+      ticking = false;
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+    }
+    window.addEventListener(
+      'scroll',
+      function () {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+
+    // Sayfa geçişinden sonra: menüyü kapat, geçerli sayfa işaretini ve kaydırma durumunu yenile
+    document.addEventListener('astro:page-load', function () {
+      setOpen(false, false);
+      var path = location.pathname.replace(/\/+$/, '') || '/';
+      var links = nav.querySelectorAll('a');
+      for (var i = 0; i < links.length; i++) {
+        var href = (links[i].getAttribute('href') || '').replace(/\/+$/, '') || '/';
+        var isCurrent = href === '/' ? path === '/' : path === href || path.indexOf(href + '/') === 0;
+        if (isCurrent) links[i].setAttribute('aria-current', 'page');
+        else links[i].removeAttribute('aria-current');
+      }
+      update();
+    });
+  })();
+  </script>
+</header>
