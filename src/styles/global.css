@@ -358,6 +358,11 @@ section[id] {
   color: var(--on-dark);
 }
 
+/* Sayfa başlığının hemen altındaki bölüm: kartların üstünde büyük boş alan kalmasın */
+.section--flush-top {
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
 .section-head {
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
@@ -1271,6 +1276,9 @@ section[id] {
   min-width: 0;
   overflow: hidden;
   background: var(--surface);
+  /* Koyu yüzeyli kart: yazı/bağlantı rengi bulunduğu (açık) bölümden miras alınmaz */
+  color: var(--on-dark);
+  --focus: var(--accent);
   border: 1px solid var(--line-dark);
   border-radius: var(--radius);
   transition:
@@ -1462,8 +1470,12 @@ section[id] {
 }
 
 .service-card:has(h3 a:focus-visible) {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--card-ring, var(--text));
   outline-offset: 3px;
+}
+
+.on-dark .service-card {
+  --card-ring: var(--accent);
 }
 
 /* ---------- Hizmet detay ---------- */
@@ -2932,6 +2944,12 @@ textarea.wizard-input {
     gap: 0.75rem;
     --focus: var(--accent);
   }
+}
+
+.floating-actions :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px rgba(20, 22, 26, 0.92);
 }
 
 .to-top,
