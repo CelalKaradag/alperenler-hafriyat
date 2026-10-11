@@ -2,14 +2,16 @@
  * Hizmet listesi.
  *
  * `onaylandi: true`  → her yerde görünür (menü, ana sayfa, /hizmetler, detay sayfaları).
- * `onaylandi: false` → YALNIZCA `npm run dev` sırasında görünür ve "TASLAK" rozeti taşır.
- *                      Yayın çıktısında (`npm run build`) ne kart ne menü ne de sayfa üretilir.
+ * `onaylandi: false` → YALNIZCA `showDrafts` (src/data/drafts.ts) true iken görünür ve "TASLAK" rozeti taşır:
+ *                      `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i.
+ *                      Normal yayın çıktısında ne kart ne menü ne de sayfa üretilir; JSON-LD'ye girmez.
  *
  * Firma bir hizmeti doğruladığında yalnızca `onaylandi` değerini `true` yapmak yeterlidir.
  * Metinlerde deneyim, makine sayısı, süre, fiyat veya garanti ifadesi yoktur; eklenmemelidir.
  */
 
 import type { IconName } from '../utils/icons';
+import { showDrafts } from './drafts';
 
 export interface Service {
   slug: string;
@@ -219,7 +221,7 @@ export const services: Service[] = [
   },
 ];
 
-/** Yayında (build) yalnızca onaylılar; geliştirmede (dev) taslaklar da. */
+/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build'i) iken taslaklar da. */
 export const visibleServices: Service[] = services.filter(
-  (service) => service.onaylandi || import.meta.env.DEV,
+  (service) => service.onaylandi || showDrafts,
 );

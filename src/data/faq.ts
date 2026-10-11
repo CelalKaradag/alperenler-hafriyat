@@ -2,12 +2,15 @@
  * Sık sorulan sorular.
  *
  * `onaylandi: true`  → ana sayfada, /hizmetler sayfasında ve FAQPage JSON-LD'de görünür.
- * `onaylandi: false` → yalnızca `npm run dev` sırasında görünür ("TASLAK" rozetiyle);
- *                      yayın çıktısında (build) hiç üretilmez.
+ * `onaylandi: false` → yalnızca `showDrafts` (src/data/drafts.ts) true iken görünür: `npm run dev` ya da
+ *                      `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i ("TASLAK" rozetiyle).
+ *                      Normal yayın çıktısında hiç üretilmez; JSON-LD'ye hiçbir zaman girmez.
  *
  * Cevaplar bilerek genel ve koşulludur; rakam, süre, garanti veya "en iyi" ifadesi yoktur.
  * Firma her cevabı okuyup onayladıktan sonra `onaylandi` değerini `true` yapmalıdır.
  */
+
+import { showDrafts } from './drafts';
 
 export interface Faq {
   question: string;
@@ -60,8 +63,8 @@ export const faqs: Faq[] = [
   },
 ];
 
-/** Yayında (build) yalnızca onaylılar; geliştirmede (dev) taslaklar da. */
-export const visibleFaqs: Faq[] = faqs.filter((item) => item.onaylandi || import.meta.env.DEV);
+/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build'i) iken taslaklar da. */
+export const visibleFaqs: Faq[] = faqs.filter((item) => item.onaylandi || showDrafts);
 
 /** JSON-LD için yalnızca onaylılar (taslaklar yapısal veriye girmez) */
 export const approvedFaqs: Faq[] = faqs.filter((item) => item.onaylandi);

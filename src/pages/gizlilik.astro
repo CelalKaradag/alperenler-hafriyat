@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { showDrafts } from '../data/drafts';
 import { site } from '../data/site';
 
 // Firma tarafından doldurulacak alanlar (uydurma bilgi yok)
 const TODO = '[firma tarafından doldurulacak]';
-const isDraft = import.meta.env.DEV;
+const isDraft = showDrafts;
 ---
 
 <BaseLayout

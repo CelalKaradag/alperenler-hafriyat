@@ -7,6 +7,7 @@ import Footer from '../components/Footer.astro';
 import MobileCallBar from '../components/MobileCallBar.astro';
 import FloatingActions from '../components/FloatingActions.astro';
 import { publicFileExists } from '../utils/assets';
+import { isPreviewBuild } from '../data/drafts';
 
 interface Props {
   title: string;
@@ -58,6 +59,13 @@ const heroFont = publicFileExists('/fonts/archivo-latin.woff2') ? '/fonts/archiv
     <ClientRouter />
   </head>
   <body class:list={[overHero && 'over-hero']}>
+    {
+      isPreviewBuild && (
+        <div class="preview-bar" role="note">
+          Önizleme sürümü – içerikler onay bekliyor
+        </div>
+      )
+    }
     <Header />
     <main id="icerik" tabindex="-1">
       <slot />

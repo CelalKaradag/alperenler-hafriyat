@@ -543,6 +543,17 @@ section[id] {
   color: var(--accent);
 }
 
+/* Önizleme sürümü şeridi (yalnızca PUBLIC_SHOW_DRAFTS=true ile alınan build'de) */
+.preview-bar {
+  padding: 0.3rem var(--gutter);
+  background: var(--accent);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
 /* ---------- Header ---------- */
 
 .site-header {

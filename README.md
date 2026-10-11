@@ -35,7 +35,7 @@ Tüm firma/iletişim bilgisi tek dosyada: [src/data/site.ts](src/data/site.ts)
 Hizmetler [src/data/services.ts](src/data/services.ts) içindedir. Şu an 8 hizmet **taslak** olarak (`onaylandi: false`) tanımlıdır.
 
 - `onaylandi: true` → menü, ana sayfa, `/hizmetler/` ve `/hizmetler/<slug>/` sayfalarında görünür.
-- `onaylandi: false` → yalnızca `npm run dev` sırasında görünür, kartta "TASLAK" rozeti olur. `npm run build` çıktısında ne kart, ne menü öğesi, ne de sayfa üretilir.
+- `onaylandi: false` → yalnızca `showDrafts` iken görünür (`npm run dev` ya da `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i, bkz. "Netlify önizleme"); kartta "TASLAK" rozeti olur. Normal `npm run build` çıktısında ne kart, ne menü öğesi, ne de sayfa üretilir.
 - Firma bir hizmeti doğruladığında yalnızca o hizmetin `onaylandi` değerini `true` yapın; metni de gözden geçirin. Hiç onaylı hizmet yoksa `/hizmetler/` sayfası da üretilmez.
 - Taslak metinlerde deneyim, makine sayısı, süre, fiyat, garanti veya "en iyi/lider" ifadesi bilerek yoktur; eklenmemelidir.
 - `keywords` alanı yalnızca veri olarak durur; sayfada görünür liste olarak basılmaz ve meta keywords eklenmez.
@@ -89,7 +89,7 @@ Notlar:
 
 ## Sık sorulan sorular
 
-[src/data/faq.ts](src/data/faq.ts): her soruda `onaylandi`. `false` olanlar yalnızca `npm run dev`'de "TASLAK" rozetiyle görünür; yayın çıktısında ve FAQPage JSON-LD'de yer almaz. Cevaplar firma tarafından okunup onaylanmalı, sonra `onaylandi: true` yapılmalıdır.
+[src/data/faq.ts](src/data/faq.ts): her soruda `onaylandi`. `false` olanlar yalnızca `showDrafts` iken (`npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` önizleme build'i) "TASLAK" rozetiyle görünür; normal yayın çıktısında ve FAQPage JSON-LD'de yer almaz. Cevaplar firma tarafından okunup onaylanmalı, sonra `onaylandi: true` yapılmalıdır.
 
 ## Harita
 
@@ -156,6 +156,26 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 - CSS tek paket dosyasıdır (Astro varsayılanı); kritik CSS ayrıca inline edilmedi.
 
 **Ölçüm (Lighthouse):** `npm run build` ardından `npm run preview` ile yayına yakın çıktı üzerinde test edin (`npm run dev` üzerinde değil). Önce/sonra için `public/fonts` ve `dist/_astro` boyutlarına, ana sayfa HTML'inin boyutuna (`(Get-Item dist\index.html).Length`) bakın.
+
+## Netlify önizleme
+
+[netlify.toml](netlify.toml) ile siteyi Netlify'a önizleme olarak koyabilirsiniz (`npm run build`, yayın klasörü `dist`, Node `24.13.0`).
+
+**Taslak bayrağı — `PUBLIC_SHOW_DRAFTS`** ([src/data/drafts.ts](src/data/drafts.ts)): `showDrafts = import.meta.env.DEV || PUBLIC_SHOW_DRAFTS === 'true'`.
+- `true` iken `onaylandi: false` hizmetler ve SSS maddeleri build çıktısına girer: menüde "Hizmetler", ana sayfa kartları, `/hizmetler/` ve detay sayfaları, footer listesi, teklif sihirbazının 1. adımı, SSS bölümü ve gizlilik sayfasındaki taslak uyarısı. "TASLAK" rozetleri görünür.
+- Sayfanın en üstünde ince sarı şerit çıkar: "Önizleme sürümü – içerikler onay bekliyor" (yalnızca bu önizleme build'inde; `npm run dev`'de ve normal yayında yok).
+- **JSON-LD'ye (Service, FAQPage) taslaklar hiçbir zaman girmez**; yalnızca `onaylandi: true` olanlar girer.
+- Yerelde denemek: `$env:PUBLIC_SHOW_DRAFTS = 'true'; npm run build; npm run preview` (PowerShell) veya `.env` dosyasına `PUBLIC_SHOW_DRAFTS=true` yazın ([.env.example](.env.example)).
+
+**Önizlemede arama motorlarından gizleme:** `netlify.toml` içindeki `[[headers]]` bloğu tüm yollara `X-Robots-Tag: noindex, nofollow` ekler. Ayrıca sayfalarda `noindex` meta etiketi vardır (`site.publish.indexable: false`).
+
+**404:** Netlify, publish dizinindeki `404.html`'i (Astro `dist/404.html` üretir) eşleşmeyen yollar için otomatik kullanır; ek ayar gerekmez.
+
+### Gerçek yayına geçerken kapatılacaklar
+1. `netlify.toml` → `PUBLIC_SHOW_DRAFTS` değerini `"false"` yapın veya satırı silin (ya da Netlify panelinde değişkeni silin). Hâlâ yayına girmesi istenen hizmet/SSS için `onaylandi: true` yapın.
+2. `netlify.toml` → `[[headers]]` (`X-Robots-Tag`) bloğunu kaldırın.
+3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
+4. Yayın öncesi kontrol listesindeki diğer maddeler (gizlilik sayfası yer tutucuları, logo, `og-image.png`, koordinat/İşletme Profili).
 
 ## Henüz doğrulanmamış / eksik içerik
 

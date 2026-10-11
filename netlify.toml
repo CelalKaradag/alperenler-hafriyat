@@ -1,0 +1,23 @@
+# Netlify yapılandırması – ÖNİZLEME sürümü.
+# Gerçek yayından önce aşağıdaki "ÖNİZLEME" notlarındaki ayarları kapatın (README: "Netlify önizleme").
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24.13.0"
+  # Önizleme: onaylanmamış (taslak) hizmetler ve SSS build'e girer, "TASLAK" rozetli görünür
+  # ve sayfanın üstünde "Önizleme sürümü" şeridi çıkar. JSON-LD'ye taslaklar hiçbir zaman girmez.
+  # Gerçek yayından önce "false" yap veya bu satırı sil.
+  PUBLIC_SHOW_DRAFTS = "true"
+
+# Önizleme döneminde arama motorlarından gizle (tüm yollar).
+# Gerçek yayında bu bloğu KALDIRIN (site.publish.indexable ile birlikte, bkz. README).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# 404: Netlify, publish dizinindeki 404.html dosyasını eşleşmeyen tüm yollar için otomatik kullanır
+# (Astro bunu dist/404.html olarak üretir); ek ayar gerekmez.
