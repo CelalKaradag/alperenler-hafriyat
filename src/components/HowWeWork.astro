@@ -1,5 +1,5 @@
 ---
-import { site } from '../data/site';
+import { whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
 
 const steps = [
@@ -7,7 +7,8 @@ const steps = [
     number: '01',
     icon: 'phone',
     title: 'Bizi arayın',
-    text: `${site.phone.display} numarasından bize ulaşın.`,
+    // Numara metin olarak yazılmaz (ana sayfada yalnızca header ve footer harita kartında görünür)
+    text: whatsappUrl ? "Telefonla veya WhatsApp'tan bize ulaşın." : 'Bizi telefonla arayın.',
   },
   {
     number: '02',

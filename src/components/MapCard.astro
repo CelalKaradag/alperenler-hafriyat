@@ -19,7 +19,7 @@ import TopoArt from './TopoArt.astro';
   <div class="map-slot" data-map-slot></div>
 
   <div class="map-stage">
-    <TopoArt class="topo-art--soft" seed={5} density="low" />
+    <TopoArt variant="low" />
     <div class="map-center">
       <span class="map-pin" aria-hidden="true">
         <span class="map-pulse"></span>
@@ -43,6 +43,18 @@ import TopoArt from './TopoArt.astro';
       </a>
     </div>
   </div>
+
+  <!--
+    Koruma katmanı: harita yüklenince iframe'in üstünü kaplar; sayfa normal kayar ve Google'ın
+    "ctrl + kaydırma" uyarısı çıkmaz. Tıklayınca/dokununca kalkar (src/scripts/map-card.js).
+    Yüzen iletişim kartı (MapBand) bunun üstünde kalır.
+  -->
+  <button type="button" class="map-shield" data-map-shield aria-label="Haritayı etkinleştir">
+    <span class="map-hint" aria-hidden="true">
+      <span class="map-hint-mouse">Haritayı kullanmak için tıklayın</span>
+      <span class="map-hint-touch">Haritayı kullanmak için dokunun</span>
+    </span>
+  </button>
 
   <!--
     Koordinat tanımlıysa Google iğnesi çıkmaz (embed'de q yok); kendi sarı iğnemiz serbest alanın

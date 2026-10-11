@@ -1,21 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import HeroInfoStrip from '../components/HeroInfoStrip.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import StatsStrip from '../components/StatsStrip.astro';
 import GallerySection from '../components/GallerySection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
-import ContactQuote from '../components/ContactQuote.astro';
+import PriceWizard from '../components/PriceWizard.astro';
+import TopoArt from '../components/TopoArt.astro';
+import LogoMark from '../components/LogoMark.astro';
 import FaqSection from '../components/FaqSection.astro';
 import JsonLd from '../components/JsonLd.astro';
-import { approvedFaqs } from '../data/faq';
-import { mapsUrl, site } from '../data/site';
+import { approvedFaqs, visibleFaqs } from '../data/faq';
+import { site } from '../data/site';
 import { faqSchema, localBusinessSchema } from '../utils/schema';
 import { visibleServices } from '../data/services';
 import { publicFileExists } from '../utils/assets';
 
-// Görsel yoksa sağ sütunda yalnızca "Firma Bilgileri" kartı görünür.
+// Fotoğraf yoksa sağ sütunda dekoratif koyu panel görünür (iletişim bilgisi yok).
 const aboutImage = '/images/hakkimizda.jpg';
 const hasAboutImage = publicFileExists(aboutImage);
 ---
@@ -32,7 +33,6 @@ const hasAboutImage = publicFileExists(aboutImage);
   </Fragment>
 
   <Hero scrollTarget="#firma" />
-  <HeroInfoStrip />
 
   <section id="firma" class="section section-light" aria-labelledby="firma-baslik">
     <div class="container about reveal">
@@ -51,41 +51,19 @@ const hasAboutImage = publicFileExists(aboutImage);
         </p>
       </div>
 
-      <div class:list={['about-side', hasAboutImage && 'about-side--photo']}>
-        {
-          hasAboutImage && (
-            <div class="about-media">
-              <img src={aboutImage} alt="" loading="lazy" decoding="async" />
-            </div>
-          )
-        }
-        <aside class="company-card on-dark" aria-labelledby="firma-bilgileri">
-          <h3 id="firma-bilgileri">Firma Bilgileri</h3>
-          <dl class="company-list">
-            <div>
-              <dt>Firma adı</dt>
-              <dd>{site.legalName}</dd>
-            </div>
-            <div>
-              <dt>Adres</dt>
-              <dd><address>{site.address}</address></dd>
-            </div>
-            <div>
-              <dt>Telefon</dt>
-              <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
-            </div>
-            <div>
-              <dt>Harita</dt>
-              <dd>
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
-                  Google Maps'te göster<span class="visually-hidden"> (yeni sekmede açılır)</span>
-                </a>
-              </dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
-    </div>
+      {
+        hasAboutImage ? (
+          <div class="about-media">
+            <img src={aboutImage} alt="" loading="lazy" decoding="async" />
+          </div>
+        ) : (
+          <div class="about-panel" aria-hidden="true">
+            <TopoArt variant="soft" />
+            <LogoMark class="about-panel-mark" />
+            <p class="about-panel-label">YEŞİLYURT · MALATYA</p>
+          </div>
+        )
+      }    </div>
   </section>
 
   <StatsStrip />
@@ -121,5 +99,6 @@ const hasAboutImage = publicFileExists(aboutImage);
 
   <FaqSection />
 
-  <ContactQuote />
+  <!-- Fiyat + sihirbaz (açık zemin): footer'ın koyu harita şeridinden önce son bölüm. SSS görünürse zemin tonu değişir. -->
+  <PriceWizard tone={visibleFaqs.length > 0 ? 'paper' : 'light'} />
 </BaseLayout>

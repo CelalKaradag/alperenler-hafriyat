@@ -32,6 +32,8 @@ const {
 
 // Dosya yoksa etiket basılmaz (README: apple-touch-icon.png)
 const hasAppleIcon = publicFileExists('/apple-touch-icon.png');
+// Hero başlığında kullanılan Archivo (latin) dosyası; scripts/subset-fonts.mjs üretir
+const heroFont = publicFileExists('/fonts/archivo-latin.woff2') ? '/fonts/archivo-latin.woff2' : null;
 ---
 
 <!doctype html>
@@ -42,6 +44,11 @@ const hasAppleIcon = publicFileExists('/apple-touch-icon.png');
     <meta name="theme-color" content="#14161a" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {hasAppleIcon && <link rel="apple-touch-icon" href="/apple-touch-icon.png" />}
+    {
+      heroFont && (
+        <link rel="preload" as="font" type="font/woff2" href={heroFont} crossorigin />
+      )
+    }
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>

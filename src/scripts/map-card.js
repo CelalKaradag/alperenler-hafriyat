@@ -24,6 +24,8 @@ function setup(card, cleanups) {
   if (card.dataset.ready) return;
   const slot = card.querySelector('[data-map-slot]');
   const show = card.querySelector('[data-map-show]');
+  const shield = card.querySelector('[data-map-shield]');
+  let frameEl = null;
   const embed = card.dataset.embed;
   if (!slot || !embed) return;
   card.dataset.ready = '1';
@@ -60,6 +62,53 @@ function setup(card, cleanups) {
 
     frame.src = embed;
     slot.appendChild(frame);
+    frameEl = frame;
+  }
+
+  /*
+   * Koruma katmanı (map-shield): harita yüklenince iframe'in üstünü şeffaf bir düğme kaplar.
+   * Varsayılan olarak tıklama/kaydırmayı katman alır; sayfa normal kayar ve Google'ın
+   * "ctrl + kaydırma ile yakınlaştırın" uyarısı hiç tetiklenmez. Tıklayınca/dokununca katman
+   * kalkar (harita kullanılabilir olur); fare haritadan çıkınca, sayfa kayınca, dışarı
+   * basılınca veya Escape ile geri gelir.
+   */
+  function activateMap() {
+    if (!shield || card.dataset.active) return;
+    card.dataset.active = '1';
+    shield.hidden = true;
+    if (frameEl) frameEl.focus(); // klavye kullanıcısı için odak haritaya geçer
+    window.addEventListener('scroll', deactivateMap, { passive: true });
+    document.addEventListener('pointerdown', onOutsidePress, true);
+    document.addEventListener('keydown', onKeyDown);
+  }
+
+  function deactivateMap() {
+    if (!shield || !card.dataset.active) return;
+    delete card.dataset.active;
+    shield.hidden = false;
+    window.removeEventListener('scroll', deactivateMap);
+    document.removeEventListener('pointerdown', onOutsidePress, true);
+    document.removeEventListener('keydown', onKeyDown);
+  }
+
+  function onOutsidePress(event) {
+    if (!card.contains(event.target)) deactivateMap();
+  }
+
+  function onKeyDown(event) {
+    if (event.key === 'Escape') deactivateMap();
+  }
+
+  if (shield) {
+    shield.addEventListener('click', activateMap);
+    card.addEventListener('pointerleave', (event) => {
+      if (event.pointerType === 'mouse') deactivateMap();
+    });
+    cleanups.push(() => {
+      window.removeEventListener('scroll', deactivateMap);
+      document.removeEventListener('pointerdown', onOutsidePress, true);
+      document.removeEventListener('keydown', onKeyDown);
+    });
   }
 
   // Save-Data: otomatik yükleme yok, eski tıkla-yükle düğmesine düş

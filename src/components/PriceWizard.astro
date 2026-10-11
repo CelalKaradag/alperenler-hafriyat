@@ -1,0 +1,49 @@
+---
+import { defaultPriceFactors } from '../data/services';
+import Icon from './Icon.astro';
+import QuoteWizard from './QuoteWizard.astro';
+
+interface Props {
+  /** Bölüm zemini: komşu bölümlerle aynı tonda olmasın diye seçilir */
+  tone?: 'light' | 'paper';
+}
+
+const { tone = 'light' } = Astro.props;
+---
+
+<!--
+  Fiyat etkenleri + teklif sihirbazı TEK bölümde. Telefon numarası metin olarak burada yok
+  (yalnızca düğmeler): ana sayfada numara yalnızca header'da ve footer harita kartında görünür.
+-->
+<section class:list={['section', `section-${tone}`]} aria-labelledby="teklif-baslik">
+  <div class="container reveal">
+    <div class="section-head">
+      <p class="eyebrow">Fiyat teklifi</p>
+      <h2 id="teklif-baslik">Fiyatı ne belirler?</h2>
+      <p class="lead">
+        Her sahanın koşulları farklıdır; bu yüzden fiyat, işi öğrendikten sonra verilir. Aşağıdaki
+        bilgiler teklif için yeterlidir.
+      </p>
+    </div>
+
+    <div class="price-wizard">
+      <div class="price-info">
+        <ul class="factor-list factor-list--light">
+          {
+            defaultPriceFactors.map((factor) => (
+              <li>
+                <Icon name="check" />
+                <span>{factor}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="price-note">
+          Teklif için soldaki bilgileri sihirbazla hazırlayın veya doğrudan arayın.
+        </p>
+      </div>
+
+      <QuoteWizard />
+    </div>
+  </div>
+</section>

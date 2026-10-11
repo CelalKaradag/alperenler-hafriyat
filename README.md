@@ -95,6 +95,7 @@ Notlar:
 
 [MapBand.astro](src/components/MapBand.astro) tam genişlik (full-bleed) harita şeridi + üstünde yüzen iletişim kartıdır (masaüstü ~440 px, tablet ~380 px, mobilde ~260 px; mobilde kart haritanın altında). Footer'da (CTA şeridinin altında) ve iletişim sayfasında (orada footer haritası gizli) kullanılır. Harita alanı [MapCard.astro](src/components/MapCard.astro). Haritanın ve iğnenin görünen merkezi, kartın sağında kalan alanın ortasına denk gelir. **Harita, kart görünür alana yaklaşınca (yaklaşık 300 px önce) Google'dan otomatik yüklenir**; HTML'de iframe yoktur, sayfa açılırken Google'a istek gitmez. Yüklenene kadar tasarım kartı bekleme ekranı olarak kalır (iğne nabzı sürer), iframe `load` olunca kart yumuşakça kaybolur. Sağ altta "Yol tarifi al" düğmesi sabittir. Mantık [map-card.js](src/scripts/map-card.js) içindedir.
 
+- **Koruma katmanı (map-shield):** harita yüklenince iframe'in üstünü şeffaf bir düğme ("Haritayı etkinleştir") kaplar; sayfa normal kayar ve Google'ın "ctrl + kaydırma ile yakınlaştırın" uyarısı çıkmaz. Fare üzerindeyken "Haritayı kullanmak için tıklayın" (dokunmatikte "dokunun") etiketi belirir. Tıklayınca/dokununca/Enter-Space ile katman kalkar ve harita sürüklenip yakınlaştırılabilir; fare haritadan çıkınca, sayfa kayınca, dışarı basılınca veya Escape ile katman geri gelir. Yüzen iletişim kartı her zaman katmanın üstündedir.
 - 8 saniye içinde yüklenmezse veya hata olursa kart kalır ve "Google Maps'te aç" bağlantısı görünür. JavaScript yoksa da kart + bu bağlantı görünür.
 - Tarayıcıda Veri Tasarrufu (Save-Data) açıksa otomatik yükleme yapılmaz; "Haritayı göster" düğmesi çıkar ve harita tıklanınca yüklenir.
 - Sayfa geçişlerinde gözlemci ve zamanlayıcılar temizlenir; çift iframe oluşmaz.
@@ -132,6 +133,29 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 
 - Hepsi [src/utils/schema.ts](src/utils/schema.ts) içinde üretilir. Ana sayfa ve iletişim: `GeneralContractor` (ad, unvan, telefon, adres). Onaylı hizmet detaylarında `Service`, onaylı SSS varsa `FAQPage`. `url` yalnızca `site` (alan adı) tanımlıysa, `sameAs` yalnızca `site.ts`'de `sameAs` doluysa eklenir. `geo`, `openingHours`, `priceRange`, `aggregateRating`, `review` bilerek yoktur.
 - Sayfa geçişleri Astro `ClientRouter` ile yapılır; header sabit kalır (`transition:persist`). Sayfaya bağlı betikler (reveal, hero video, sihirbaz) [page-init.js](src/scripts/page-init.js) içinde her sayfa yüklenişinde yeniden başlatılır. Hareket azaltma açıkken geçiş animasyonu yoktur.
+
+## Performans
+
+`npm run dev` ve `npm run build` öncesinde (`predev` / `prebuild` → `npm run prepare:assets`) iki betik otomatik çalışır; elle çalıştırmak gerekmez:
+
+**1) Font kırpma — [scripts/subset-fonts.mjs](scripts/subset-fonts.mjs)** (saf JS, `subset-font 2.9.0`; Python gerekmez)
+- `node_modules/@fontsource-variable/{archivo,inter}` içindeki latin + latin-ext dosyalarını, yalnızca gereken karakterlere (ASCII, Türkçe harfler, şapkalılar, tırnak/tire/üç nokta, `→ ₺ € © ®` vb.) kırpar (eksenler korunur); çıktı `public/fonts/*.woff2` olur:
+  - **Eksenler KIRPILMAZ.** `variationAxes` ile eksen daraltma denendi ve Archivo'nun geniş biçimini bozdu (başlıklar, düğmeler dar göründü); bu yüzden yalnızca karakter kırpılır, `wght` (ve Archivo'da `wdth`) orijinal aralıklarıyla kalır. `@font-face` aralıkları fontsource'unkiyle aynıdır (Archivo: `100 900` / `62% 125%`, Inter: `100 900`). Betik, ayar değişince çıktıları yeniden üretmek için imzada `SCRIPT_VERSION` kullanır.
+- Aile başına iki dosya üretilir (`*-latin.woff2` ana, `*-latin-ext.woff2` Ğ ğ İ Ş ş ₺ gibi karakterler için). fontsource latin ve latin-ext'i ayrı sunar ve JS ile birleştirilemez; tarayıcı `unicode-range` ile gerekeni alır. Hero başlığındaki Archivo (`archivo-latin.woff2`) `<link rel="preload" as="font">` ile önyüklenir.
+- Çıktılar, kaynak/ayar değişmedikçe yeniden üretilmez (`public/fonts/.cache.json`).
+- **Hata olursa build durmaz:** kırpılamayan dosya yerine aynı adla fontsource dosyasının kopyası konur (daha büyük ama eksiksiz). Betik her zaman 0 koduyla çıkar.
+- **Yeni karakter gerekirse:** `scripts/subset-fonts.mjs` içindeki `TEXT` listesine ekleyin. Ağırlık/genişlik için ayar gerekmez (tüm aralık korunur).
+- Not: `→` ve bazı simgeler fontsource alt kümelerinde yoksa tarayıcı sistem fontuna düşer (görünümde fark etmez).
+
+**2) Topoğrafik desen — [scripts/generate-topo.mjs](scripts/generate-topo.mjs)**
+- Desenler sayfaya inline basılmaz; `public/topo/hero.svg`, `soft.svg`, `low.svg` olarak üretilir ve CSS `background-image` ile kullanılır (tarayıcı önbelleğe alır). Opaklık ve maske CSS'te aynı kaldı. İki ince sarı çizgi SVG dosyasının içindedir (ayrıca inline gerekmez).
+- Betik çalışmazsa desen görünmez, site bozulmaz.
+
+**Betikler ve CSS**
+- Bütün sayfa betikleri Astro'nun paketlediği `type="module"` (varsayılan olarak ertelenir) betiklerdir; ilk boyamayı engellemez. İstisna: `<head>` içindeki tek satırlık `js` sınıfı betiği (ilk boyamadan önce çalışmalı, yoksa hero/başlık yer değiştirir) ve header içindeki menü betiği (header'ın persist edilen elemanında, menünün yanıp sönmemesi için sayfa çizilirken çalışır). İkisi de çok küçüktür.
+- CSS tek paket dosyasıdır (Astro varsayılanı); kritik CSS ayrıca inline edilmedi.
+
+**Ölçüm (Lighthouse):** `npm run build` ardından `npm run preview` ile yayına yakın çıktı üzerinde test edin (`npm run dev` üzerinde değil). Önce/sonra için `public/fonts` ve `dist/_astro` boyutlarına, ana sayfa HTML'inin boyutuna (`(Get-Item dist\index.html).Length`) bakın.
 
 ## Henüz doğrulanmamış / eksik içerik
 

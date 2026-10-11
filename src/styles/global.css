@@ -1,6 +1,11 @@
 /* Alperenler Hafriyat – tasarım sistemi. Fontlar kendi sunucumuzdan (fontsource), dış istek yok. */
 
-/* ---------- Fontlar (yalnızca latin + latin-ext: Türkçe karakterler için) ---------- */
+/* ---------- Fontlar ----------
+   Dosyalar public/fonts/ altındadır ve `npm run dev` / `npm run build` öncesi
+   scripts/subset-fonts.mjs tarafından üretilir: yalnızca gereken karakterler (Türkçe dahil)
+   (değişken eksenler KIRPILMAZ). Kırpma başarısız olursa aynı adlarla fontsource dosyalarının
+   kopyası konur. font-weight / font-stretch aralıkları fontsource'un orijinal değerleridir
+   (Archivo: 100 900 / 62% 125%, Inter: 100 900). Ayrıntı: README "Performans". */
 
 @font-face {
   font-family: 'Archivo Variable';
@@ -8,8 +13,7 @@
   font-display: swap;
   font-weight: 100 900;
   font-stretch: 62% 125%;
-  src: url('../../node_modules/@fontsource-variable/archivo/files/archivo-latin-ext-wdth-normal.woff2')
-    format('woff2-variations');
+  src: url('/fonts/archivo-latin-ext.woff2') format('woff2-variations');
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
@@ -22,8 +26,7 @@
   font-display: swap;
   font-weight: 100 900;
   font-stretch: 62% 125%;
-  src: url('../../node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2')
-    format('woff2-variations');
+  src: url('/fonts/archivo-latin.woff2') format('woff2-variations');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -34,8 +37,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2')
-    format('woff2-variations');
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2-variations');
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
@@ -47,8 +49,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
-    format('woff2-variations');
+  src: url('/fonts/inter-latin.woff2') format('woff2-variations');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -277,6 +278,29 @@ ol {
 
 main:focus {
   outline: none;
+}
+
+/* Footer'dan hemen önceki koyu bölümün alt boşluğu: footer (harita şeridi) ile üst üste binip
+   iki kat boşluk oluşturmasın; tek tutarlı boşluk. */
+:root {
+  --footer-gap: 2.5rem;
+}
+
+@media (min-width: 48em) {
+  :root {
+    --footer-gap: 4rem; /* 64 px */
+  }
+}
+
+main > .section-dark:last-child,
+main > .section-surface:last-child {
+  padding-bottom: var(--footer-gap);
+}
+
+/* Bölümün sonundaki içerik kendi alt boşluğunu eklemesin: toplam boşluk yalnızca --footer-gap */
+main > .section-dark:last-child > .container > :last-child,
+main > .section-surface:last-child > .container > :last-child {
+  margin-bottom: 0;
 }
 
 /* Anchor hedefleri sabit header'ın altında kalmasın */
@@ -808,8 +832,11 @@ section[id] {
   inset: 0;
   width: 100%;
   height: 100%;
-  color: var(--on-dark);
-  opacity: 0.16;
+  /* Desen public/topo/*.svg dosyalarından gelir (scripts/generate-topo.mjs); tarayıcı önbelleğe alır */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.18;
   pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 85% 110% at 82% 45%, #000 18%, transparent 78%);
   mask-image: radial-gradient(ellipse 85% 110% at 82% 45%, #000 18%, transparent 78%);
@@ -820,6 +847,18 @@ section[id] {
   opacity: 0.08;
   -webkit-mask-image: none;
   mask-image: none;
+}
+
+.topo-art--hero {
+  background-image: url('/topo/hero.svg');
+}
+
+.topo-art--soft:not(.topo-art--low) {
+  background-image: url('/topo/soft.svg');
+}
+
+.topo-art--low {
+  background-image: url('/topo/low.svg');
 }
 
 /* Derinlik: çok hafif statik film greni + sağ üstte sıcak (amber) ışık */
@@ -1005,76 +1044,6 @@ section[id] {
   }
 }
 
-/* ---------- Hero altı bilgi şeridi ---------- */
-
-.info-strip {
-  color: var(--on-dark);
-  background: var(--surface);
-  border-top: 1px solid var(--line-dark);
-  border-bottom: 1px solid var(--line-dark);
-}
-
-.info-grid {
-  display: grid;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  min-width: 0;
-  padding-block: 1.1rem;
-}
-
-.info-item + .info-item {
-  border-top: 1px solid var(--line-dark);
-}
-
-.info-icon {
-  color: var(--accent);
-}
-
-.info-label {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--on-dark-muted);
-}
-
-.info-value {
-  display: block;
-  font-weight: 600;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-a.info-value {
-  width: fit-content;
-}
-
-@media (min-width: 48em) {
-  .info-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .info-item {
-    padding-block: 1.4rem;
-    padding-inline: 1.5rem;
-  }
-
-  .info-item:first-child {
-    padding-left: 0;
-  }
-
-  .info-item + .info-item {
-    border-top: 0;
-    border-left: 1px solid var(--line-dark);
-  }
-}
-
 /* ---------- Sayfa başlığı ---------- */
 
 .page-head {
@@ -1145,10 +1114,6 @@ a.info-value {
   max-width: 40rem;
 }
 
-.about-side {
-  position: relative;
-}
-
 .about-media {
   overflow: hidden;
   border-radius: var(--radius);
@@ -1160,72 +1125,43 @@ a.info-value {
   object-fit: cover;
 }
 
-/* Firma bilgileri kartı (yalnızca site.ts'deki doğrulanmış veriler) */
-.company-card {
-  padding: 1.75rem;
+/* Fotoğraf yokken: dekoratif koyu panel (topo deseni + büyük logo işareti + etiket).
+   İletişim bilgisi, telefon veya düğme YOK. */
+.about-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
   background: var(--surface);
   color: var(--on-dark);
-  border-top: 2px solid var(--accent);
+  border: 1px solid var(--line-dark);
   border-radius: var(--radius);
 }
 
-.company-card h3 {
-  margin-bottom: 1.25rem;
-  font-size: 0.8rem;
-  font-stretch: 110%;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.about-panel > :not(.topo-art) {
+  position: relative;
+  z-index: 1;
+}
+
+.about-panel-mark {
+  width: 7.5rem;
+  height: 7.5rem;
   color: var(--accent);
 }
 
-.company-list {
+.about-panel-label {
   margin: 0;
-}
-
-.company-list > div {
-  padding: 0.85rem 0;
-  border-top: 1px solid var(--line-dark);
-}
-
-.company-list > div:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.company-list dt {
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-stretch: 110%;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  text-align: center;
   color: var(--on-dark-muted);
-}
-
-.company-list dd {
-  margin: 0.2rem 0 0;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.company-list a {
-  background-image: linear-gradient(var(--accent), var(--accent));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0 2px;
-  padding-bottom: 0.12em;
-  transition: background-size 0.3s ease;
-}
-
-.company-list a:hover,
-.company-list a:focus-visible {
-  background-size: 100% 2px;
-}
-
-/* Fotoğraf varken kart fotoğrafın üstüne biner */
-.about-side--photo .company-card {
-  position: relative;
-  margin: -3.5rem 1rem 0;
-  box-shadow: 0 18px 40px rgba(20, 22, 26, 0.3);
 }
 
 @media (min-width: 56em) {
@@ -1234,12 +1170,8 @@ a.info-value {
     gap: 5rem;
   }
 
-  .about-side--photo .company-card {
-    position: absolute;
-    right: -1.5rem;
-    bottom: -2rem;
-    width: min(21rem, 80%);
-    margin: 0;
+  .about-panel {
+    aspect-ratio: 4 / 5;
   }
 }
 
@@ -1706,78 +1638,7 @@ a.info-value {
   }
 }
 
-/* ---------- Fiyat + iletişim (birleşik bölüm) ---------- */
-
-.quote {
-  display: grid;
-  gap: 3rem;
-  align-items: center;
-}
-
-.quote > * {
-  min-width: 0;
-}
-
-.contact-quote {
-  position: relative;
-  container-type: inline-size;
-  min-width: 0;
-  overflow: hidden;
-  padding: clamp(1.75rem, 4vw, 3rem);
-  background: var(--surface);
-  border: 1px solid var(--line-dark);
-  border-top: 2px solid var(--accent);
-  border-radius: var(--radius);
-}
-
-.contact-quote > *:not(.topo-art) {
-  position: relative;
-  z-index: 1;
-}
-
-.contact-quote-label {
-  margin: 0 0 0.75rem;
-  font-family: var(--font-display);
-  font-stretch: 110%;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.contact-quote-phone {
-  display: block;
-  margin: 0 0 1.25rem;
-  font-family: var(--font-display);
-  font-stretch: 112%;
-  /* Tek satırda kalmalı: önce vw tabanlı yedek, destekleniyorsa kartın kendi genişliğine göre */
-  font-size: clamp(1.25rem, 0.5rem + 4.4vw, 3.2rem);
-  font-size: min(3.6rem, 10.5cqw);
-  font-weight: 850;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.contact-quote-phone a {
-  background-image: linear-gradient(var(--accent), var(--accent));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0 3px;
-  padding-bottom: 0.08em;
-  transition: background-size 0.3s ease;
-}
-
-.contact-quote-phone a:hover,
-.contact-quote-phone a:focus-visible {
-  background-size: 100% 3px;
-}
-
-.contact-quote address {
-  margin-bottom: 0.75rem;
-  color: var(--on-dark-muted);
-}
+/* ---------- Fiyat etkenleri listesi (ana sayfa fiyat + sihirbaz bölümü, /teklif) ---------- */
 
 .factor-list {
   display: grid;
@@ -1799,10 +1660,38 @@ a.info-value {
   color: var(--accent);
 }
 
+/* ---------- Ana sayfa: fiyat etkenleri + teklif sihirbazı (tek bölüm) ---------- */
+
+.section-head .lead {
+  margin: 1.25rem 0 0;
+}
+
+.price-wizard {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.price-wizard > * {
+  min-width: 0;
+}
+
+.price-note {
+  margin: 1.25rem 0 0;
+  max-width: 30rem;
+  color: var(--text-muted);
+}
+
+/* açık zeminde kart ayrışsın */
+.section-light .wizard,
+.section-paper .wizard {
+  box-shadow: 0 10px 30px rgba(22, 24, 27, 0.08);
+}
+
 @media (min-width: 56em) {
-  .quote {
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 5rem;
+  .price-wizard {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 4rem;
   }
 }
 
@@ -2427,29 +2316,6 @@ textarea.wizard-input {
   color: var(--text-muted);
 }
 
-/* Ana sayfa birleşik bölümünde sihirbaz satırı */
-.wizard-row {
-  display: grid;
-  gap: 2rem;
-  margin-top: clamp(3rem, 6vw, 5rem);
-  align-items: start;
-}
-
-.wizard-row > * {
-  min-width: 0;
-}
-
-.wizard-intro h3 {
-  font-size: var(--fs-h2);
-}
-
-@media (min-width: 56em) {
-  .wizard-row {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 5rem;
-  }
-}
-
 /* /teklif sayfası */
 .quote-page {
   display: grid;
@@ -2752,6 +2618,79 @@ textarea.wizard-input {
 
 .map-show[hidden] {
   display: none;
+}
+
+/* Koruma katmanı: yalnızca harita yüklüyken; iframe'in üstünü kaplar (pin ve iletişim kartı üstte) */
+.map-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.map-shield[hidden] {
+  display: none;
+}
+
+.map-card[data-state='loaded'] .map-shield:not([hidden]) {
+  display: block;
+}
+
+.map-shield:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -6px;
+}
+
+/* "Haritayı kullanmak için tıklayın/dokunun" etiketi: iğnenin altında, serbest alanın ortasında */
+.map-hint {
+  position: absolute;
+  left: calc(50% + var(--map-shift, 0px) / 2);
+  top: calc(50% + 1.6rem);
+  padding: 0.35rem 0.9rem;
+  background: rgba(20, 22, 26, 0.82);
+  color: var(--on-dark);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.map-hint-touch {
+  display: none;
+}
+
+/* Fare: üzerine gelince veya klavye odağında */
+@media (hover: hover) and (pointer: fine) {
+  .map-shield:hover .map-hint,
+  .map-shield:focus-visible .map-hint {
+    opacity: 1;
+  }
+}
+
+/* Dokunmatik: etiket katman varken hep görünür, metin "dokunun" */
+@media (hover: none), (pointer: coarse) {
+  .map-hint {
+    opacity: 1;
+  }
+
+  .map-hint-mouse {
+    display: none;
+  }
+
+  .map-hint-touch {
+    display: inline;
+  }
 }
 
 /* Kendi iğnemiz (yalnızca mapCoords varken): ucu (SVG'de y=22/24) serbest alanın tam merkezinde */
