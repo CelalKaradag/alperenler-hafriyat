@@ -196,7 +196,7 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
   expect(box.width / box.height).toBeCloseTo(1.5, 1);
 });
 
-test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sayı şeridi 5-2-7-2', async ({ page }) => {
+test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sayı şeridi 7-2-7-2', async ({ page }) => {
   await page.goto('/makine-kiralama/ekskavator-kiralama/');
   const fleet = page.locator('[data-fleet]');
   await expect(fleet).toBeVisible();
@@ -205,22 +205,22 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sa
   await expect(rows.nth(0)).toContainText('22 ton');
   await expect(rows.nth(0).locator('td')).toHaveText('3');
   await expect(rows.nth(1)).toContainText('30 ton');
-  await expect(rows.nth(1).locator('td')).toHaveText('1');
+  await expect(rows.nth(1).locator('td')).toHaveText('2');
   await expect(rows.nth(2)).toContainText('35 ton');
-  await expect(rows.nth(2).locator('td')).toHaveText('1');
+  await expect(rows.nth(2).locator('td')).toHaveText('2');
   await expect(fleet.locator('tfoot')).toContainText('Toplam');
-  await expect(fleet.locator('tfoot td')).toHaveText('5');
+  await expect(fleet.locator('tfoot td')).toHaveText('7');
   await expect(page.locator('main')).toContainText('22 ile 35 ton arası');
 
   await page.goto('/makine-kiralama/kiralik-kepce-jcb/');
   await expect(page.locator('main')).toContainText('Filomuzda 2 adet JCB');
 
-  // Ana sayfa sayı şeridi: sırayla 5 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır
+  // Ana sayfa sayı şeridi: sırayla 7 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır
   await page.goto('/');
   const items = page.locator('.stats .stat');
   await expect(items).toHaveCount(4);
   const expected = [
-    ['5', 'Paletli ekskavatör'],
+    ['7', 'Paletli ekskavatör'],
     ['2', 'JCB'],
     ['7', 'Kamyon'],
     ['2', 'Lowbed tır'],

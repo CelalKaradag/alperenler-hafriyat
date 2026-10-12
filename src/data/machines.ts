@@ -7,7 +7,7 @@
  *
  * Firma onayı (hepsi onaylı): kepçe/JCB, ekskavatör, kırıcılı ekskavatör, hafriyat kamyonu, lowbed ile taşıma.
  * Mini ekskavatör firmada yok: kaldırıldı.
- * FİLO (müşteri onayı, kesin): 5 paletli ekskavatör (22 ton × 3, 30 ton × 1, 35 ton × 1), 2 JCB, 7 kamyon,
+ * FİLO (müşteri onayı, kesin): 7 paletli ekskavatör (22 ton × 3, 30 ton × 2, 35 ton × 2), 2 JCB, 7 kamyon,
  * 2 lowbed tır; firmada hidrolik kırıcı var (adet ve hangi makineye takıldığı BİLİNMİYOR: yazılmaz).
  * Marka/model/yıl, kapasite, güzergâh, fiyat, süre, "en iyi" ifadesi YAZILMAZ.
  */
@@ -99,8 +99,8 @@ export const machines: Machine[] = [
       title: 'Ekskavatör filomuz',
       rows: [
         { label: '22 ton paletli ekskavatör', count: 3 },
-        { label: '30 ton paletli ekskavatör', count: 1 },
-        { label: '35 ton paletli ekskavatör', count: 1 },
+        { label: '30 ton paletli ekskavatör', count: 2 },
+        { label: '35 ton paletli ekskavatör', count: 2 },
       ],
     },
     uses: [
