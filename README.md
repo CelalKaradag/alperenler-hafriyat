@@ -40,7 +40,7 @@ Hizmetler [src/data/services.ts](src/data/services.ts) içindedir. Şu an 8 hizm
 - Taslak metinlerde deneyim, makine sayısı, süre, fiyat, garanti veya "en iyi/lider" ifadesi bilerek yoktur; eklenmemelidir.
 - `keywords` alanı yalnızca veri olarak durur; sayfada görünür liste olarak basılmaz ve meta keywords eklenmez.
 
-Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical`, `og:url`, `og:image` ve JSON-LD `url` üretilir. **Şu an önizleme adresi (`https://alperenler-hafriyat.netlify.app`) yazılıdır; gerçek alan adıyla değiştirilmelidir.** Sayfalar `noindex` kalır (`site.publish.indexable: false`).
+Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical`, `og:url`, `og:image` ve JSON-LD `url` üretilir. **Adres `SITE_URL` ortam değişkeninden gelir; verilmezse önizleme adresi `https://alperenler-hafriyat.pages.dev` kullanılır (bkz. "Yayın: Cloudflare Pages"); gerçek alan adı için `SITE_URL` ayarlanmalıdır.** Sayfalar `noindex` kalır (`site.publish.indexable: false`).
 
 ## Görseller (public/images/)
 
@@ -201,7 +201,23 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 [.github/workflows/ci.yml](.github/workflows/ci.yml) (`ubuntu-24.04`; `actions/checkout`, `setup-node` ve `upload-artifact` Node 24 çalıştıran `@v7` sürümleri): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`; ayrıca ayrı bir `lighthouse` işi (bkz. Lighthouse CI). Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
 
-## Netlify önizleme
+## Yayın: Cloudflare Pages
+
+Site Cloudflare Pages'te önizleme olarak yayınlanır: **https://alperenler-hafriyat.pages.dev** (Netlify ücretsiz kredisi bittiği için taşındı).
+
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
+- **Ortam değişkenleri (Settings → Environment variables):** `NODE_VERSION=24.13.0`, `PUBLIC_SHOW_DRAFTS=true` (önizleme: taslaklar "TASLAK" rozetiyle görünür). İsteğe bağlı `SITE_URL` (verilmezse `https://alperenler-hafriyat.pages.dev`).
+- **Site adresi:** [astro.config.mjs](astro.config.mjs) → `site: process.env.SITE_URL || 'https://alperenler-hafriyat.pages.dev'`; canonical, `og:url`, `og:image`, sitemap ve JSON-LD `url` hep bundan türer (kodda sabit netlify adresi kalmadı).
+- **Arama motorlarından gizleme:** [public/_headers](public/_headers) tüm yollara `X-Robots-Tag: noindex, nofollow` ekler (Cloudflare Pages bu dosyayı okur; `dist/_headers` olarak çıkar). Sayfalarda ayrıca `noindex` meta etiketi vardır (`site.publish.indexable: false`).
+- **404:** Cloudflare Pages `dist/404.html`'i (Astro üretir) eşleşmeyen yollar için otomatik kullanır; ek ayar gerekmez.
+- **Önbellek başlığı eklenmedi:** `/fonts/*`, `/images/_r/*`, `/videos/*` için `immutable` yazılmadı (dosya adları içerik özetli değil; adı aynı kalıp içerik değişebilir).
+
+**Gerçek yayında:** `PUBLIC_SHOW_DRAFTS`'ı kaldırın (veya `false`), `public/_headers` içindeki `X-Robots-Tag` satırlarını silin, `SITE_URL`'i gerçek alan adına ayarlayın ve `site.publish.indexable: true` yapın.
+
+## Netlify önizleme (ESKİ – şu an kullanılmıyor)
+
+> Site artık Cloudflare Pages'te (yukarıya bakın). Aşağıdaki bölüm ve [netlify.toml](netlify.toml) yalnızca ileride gerekirse diye duruyor.
 
 [netlify.toml](netlify.toml) ile siteyi Netlify'a önizleme olarak koyabilirsiniz (`npm run build`, yayın klasörü `dist`, Node `24.13.0`).
 
@@ -215,7 +231,7 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 **404:** Netlify, publish dizinindeki `404.html`'i (Astro `dist/404.html` üretir) eşleşmeyen yollar için otomatik kullanır; ek ayar gerekmez.
 
-### Gerçek yayına geçerken kapatılacaklar
+### Gerçek yayına geçerken kapatılacaklar (ESKİ Netlify adımları; Cloudflare için yukarıdaki "Gerçek yayında" paragrafı geçerlidir)
 1. `netlify.toml` → `PUBLIC_SHOW_DRAFTS` değerini `"false"` yapın veya satırı silin (ya da Netlify panelinde değişkeni silin). Hâlâ yayına girmesi istenen hizmet/SSS için `onaylandi: true` yapın.
 2. `netlify.toml` → `[[headers]]` (`X-Robots-Tag`) bloğunu kaldırın.
 3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
@@ -273,10 +289,10 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 ## Yayına alma kontrol listesi
 
-1. **Alan adı:** satın alın ve DNS/Netlify ayarlarını yapın.
+1. **Alan adı:** satın alın ve DNS/Cloudflare Pages ayarlarını yapın.
 2. **`astro.config.mjs` → `site`:** önizleme adresini gerçek alan adıyla değiştirin (canonical, `og:url`, `og:image`, sitemap, JSON-LD buna bağlıdır).
-3. **`PUBLIC_SHOW_DRAFTS`:** Netlify ortamında `false` yapın veya silin (`netlify.toml` ve Netlify panelinde); taslaklar yayına girmesin.
-4. **`netlify.toml`:** `[[headers]]` altındaki `X-Robots-Tag: noindex, nofollow` bloğunu kaldırın.
+3. **`PUBLIC_SHOW_DRAFTS`:** Cloudflare Pages ortamında `false` yapın veya silin; taslaklar yayına girmesin.
+4. **`public/_headers`:** `X-Robots-Tag: noindex, nofollow` satırlarını kaldırın (ve `SITE_URL`'i gerçek alan adına ayarlayın).
 5. **`src/data/site.ts` → `publish.indexable: true`:** sitemap ve `robots.txt` bu ayarla açılır, sayfalar `index` olur (gizlilik sayfası `noindex` kalır).
 6. **Onaylanan içerikler:** firmanın doğruladığı hizmet, SSS, makine, güven şeridi maddeleri ve fiyat rehberi için `onaylandi: true` yapın; doğrulanmayanlar `false` kalsın.
 7. **Gizlilik sayfası:** `[firma tarafından doldurulacak]` yer tutucularını (barındırma sağlayıcısı, ticari unvan, vergi no, KVKK veri sorumlusu, tarih) doldurun; metin hukuki onaydan geçsin.

@@ -1,0 +1,4 @@
+# Cloudflare Pages bu dosyayı okur (build çıktısında dist/_headers olur).
+# ÖNİZLEME – gerçek yayında bu satırları kaldır (README: "Yayın: Cloudflare Pages").
+/*
+  X-Robots-Tag: noindex, nofollow
