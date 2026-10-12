@@ -143,19 +143,20 @@
 }
 
 /*
- * Menü eşiği: 72em (1152 px).
- * Hesap (Inter 600 / Archivo ölçüleriyle, 5 menü öğesi: Hizmetler, Teklif Al, Galeri, Hakkımızda, İletişim):
+ * Menü eşiği: 84em (1344 px).
+ * Hesap (6 menü öğesi: Ana Sayfa, Hizmetler, Teklif Al, Galeri, Hakkımızda, İletişim):
  *   logo (işaret 48 + boşluk 13 + "ALPERENLER" ≈ 174)        ≈ 235 px
- *   menü (öğeler ≈ 307 + 4 aralık × 28)                      ≈ 419 px
+ *   menü (öğeler ≈ 402 + 5 aralık × 28 en çok)               ≈ 542 px
  *   "Hemen Ara" (ikon + metin + dolgu)                       ≈ 170 px
- *   header boşlukları (2 × 32)                               =  64 px   → toplam ≈ 890 px
- * %15 pay ile ≈ 1020 px gerekir. Kenar boşluğu `clamp(1.25rem, 0.75rem + 2.6vw, 3rem)` olduğundan
- * 1152 px'te içerik genişliği ≈ 1068 px ≥ 1020 px. Daha dar ekranlarda menü hamburger olur (tek satır).
- * Telefon (≈ 130 px + boşluk) yalnızca 90em (1440 px) üstünde eklenir (header-phone.css).
+ *   header boşlukları (2 × 32) + logo/menü/düğme arası (2 × 32) = 128 px   → toplam ≈ 1075 px
+ * %15 pay ile ≈ 1235 px gerekir. Kenar boşluğu `clamp(1.25rem, 0.75rem + 2.6vw, 3rem)` olduğundan
+ * 1344 px'te içerik genişliği ≈ 1250 px ≥ 1235 px; 1280 px'te ≈ 1189 px (yetmez), bu yüzden
+ * 1280'de menü hamburger (yine tek satır); 1366, 1440, 1600, 1920'de satır içi menü tek satırdır.
+ * Telefon (≈ 130 px + boşluk) yalnızca 100em (1600 px) ve üstünde eklenir (header-phone.css).
  */
 
-/* <72em: hamburger. Menü kapalı başlar, açılınca panel olarak iner. JS yoksa menü her zaman görünür. */
-@media (max-width: 71.99em) {
+/* <84em: hamburger. Menü kapalı başlar, açılınca panel olarak iner. JS yoksa menü her zaman görünür. */
+@media (max-width: 83.99em) {
   .site-nav {
     flex-basis: 100%;
     order: 3;
@@ -215,15 +216,15 @@
   }
 }
 
-/* 48em–72em: menü düğmesi ve "Hemen Ara" sağda yan yana */
-@media (min-width: 48em) and (max-width: 71.99em) {
+/* 48em–84em: menü düğmesi ve "Hemen Ara" sağda yan yana */
+@media (min-width: 48em) and (max-width: 83.99em) {
   .nav-toggle {
     margin-left: auto;
   }
 }
 
-/* >=72em: satır içi menü, tek satır */
-@media (min-width: 72em) {
+/* >=84em: satır içi menü, tek satır */
+@media (min-width: 84em) {
   .nav-toggle,
   .nav-toggle[hidden] {
     display: none;
@@ -241,10 +242,5 @@
   .site-nav ul {
     flex-wrap: nowrap;
     gap: 0 clamp(1rem, 1.6vw, 1.75rem);
-  }
-
-  /* "Ana Sayfa" masaüstü menüde yok: logo ana sayfaya gider (mobil/tablet menüde ve footer'da kalır) */
-  .site-nav .nav-home {
-    display: none;
   }
 }

@@ -1,4 +1,4 @@
----
+﻿---
 import { navItems } from '../data/nav';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
@@ -75,7 +75,7 @@ const isCurrent = (href: string) => {
     header.classList.add('js-nav');
     toggle.hidden = false;
 
-    var desktop = window.matchMedia('(min-width: 72em)');
+    var desktop = window.matchMedia('(min-width: 84em)');
 
     function setOpen(open, returnFocus) {
       header.classList.toggle('is-open', open);

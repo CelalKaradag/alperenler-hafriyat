@@ -1,10 +1,10 @@
-/* ---------- Header telefonu (90em = 1440 px üstü) ---------- */
+﻿/* ---------- Header telefonu (100em = 1600 px üstü) ---------- */
 
 .header-phone {
   display: none;
 }
 
-@media (min-width: 90em) {
+@media (min-width: 100em) {
   .header-phone {
     display: flex;
     flex: none;

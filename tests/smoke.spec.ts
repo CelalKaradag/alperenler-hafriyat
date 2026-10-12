@@ -204,6 +204,8 @@ test('teklif sihirbazı: 3 adım doldurulur, WhatsApp bağlantısında mesaj olu
 test.describe('masaüstü header tek satır', () => {
   for (const size of [
     { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1600, height: 900 },
     { width: 1920, height: 1080 },
   ]) {
     test(`${size.width}x${size.height}: header <= 96px, menü öğeleri aynı satırda, üstte boşluk yok`, async ({
@@ -225,8 +227,12 @@ test.describe('masaüstü header tek satır', () => {
       expect(tops.length).toBeGreaterThan(0);
       expect(new Set(tops).size, `menü öğesi üst konumları: ${tops.join(', ')}`).toBe(1);
 
-      // "Ana Sayfa" masaüstü menüde görünmez; "Hemen Ara" tek satır
-      await expect(page.locator('#site-nav a[href="/"]')).toBeHidden();
+      // "Ana Sayfa" menünün ilk öğesi olarak görünür; "Hemen Ara" tek satır
+      await expect(page.locator('#site-nav a[href="/"]')).toBeVisible();
+      await expect(page.locator('#site-nav a').first()).toHaveAttribute('href', '/');
+      // Header telefonu yalnızca 1600 px ve üstünde görünür
+      if (size.width >= 1600) await expect(page.locator('.header-phone')).toBeVisible();
+      else await expect(page.locator('.header-phone')).toBeHidden();
       const call = await page.locator('.header-call').boundingBox();
       expect((call as { height: number }).height).toBeLessThanOrEqual(56);
 
@@ -236,13 +242,15 @@ test.describe('masaüstü header tek satır', () => {
     });
   }
 
-  test('1024 ve 1280: tek satır (1024 hamburger, 1280 satır içi menü)', async ({ page }) => {
-    await page.setViewportSize({ width: 1024, height: 768 });
-    await page.goto('/');
-    await expect(page.locator('.nav-toggle')).toBeVisible();
-    expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(96);
+  test('1024 ve 1280: hamburger, tek satır header; 1344 satır içi menü', async ({ page }) => {
+    for (const width of [1024, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/');
+      await expect(page.locator('.nav-toggle'), `${width} hamburger`).toBeVisible();
+      expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(96);
+    }
 
-    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.setViewportSize({ width: 1344, height: 800 });
     await page.goto('/');
     await expect(page.locator('.nav-toggle')).toBeHidden();
     expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(96);
