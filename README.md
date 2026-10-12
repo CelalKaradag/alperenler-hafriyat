@@ -40,7 +40,7 @@ Hizmetler [src/data/services.ts](src/data/services.ts) içindedir. Şu an 8 hizm
 - Taslak metinlerde deneyim, makine sayısı, süre, fiyat, garanti veya "en iyi/lider" ifadesi bilerek yoktur; eklenmemelidir.
 - `keywords` alanı yalnızca veri olarak durur; sayfada görünür liste olarak basılmaz ve meta keywords eklenmez.
 
-Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical`, `og:url`, `og:image` ve JSON-LD `url` üretilir. **Adres `SITE_URL` ortam değişkeninden gelir; verilmezse önizleme adresi `https://alperenler-hafriyat.pages.dev` kullanılır (bkz. "Yayın: Cloudflare Pages"); gerçek alan adı için `SITE_URL` ayarlanmalıdır.** Sayfalar `noindex` kalır (`site.publish.indexable: false`).
+Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical`, `og:url`, `og:image` ve JSON-LD `url` üretilir. **Adres `SITE_URL` ortam değişkeninden gelir; verilmezse önizleme adresi `https://alperenler-hafriyat.celal-krdg-13.workers.dev` kullanılır (bkz. "Yayın: Cloudflare Workers"); gerçek alan adı için `SITE_URL` ayarlanmalıdır.** Sayfalar `noindex` kalır (`site.publish.indexable: false`).
 
 ## Görseller (public/images/)
 
@@ -201,23 +201,23 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 [.github/workflows/ci.yml](.github/workflows/ci.yml) (`ubuntu-24.04`; `actions/checkout`, `setup-node` ve `upload-artifact` Node 24 çalıştıran `@v7` sürümleri): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`; ayrıca ayrı bir `lighthouse` işi (bkz. Lighthouse CI). Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
 
-## Yayın: Cloudflare Pages
+## Yayın: Cloudflare Workers (yalnızca statik dosya)
 
-Site Cloudflare Pages'te önizleme olarak yayınlanır: **https://alperenler-hafriyat.pages.dev** (Netlify ücretsiz kredisi bittiği için taşındı).
+Önizleme **Cloudflare Workers statik assets** olarak yayınlanır (Worker kodu ve Astro adaptörü YOK; yalnızca `dist/`): **https://alperenler-hafriyat.celal-krdg-13.workers.dev**. (Önce Netlify, sonra Pages denendi; Netlify kredisi bittiği için Cloudflare'e taşındı.)
 
-- **Build command:** `npm run build`
-- **Build output directory:** `dist`
-- **Ortam değişkenleri (Settings → Environment variables):** `NODE_VERSION=24.13.0`, `PUBLIC_SHOW_DRAFTS=true` (önizleme: taslaklar "TASLAK" rozetiyle görünür). İsteğe bağlı `SITE_URL` (verilmezse `https://alperenler-hafriyat.pages.dev`).
-- **Site adresi:** [astro.config.mjs](astro.config.mjs) → `site: process.env.SITE_URL || 'https://alperenler-hafriyat.pages.dev'`; canonical, `og:url`, `og:image`, sitemap ve JSON-LD `url` hep bundan türer (kodda sabit netlify adresi kalmadı).
-- **Arama motorlarından gizleme:** [public/_headers](public/_headers) tüm yollara `X-Robots-Tag: noindex, nofollow` ekler (Cloudflare Pages bu dosyayı okur; `dist/_headers` olarak çıkar). Sayfalarda ayrıca `noindex` meta etiketi vardır (`site.publish.indexable: false`).
-- **404:** Cloudflare Pages `dist/404.html`'i (Astro üretir) eşleşmeyen yollar için otomatik kullanır; ek ayar gerekmez.
-- **Önbellek başlığı eklenmedi:** `/fonts/*`, `/images/_r/*`, `/videos/*` için `immutable` yazılmadı (dosya adları içerik özetli değil; adı aynı kalıp içerik değişebilir).
+- **Git bağlantısı yok, yayın elle:** `npm run deploy:preview` ([scripts/deploy-preview.mjs](scripts/deploy-preview.mjs)): önce `PUBLIC_SHOW_DRAFTS=true` ile `npm run build`, başarılıysa `npx wrangler deploy`; hata olursa çıkış koduyla durur. İlk kez `npx wrangler login` gerekir. `wrangler` sabit sürümle devDependency'dir (`4.149.0`).
+- **Yapılandırma:** [wrangler.jsonc](wrangler.jsonc) (`assets.directory: ./dist`, `not_found_handling: 404-page`, `html_handling: auto-trailing-slash`). `.wrangler/` yerel durum klasörüdür (git'e girmez). Wrangler'ın "otomatik kurulum" önerisini (Astro Cloudflare adaptörü) KABUL ETMEYİN; site statiktir. `astro.config.mjs`'te `adapter` olmamalıdır.
+- **Site adresi:** [astro.config.mjs](astro.config.mjs) → `site: process.env.SITE_URL || 'https://alperenler-hafriyat.celal-krdg-13.workers.dev'`; canonical, `og:url`, `og:image`, sitemap ve JSON-LD `url` hep bundan türer.
+- **Arama motorlarından gizleme:** [public/_headers](public/_headers) tüm yollara `X-Robots-Tag: noindex, nofollow` ekler (Workers assets bu dosyayı okur; `dist/_headers`). Sayfalarda ayrıca `noindex` meta etiketi vardır (`site.publish.indexable: false`).
+- **404:** `not_found_handling: "404-page"` ile Astro'nun `dist/404.html`'i kullanılır; durum kodu 404 döner.
+- **Önbellek başlığı eklenmedi:** `/fonts/*`, `/images/_r/*`, `/videos/*` için `immutable` yazılmadı (dosya adları içerik özetli değil).
+- **Bu bilgisayardan erişim:** `*.workers.dev` adresine bu ağdan TLS el sıkışması kurulamayabilir (`curl` hata 35; ağ/ISS engeli olabilir). Yayını doğrulamak için `npx wrangler dev --port 8799` ile `dist/` yerelde aynı yapılandırmayla sunulabilir.
 
-**Gerçek yayında:** `PUBLIC_SHOW_DRAFTS`'ı kaldırın (veya `false`), `public/_headers` içindeki `X-Robots-Tag` satırlarını silin, `SITE_URL`'i gerçek alan adına ayarlayın ve `site.publish.indexable: true` yapın.
+**Gerçek yayında:** `public/_headers` içindeki `X-Robots-Tag` satırlarını silin, `PUBLIC_SHOW_DRAFTS` olmadan build alın (deploy betiğini taslaksız yapacak şekilde değiştirin veya `npm run build && npx wrangler deploy`), `SITE_URL`'i gerçek alan adına ayarlayın ve `site.publish.indexable: true` yapın. Alan adı: Cloudflare paneli → Workers & Pages → `alperenler-hafriyat` → **Settings → Domains & Routes**.
 
 ## Netlify önizleme (ESKİ – şu an kullanılmıyor)
 
-> Site artık Cloudflare Pages'te (yukarıya bakın). Aşağıdaki bölüm ve [netlify.toml](netlify.toml) yalnızca ileride gerekirse diye duruyor.
+> Site artık Cloudflare Workers'ta (statik assets; yukarıya bakın). Aşağıdaki bölüm ve [netlify.toml](netlify.toml) yalnızca ileride gerekirse diye duruyor.
 
 [netlify.toml](netlify.toml) ile siteyi Netlify'a önizleme olarak koyabilirsiniz (`npm run build`, yayın klasörü `dist`, Node `24.13.0`).
 
@@ -289,9 +289,9 @@ Site Cloudflare Pages'te önizleme olarak yayınlanır: **https://alperenler-haf
 
 ## Yayına alma kontrol listesi
 
-1. **Alan adı:** satın alın ve DNS/Cloudflare Pages ayarlarını yapın.
+1. **Alan adı:** satın alın ve DNS/Cloudflare Workers ayarlarını yapın.
 2. **`astro.config.mjs` → `site`:** önizleme adresini gerçek alan adıyla değiştirin (canonical, `og:url`, `og:image`, sitemap, JSON-LD buna bağlıdır).
-3. **`PUBLIC_SHOW_DRAFTS`:** Cloudflare Pages ortamında `false` yapın veya silin; taslaklar yayına girmesin.
+3. **`PUBLIC_SHOW_DRAFTS`:** taslaksız build alın (`PUBLIC_SHOW_DRAFTS` verilmeden); taslaklar yayına girmesin.
 4. **`public/_headers`:** `X-Robots-Tag: noindex, nofollow` satırlarını kaldırın (ve `SITE_URL`'i gerçek alan adına ayarlayın).
 5. **`src/data/site.ts` → `publish.indexable: true`:** sitemap ve `robots.txt` bu ayarla açılır, sayfalar `index` olur (gizlilik sayfası `noindex` kalır).
 6. **Onaylanan içerikler:** firmanın doğruladığı hizmet, SSS, makine, güven şeridi maddeleri ve fiyat rehberi için `onaylandi: true` yapın; doğrulanmayanlar `false` kalsın.

@@ -33,3 +33,6 @@ playwright-report/
 test-results/
 screenshots/
 .lighthouseci/
+
+# wrangler (Cloudflare) yerel durum klasörü
+.wrangler/
