@@ -72,6 +72,50 @@
   font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem);
 }
 
+/* rehber yazı: yazar/okuma süresi satırı ve liste kartları */
+.guide-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--on-dark-muted, rgba(255, 255, 255, 0.78));
+}
+
+.guide-meta--light {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+}
+
+.guide-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.guide-card {
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.guide-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
+}
+
+.guide-card p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.call-card--wide {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
 .link-list .draft-badge {
   flex: none;
 }

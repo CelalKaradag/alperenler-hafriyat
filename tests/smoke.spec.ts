@@ -51,13 +51,56 @@ test('tel: ve wa.me bağlantıları doğru numarayı içeriyor', async ({ page }
 
 test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async ({ page, request }) => {
   // Not: bu sayfalar onaylanıp `onaylandi: true` yapılınca burası güncellenmelidir.
-  for (const path of ['/makine-kiralama/', '/hafriyat-fiyatlari/']) {
+  // Bölge ve rehber sayfaları da onaylanana kadar (onaylandi:false) normal build'de üretilmez.
+  for (const path of [
+    '/makine-kiralama/',
+    '/hafriyat-fiyatlari/',
+    '/bolgeler/',
+    '/bolgeler/yesilyurt/',
+    '/rehber/',
+    '/rehber/temel-kazisindan-once-bilinmesi-gerekenler/',
+  ]) {
     const response = await request.get(path);
     expect(response.status(), `${path} üretilmemeli`).toBe(404);
   }
   await page.goto('/');
   await expect(page.locator('.preview-bar')).toHaveCount(0);
   await expect(page.locator('.draft-badge')).toHaveCount(0);
+  // Footer'da taslak bölge/rehber bağlantısı da görünmemeli
+  await expect(page.locator('footer a[href="/bolgeler/"], footer a[href="/rehber/"]')).toHaveCount(0);
+});
+
+test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
+  await page.goto('/hakkimizda/');
+  await expect(page.locator('h1')).toHaveCount(1);
+  const opener = page.locator('.gallery-open[data-kind="image"]');
+  test.skip((await opener.count()) === 0, 'Galeride görsel yok (medya dosyaları eklenmemiş)');
+  expect(await opener.count()).toBeLessThanOrEqual(4);
+
+  const dialog = page.locator('[data-lightbox]');
+  const isOpen = () => dialog.evaluate((element) => (element as HTMLDialogElement).open);
+  await opener.first().click();
+  await expect.poll(isOpen).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect.poll(isOpen).toBe(false);
+});
+
+test('teklif sihirbazı: ?yer= ile yer alanı ön-dolu gelir ve mesaja yazılır', async ({ page }) => {
+  await page.goto('/teklif/?yer=Ye%C5%9Filyurt');
+  await expect(page.locator('[data-wizard-app]')).toBeVisible();
+  await expect(page.locator('#wizard-place')).toHaveValue('Yeşilyurt');
+
+  const choices = page.locator('.choice');
+  if ((await choices.count()) > 0) {
+    await choices.first().click();
+  } else {
+    await page.locator('#wizard-job-text').fill('Temel kazısı');
+  }
+  await page.locator('[data-step]').nth(0).locator('[data-action="next"]').click();
+  await expect(page.locator('#wizard-place')).toHaveValue('Yeşilyurt');
+  await page.locator('[data-step]').nth(1).locator('[data-action="next"]').click();
+  await page.locator('[data-step]').nth(2).locator('[data-action="next"]').click();
+  await expect(page.locator('[data-preview]')).toContainText('Yer: Yeşilyurt');
 });
 
 test.describe('mobil 390x844', () => {

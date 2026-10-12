@@ -44,6 +44,32 @@
   }
 }
 
+/* Hakkımızda: "Nasıl çalışıyoruz" kısa hâli (ikonsuz) */
+.steps--compact .step-icon {
+  display: none;
+}
+
+/* Hakkımızda: konum kartı (adres + yol tarifi; harita footer’daki şeritte) */
+.about-location {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 40rem;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.about-location h3 {
+  margin: 0;
+}
+
+.about-location p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
 /* Fotoğraf yokken: dekoratif koyu panel (topo deseni + büyük logo işareti + etiket).
    İletişim bilgisi, telefon veya düğme YOK. */
 .about-panel {

@@ -8,6 +8,7 @@ import FaqSection from '../../components/FaqSection.astro';
 import { approvedFaqs } from '../../data/faq';
 import { breadcrumbSchema, faqSchema, serviceSchema } from '../../utils/schema';
 import { visibleMachines } from '../../data/machines';
+import { guidesForService } from '../../data/guides';
 import RelatedLinks from '../../components/RelatedLinks.astro';
 import { defaultPriceFactors, visibleServices, type Service } from '../../data/services';
 import { site, whatsappLink, whatsappServiceMessage } from '../../data/site';
@@ -45,6 +46,8 @@ const hasRelated = service
 const relatedMachines = service
   ? visibleMachines.filter((machine) => machine.relatedServices.includes(service.slug))
   : [];
+// İlgili rehber yazılar (iç bağlantı)
+const relatedGuides = service ? guidesForService(service.slug) : [];
 // Taslak içerik sayfaları noindex (site yayına çıksa bile onaylanana kadar)
 const anyApproved = visibleServices.some((item) => item.onaylandi);
 const noindex = service ? !service.onaylandi : !anyApproved;
@@ -148,6 +151,15 @@ const description = service
                   title: machine.title,
                   icon: machine.icon,
                   draft: !machine.onaylandi,
+                }))}
+              />
+              <RelatedLinks
+                heading="İlgili rehber yazılar"
+                items={relatedGuides.map((guide) => ({
+                  href: `/rehber/${guide.slug}/`,
+                  title: guide.title,
+                  icon: 'check',
+                  draft: !guide.onaylandi,
                 }))}
               />
             </div>

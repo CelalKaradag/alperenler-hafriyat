@@ -2,6 +2,13 @@
 import { whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
 
+interface Props {
+  /** Kısa hâl (Hakkımızda): ikonlar gizlenir, adımlar sıkı durur */
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+
 const steps = [
   {
     number: '01',
@@ -31,7 +38,7 @@ const steps = [
       <p class="eyebrow">Süreç</p>
       <h2 id="calisma-baslik">Nasıl çalışıyoruz?</h2>
     </div>
-    <ol class="steps" data-steps>
+    <ol class:list={['steps', compact && 'steps--compact']} data-steps>
       {
         steps.map((step) => (
           <li class="step">

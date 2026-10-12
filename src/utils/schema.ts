@@ -77,6 +77,30 @@ export function faqSchema(faqs: Faq[]): JsonObject {
   };
 }
 
+/**
+ * Article (rehber yazı). Yalnızca onaylı yazılar için kullanılır. Yazar/yayıncı firmadır (kişi adı yok);
+ * tarih doğrulanmadığından datePublished eklenmez.
+ */
+export function articleSchema(
+  guide: { slug: string; title: string; description: string; cover?: string },
+  base?: URL,
+): JsonObject {
+  const org = { '@type': 'Organization', name: site.name };
+  const data: JsonObject = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.description,
+    author: org,
+    publisher: org,
+  };
+  const url = pageUrl(base, `/rehber/${guide.slug}/`);
+  if (url) data.mainEntityOfPage = url;
+  const image = guide.cover ? pageUrl(base, guide.cover) : undefined;
+  if (image) data.image = image;
+  return data;
+}
+
 /** <script type="application/ld+json"> içine güvenle gömülecek metin */
 export function toJsonLd(data: JsonObject): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');

@@ -176,12 +176,13 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 
 `npm test` ([playwright.config.ts](playwright.config.ts), [tests/](tests/)): önce [scripts/serve-for-tests.mjs](scripts/serve-for-tests.mjs) siteyi iki kez build eder (normal → `dist-test/` :4321, `PUBLIC_SHOW_DRAFTS=true` → `dist-test-drafts/` :4322) ve önizler, sonra:
 - `smoke.spec.ts` (normal build): tüm sayfalar 200 / konsolda hata yok / tek H1; iç bağlantılar 404 vermiyor; `tel:` ve `wa.me` doğru numara; taslak sayfalar ve önizleme şeridi yok; mobil (390×844) menü ve sayfa geçişi sonrası menü, yatay taşma; galeri lightbox'ı (açılır, Escape ile kapanır, ClientRouter geçişi sonrası yine açılır); teklif sihirbazı 3 adım ve WhatsApp mesajı.
-- `drafts.spec.ts` (taslaklı build): taslak sayfalar var, önizleme şeridi/rozetler görünür, JSON-LD'de `Service`/`FAQPage` yok.
+- `smoke.spec.ts` ayrıca: bölge/rehber sayfaları normal build'de 404 (footer'da bağlantıları yok), Hakkımızda fotoğraf şeridi lightbox'ı ve `/teklif/?yer=` ile yer alanı ön-doldurma.
+- `drafts.spec.ts` (taslaklı build): taslak sayfalar var, önizleme şeridi/rozetler görünür, JSON-LD'de `Service`/`FAQPage`/`Article` yok; 13 bölge sayfası (başlık, taslak notu, ilçeye özel WhatsApp, ön-dolu sihirbaz bağlantısı); 4 rehber yazısı (500–800 kelime, okuma süresi, içindekiler, belediye notu); hizmet sayfasında ilgili rehber bağlantısı.
 Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştırmak zorunlu değildir; ilk kez: `npx playwright install chromium`.
 
 ## GitHub Actions (CI)
 
-[.github/workflows/ci.yml](.github/workflows/ci.yml): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`. Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
+[.github/workflows/ci.yml](.github/workflows/ci.yml): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`; ayrıca ayrı bir `lighthouse` işi (bkz. Lighthouse CI). Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
 
 ## Netlify önizleme
 
@@ -238,6 +239,19 @@ Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştı
 - **Taslak sayfalar `noindex`** olur (site yayına çıksa bile onaylanana kadar). `BreadcrumbList` JSON-LD hizmet, makine ve rehber sayfalarında yalnızca onaylı sayfalar için ve `astro.config.mjs` içinde `site` tanımlıysa basılır.
 - **`/robots.txt`** ([robots.txt.ts](src/pages/robots.txt.ts)): `site.publish.indexable: false` iken `Disallow: /`; `true` iken `Allow: /` ve `Sitemap:` satırı.
 - **`/sitemap.xml`** ([[feed].xml.ts](src/pages/[feed].xml.ts), kendi yazımımız, `@astrojs/sitemap` yok): yalnızca `indexable: true` iken üretilir; hiçbir taslak sayfa girmez (yalnızca `onaylandi: true` hizmet/makine/rehber, `/gizlilik/` ve 404 hariç).
+
+## Bölge sayfaları, rehber yazılar, Hakkımızda (Aşama 10)
+
+- **Hizmet bölgeleri** ([src/data/regions.ts](src/data/regions.ts)): Malatya'nın 13 ilçesi için `/bolgeler/` (liste) ve `/bolgeler/<slug>/` (SEO başlığı "<İlçe> Hafriyat | Alperenler Hafriyat"). Hepsi `onaylandi: false`; yalnızca `showDrafts` iken üretilir, "TASLAK" rozeti ve "Bu bölgeye hizmet verildiği onaylanmadı." notuyla, `noindex`, sitemap'e ve JSON-LD'ye girmeden. **Firma hangi ilçelere gittiğini onayladığında yalnızca o ilçelerin `onaylandi` değerini `true` yapın.** Coğrafi, nüfus veya mesafe bilgisi yazılmaz. Giriş cümlesi 4 farklı kalıptan ilçeye göre seçilir. Sayfada ilçeye özel WhatsApp mesajı, "Teklif için gerekenler" ve hizmet kartları vardır; "Teklif mesajını hazırla" bağlantısı `/teklif/?yer=<ilçe>` açar ve sihirbazın yer alanı ön-dolu gelir. Footer'da "Hizmet bölgeleri" bağlantısı yalnızca görünür bölge varsa çıkar. SSS'deki "Hangi bölgelere hizmet veriyorsunuz?" cevabına **onaylı** bölgelerin listesi otomatik eklenir (onaylı bölge yoksa genel cevap kalır).
+- **Rehber yazılar** ([src/data/guides.ts](src/data/guides.ts)): `/rehber/` ve `/rehber/<slug>/`; 4 yazı, her biri 500–800 kelime, sade genel bilgi (firmaya özel iddia, rakam, fiyat veya süre yok). Hukuki konularda "güncel kuralları belediyenizden teyit edin" notu otomatik çıkar. Okuma süresi kelime sayısından (≈200 kelime/dk) hesaplanır; yazar "Alperenler Hafriyat"tır. Hepsi `onaylandi: false`: yalnızca `showDrafts` iken üretilir, `noindex`; `Article` ve `BreadcrumbList` JSON-LD yalnızca `onaylandi: true` yazı için basılır. Footer'da "Rehber yazılar", ilgili hizmet sayfalarında "İlgili rehber yazılar" bağlantısı vardır. Her yazıyı firma okuyup onaylamadan `true` yapmayın.
+- **Sitemap:** onaylı bölge ve rehber sayfaları eklenir (taslaklar asla girmez).
+- **Hakkımızda:** üstte büyük fotoğraf + başlık, kısa "Nasıl çalışıyoruz", görünür hizmetler listesi, galeriden 4'lü fotoğraf şeridi (lightbox) ve adres/yol tarifi kartı. Kuruluş yılı, ekip sayısı veya iddia yoktur.
+
+## Lighthouse CI
+
+[lighthouserc.json](lighthouserc.json) + `@lhci/cli` (0.15.1): normal build'in `dist/` çıktısını `astro preview` ile sunar ve **mobil** Lighthouse'u `/`, `/galeri/`, `/iletisim/` için 3'er kez çalıştırır. Eşikler: performans ≥ 0.9, erişilebilirlik ≥ 0.95, en iyi uygulamalar ≥ 0.95 (altına düşerse CI **kırmızı**); SEO ≥ 0.9 yalnızca **uyarı**: site henüz yayında değil (`publish.indexable: false`) ve tüm sayfalar bilerek `noindex` olduğundan Lighthouse "taranabilir" denetiminde puan kaybeder. Yayına alınıp `indexable: true` yapılınca `lighthouserc.json` içinde `categories:seo` değeri `"warn"` yerine `"error"` yapılmalıdır.
+
+**Sonucu nereden görürsünüz:** GitHub'da **Actions** → ilgili çalıştırma → `lighthouse` işi (log'da kategori puanları ve eşik ihlalleri) → sayfanın altındaki **Artifacts** bölümünden `lighthouse-report` (HTML ve JSON raporları). Yerelde: `npm run build` sonra `npm run lighthouse` (rapor `.lighthouseci/` klasörüne yazılır; Chrome kurulu olmalıdır). Rapor üçüncü taraf bir sunucuya yüklenmez.
 
 ## Yayına alma kontrol listesi
 

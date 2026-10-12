@@ -1,0 +1,253 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import Picture from '../../components/Picture.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import TopoArt from '../../components/TopoArt.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import {
+  guideLegalNote,
+  guideReadingMinutes,
+  visibleGuides,
+  type Guide,
+} from '../../data/guides';
+import { visibleServices } from '../../data/services';
+import { site, whatsappLink } from '../../data/site';
+import { publicFileExists } from '../../utils/assets';
+import { imageSize } from '../../utils/image-size';
+import { articleSchema, breadcrumbSchema } from '../../utils/schema';
+
+// /rehber/ (liste) ve /rehber/<slug>/ (detay) tek dosyada üretilir.
+// Görünür yazı yoksa (yayında onaylı yazı yok) hiçbir sayfa üretilmez.
+export function getStaticPaths() {
+  if (visibleGuides.length === 0) return [];
+  return [
+    { params: { slug: undefined }, props: { guide: null } },
+    ...visibleGuides.map((item) => ({ params: { slug: item.slug }, props: { guide: item } })),
+  ];
+}
+
+const { guide } = Astro.props as { guide: Guide | null };
+const others = guide ? visibleGuides.filter((item) => item.slug !== guide.slug) : [];
+const relatedServices = guide
+  ? visibleServices.filter((service) => guide.relatedServices.includes(service.slug))
+  : [];
+const waLink = whatsappLink();
+const cover = guide && publicFileExists(guide.cover) ? guide.cover : null;
+const coverSize = cover ? imageSize(cover) : null;
+
+// Taslak sayfalar noindex (site yayına çıksa bile onaylanana kadar)
+const anyApproved = visibleGuides.some((item) => item.onaylandi);
+const noindex = guide ? !guide.onaylandi : !anyApproved;
+
+const title = guide ? `${guide.seoTitle} | ${site.name}` : `Rehber Yazılar | ${site.name}`;
+const description = guide
+  ? guide.description
+  : `${site.legalName} rehber yazıları: temel kazısı, hafriyat toprağı ve moloz, makine seçimi ve bina yıkımı hakkında sade genel bilgiler.`;
+
+const tocItems = guide
+  ? [
+      ...guide.sections.map((section) => ({ id: section.id, title: section.title })),
+      { id: 'teklif', title: 'Teklif için bize ulaşın' },
+    ]
+  : [];
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <Fragment slot="head">
+    {
+      guide?.onaylandi && (
+        <>
+          <JsonLd data={articleSchema({ ...guide, cover: cover ?? undefined }, Astro.site)} />
+          {Astro.site && (
+            <JsonLd
+              data={breadcrumbSchema(
+                [
+                  { name: 'Ana Sayfa', path: '/' },
+                  { name: 'Rehber', path: '/rehber/' },
+                  { name: guide.seoTitle, path: `/rehber/${guide.slug}/` },
+                ],
+                Astro.site,
+              )}
+            />
+          )}
+        </>
+      )
+    }
+  </Fragment>
+  {
+    guide ? (
+      <>
+        <section class="page-head on-dark">
+          {
+            cover && (
+              <div class="page-head-media" aria-hidden="true">
+                <Picture
+                  src={cover}
+                  alt=""
+                  width={coverSize?.width ?? 1600}
+                  height={coverSize?.height ?? 1000}
+                  loading="eager"
+                  sizes="100vw"
+                />
+              </div>
+            )
+          }
+          <TopoArt variant="soft" />
+          <div class="container narrow">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+              <ol>
+                <li><a href="/">Ana Sayfa</a></li>
+                <li><a href="/rehber/">Rehber</a></li>
+                <li aria-current="page">{guide.seoTitle}</li>
+              </ol>
+            </nav>
+            <h1>{guide.title}</h1>
+            <p class="guide-meta">
+              <span>{site.name}</span>
+              <span aria-hidden="true">·</span>
+              <span>{guideReadingMinutes(guide)} dk okuma</span>
+              {!guide.onaylandi && <span class="draft-badge">TASLAK</span>}
+            </p>
+          </div>
+        </section>
+
+        <section class="section section-light">
+          <div class="container narrow prose">
+            {
+              !guide.onaylandi && (
+                <p class="draft-notice" role="note">
+                  <span class="draft-badge">TASLAK</span> Bu yazı firma tarafından henüz onaylanmadı.
+                </p>
+              )
+            }
+
+            <nav class="toc" aria-label="İçindekiler">
+              <h2>İçindekiler</h2>
+              <ol>
+                {
+                  tocItems.map((item) => (
+                    <li>
+                      <a href={`#${item.id}`}>{item.title}</a>
+                    </li>
+                  ))
+                }
+              </ol>
+            </nav>
+
+            {
+              guide.sections.map((section) => (
+                <section id={section.id} class="guide-section" aria-labelledby={`${section.id}-baslik`}>
+                  <h2 id={`${section.id}-baslik`}>{section.title}</h2>
+                  {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                  {
+                    section.items && (
+                      <ul class="check-list">
+                        {section.items.map((item) => (
+                          <li>
+                            <Icon name="check" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  }
+                </section>
+              ))
+            }
+
+            {guide.legal && <p class="guide-note">{guideLegalNote}</p>}
+
+            <RelatedLinks
+              heading="İlgili hizmetler"
+              items={relatedServices.map((service) => ({
+                href: `/hizmetler/${service.slug}/`,
+                title: service.title,
+                icon: service.icon,
+                draft: !service.onaylandi,
+              }))}
+            />
+          </div>
+        </section>
+
+        <section id="teklif" class="section section-paper" aria-labelledby="rehber-cta-baslik">
+          <div class="container narrow">
+            <aside class="call-card call-card--wide on-dark" aria-label="Teklif için arayın">
+              <Icon name="phone" />
+              <h2 id="rehber-cta-baslik">Teklif için bize ulaşın</h2>
+              <p>İşi anlatın, ihtiyacınıza göre teklif hazırlayalım.</p>
+              <a class="btn btn-primary btn-lg" href={site.phone.href}>
+                {site.phone.display}
+              </a>
+              {waLink && <WhatsAppButton class="btn btn-wa btn-lg call-card-wa" href={waLink} />}
+            </aside>
+          </div>
+        </section>
+
+        {
+          others.length > 0 && (
+            <section class="section section-light" aria-labelledby="diger-rehber-baslik">
+              <div class="container narrow">
+                <div class="section-head">
+                  <p class="eyebrow">Rehber</p>
+                  <h2 id="diger-rehber-baslik">Diğer yazılar</h2>
+                </div>
+                <ul class="link-list">
+                  {others.map((item) => (
+                    <li>
+                      <a href={`/rehber/${item.slug}/`}>
+                        <Icon name="check" />
+                        <span>{item.title}</span>
+                        {!item.onaylandi && <span class="draft-badge">TASLAK</span>}
+                        <Icon class="link-list-arrow" name="arrow" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )
+        }
+      </>
+    ) : (
+      <>
+        <section class="page-head on-dark">
+          <TopoArt variant="soft" />
+          <div class="container narrow">
+            <p class="eyebrow">Rehber</p>
+            <h1>Rehber Yazılar</h1>
+            <p class="lead">
+              Temel kazısı, hafriyat toprağı ve moloz, makine seçimi ve bina yıkımı hakkında sade genel
+              bilgiler.
+            </p>
+            {visibleGuides.some((item) => !item.onaylandi) && (
+              <p class="draft-notice" role="note">
+                <span class="draft-badge">TASLAK</span> Bu yazılar firma tarafından henüz onaylanmadı.
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section class="section section-light section--flush-top">
+          <div class="container narrow">
+            <ul class="guide-list">
+              {visibleGuides.map((item) => (
+                <li class="guide-card">
+                  <h2>
+                    <a href={`/rehber/${item.slug}/`}>{item.title}</a>
+                  </h2>
+                  <p>{item.description}</p>
+                  <p class="guide-meta guide-meta--light">
+                    <span>{guideReadingMinutes(item)} dk okuma</span>
+                    {!item.onaylandi && <span class="draft-badge">TASLAK</span>}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </>
+    )
+  }
+</BaseLayout>

@@ -11,6 +11,14 @@
  */
 
 import { showDrafts } from './drafts';
+import { approvedRegionNames } from './regions';
+
+const regionAnswer = 'Bulunduğunuz yeri yazın veya bizi arayın; konumunuza uygun olup olmadığını birlikte netleştirelim.';
+/** Onaylı bölge varsa cevaba liste eklenir (taslak bölgeler asla yazılmaz) */
+const regionAnswerWithList =
+  approvedRegionNames.length > 0
+    ? `Hizmet verdiğimiz bölgeler: ${approvedRegionNames.join(', ')}. ${regionAnswer}`
+    : regionAnswer;
 
 export interface Faq {
   question: string;
@@ -57,8 +65,7 @@ export const faqs: Faq[] = [
   },
   {
     question: 'Hangi bölgelere hizmet veriyorsunuz?',
-    answer:
-      'Bulunduğunuz yeri yazın veya bizi arayın; konumunuza uygun olup olmadığını birlikte netleştirelim.',
+    answer: regionAnswerWithList,
     onaylandi: false,
   },
 ];

@@ -1,7 +1,9 @@
 ---
 import { navItems } from '../data/nav';
+import { visibleGuides } from '../data/guides';
 import { visibleMachines } from '../data/machines';
 import { guideVisible } from '../data/price-guide';
+import { visibleRegions } from '../data/regions';
 import { visibleServices } from '../data/services';
 import { site, whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
@@ -91,6 +93,20 @@ const hasServices = visibleServices.length > 0;
               guideVisible && (
                 <li>
                   <a href="/hafriyat-fiyatlari/">Hafriyat fiyatları</a>
+                </li>
+              )
+            }
+            {
+              visibleGuides.length > 0 && (
+                <li>
+                  <a href="/rehber/">Rehber yazılar</a>
+                </li>
+              )
+            }
+            {
+              visibleRegions.length > 0 && (
+                <li>
+                  <a href="/bolgeler/">Hizmet bölgeleri</a>
                 </li>
               )
             }

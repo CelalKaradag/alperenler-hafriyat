@@ -25,3 +25,18 @@
   );
 }
 
+/* Hakkımızda: büyük fotoğraflı üst alan (fotoğraf daha görünür, başlık altta) */
+.page-head--tall {
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(18rem, 48vh, 30rem);
+}
+
+.page-head--tall > .container {
+  width: 100%; /* flex çocuğu olarak daralmasın */
+}
+
+.page-head--tall .page-head-media::after {
+  background: linear-gradient(0deg, rgba(20, 22, 26, 0.92) 0%, rgba(20, 22, 26, 0.35) 70%);
+}
+

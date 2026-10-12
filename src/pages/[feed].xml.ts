@@ -1,6 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
+import { guides } from '../data/guides';
 import { machines } from '../data/machines';
 import { priceGuide } from '../data/price-guide';
+import { regions } from '../data/regions';
 import { services } from '../data/services';
 import { site } from '../data/site';
 import { getGalleryEntries } from '../utils/gallery';
@@ -8,7 +10,7 @@ import { getGalleryEntries } from '../utils/gallery';
 /**
  * Basit kendi sitemap’imiz (/sitemap.xml). `@astrojs/sitemap` kullanılmaz.
  *  - Yalnızca site.publish.indexable === true iken ÜRETİLİR (aksi halde dosya hiç oluşmaz).
- *  - Taslak içerik ASLA girmez: hizmet, makine ve fiyat rehberi için yalnızca `onaylandi: true`
+ *  - Taslak içerik ASLA girmez: hizmet, makine, bölge, rehber yazı ve fiyat rehberi için yalnızca `onaylandi: true`
  *    olanlar listelenir (PUBLIC_SHOW_DRAFTS açık olsa bile).
  *  - /gizlilik/ (noindex) ve 404 listelenmez.
  */
@@ -39,6 +41,18 @@ export const GET: APIRoute = ({ site: base }) => {
   }
 
   if (priceGuide.onaylandi) paths.add('/hafriyat-fiyatlari/');
+
+  const approvedRegions = regions.filter((item) => item.onaylandi);
+  if (approvedRegions.length > 0) {
+    paths.add('/bolgeler/');
+    approvedRegions.forEach((item) => paths.add(`/bolgeler/${item.slug}/`));
+  }
+
+  const approvedGuides = guides.filter((item) => item.onaylandi);
+  if (approvedGuides.length > 0) {
+    paths.add('/rehber/');
+    approvedGuides.forEach((item) => paths.add(`/rehber/${item.slug}/`));
+  }
 
   const urls = [...paths]
     .map((path) => `  <url><loc>${new URL(path, base).href}</loc></url>`)

@@ -1,18 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import GallerySection from '../components/GallerySection.astro';
+import HowWeWork from '../components/HowWeWork.astro';
+import Icon from '../components/Icon.astro';
 import Picture from '../components/Picture.astro';
-import { site } from '../data/site';
+import TopoArt from '../components/TopoArt.astro';
+import { visibleServices } from '../data/services';
+import { mapsDirectionsUrl, mapsUrl, site } from '../data/site';
 import { publicFileExists } from '../utils/assets';
+import { imageSize } from '../utils/image-size';
 
 const photo = '/images/hakkimizda.jpg';
 const hasPhoto = publicFileExists(photo);
+const photoSize = hasPhoto ? imageSize(photo) : null;
 ---
 
 <BaseLayout
   title={`Hakkımızda | ${site.name}`}
   description={`${site.legalName} hakkında kısa bilgi ve iletişim yolları. Merkezimiz Yeşilyurt / Malatya.`}
 >
-  <section class="page-head on-dark">
+  <section class:list={['page-head', 'on-dark', hasPhoto && 'page-head--tall']}>
+    {
+      hasPhoto && (
+        <div class="page-head-media" aria-hidden="true">
+          <Picture
+            src={photo}
+            alt=""
+            width={photoSize?.width ?? 1000}
+            height={photoSize?.height ?? 1333}
+            loading="eager"
+            sizes="100vw"
+          />
+        </div>
+      )
+    }
+    <TopoArt variant="soft" />
     <div class="container narrow">
       <p class="eyebrow">Hakkımızda</p>
       <h1>{site.legalName}</h1>
@@ -20,52 +42,82 @@ const hasPhoto = publicFileExists(photo);
   </section>
 
   <section class="section section-light">
-    <div class:list={['container', 'about-page', hasPhoto && 'about-page--photo']}>
+    <div class="container about-page">
       <div class="prose">
-      <h2>Kimiz?</h2>
-      <p>
-        {site.legalName}, Malatya’nın Yeşilyurt ilçesinde, Koyunoğlu Mahallesi’ndeki adresinden
-        çalışır. İş talepleri telefonla alınır; ihtiyaç önce konuşulur, sonra netleştirilir.
-      </p>
+        <h2>Kimiz?</h2>
+        <p>
+          {site.legalName}, Malatya’nın Yeşilyurt ilçesinde, Koyunoğlu Mahallesi’ndeki adresinden
+          çalışır. İş talepleri telefonla alınır; ihtiyaç önce konuşulur, sonra netleştirilir.
+        </p>
 
-      <h2>Bize nasıl ulaşırsınız?</h2>
-      <p>
-        En hızlı yol telefondur. Adresimiz ve harita bağlantısı iletişim sayfasında yer alır.
-      </p>
+        <h2>Bize nasıl ulaşırsınız?</h2>
+        <p>En hızlı yol telefondur. Adresimiz ve harita bağlantısı iletişim sayfasında yer alır.</p>
 
-      <dl class="facts">
-        <div>
-          <dt>Firma</dt>
-          <dd>{site.legalName}</dd>
-        </div>
-        <div>
-          <dt>Telefon</dt>
-          <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
-        </div>
-        <div>
-          <dt>Adres</dt>
-          <dd>{site.address}</dd>
-        </div>
-      </dl>
-
-      <div class="btn-row">
-        <a class="btn btn-dark" href="/iletisim/">İletişim Bilgileri</a>
-      </div>
-      </div>
-
-      {
-        hasPhoto && (
-          <div class="about-media">
-            <Picture
-              src={photo}
-              alt="Kayalık arazide çalışan Hitachi ekskavatör"
-              width={1000}
-              height={1333}
-              sizes="(min-width: 56em) 35vw, 100vw"
-            />
+        <dl class="facts">
+          <div>
+            <dt>Firma</dt>
+            <dd>{site.legalName}</dd>
           </div>
-        )
-      }
+          <div>
+            <dt>Telefon</dt>
+            <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
+          </div>
+          <div>
+            <dt>Adres</dt>
+            <dd>{site.address}</dd>
+          </div>
+        </dl>
+
+        <div class="btn-row">
+          <a class="btn btn-dark" href="/iletisim/">İletişim Bilgileri</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <HowWeWork compact />
+
+  {
+    visibleServices.length > 0 && (
+      <section class="section section-light" aria-labelledby="hakkimizda-hizmet-baslik">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Hizmetler</p>
+            <h2 id="hakkimizda-hizmet-baslik">Hizmetlerimiz</h2>
+          </div>
+          <ul class="link-list">
+            {visibleServices.map((service) => (
+              <li>
+                <a href={`/hizmetler/${service.slug}/`}>
+                  <Icon name={service.icon} />
+                  <span>{service.title}</span>
+                  {!service.onaylandi && <span class="draft-badge">TASLAK</span>}
+                  <Icon class="link-list-arrow" name="arrow" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <GallerySection variant="strip" />
+
+  <section class="section section-light" aria-labelledby="konum-baslik">
+    <div class="container">
+      <div class="about-location">
+        <h2 id="konum-baslik">Konum</h2>
+        <p>{site.address}</p>
+        <div class="btn-row">
+          <a class="btn btn-dark" href={mapsDirectionsUrl} target="_blank" rel="noopener noreferrer">
+            Yol tarifi al
+          </a>
+          <a class="btn btn-outline-dark" href={mapsUrl} target="_blank" rel="noopener noreferrer">
+            Google Maps’te aç
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>

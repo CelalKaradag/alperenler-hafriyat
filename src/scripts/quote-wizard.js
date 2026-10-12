@@ -33,6 +33,10 @@ function setup(root) {
   const placeInput = app.querySelector('[name="place"]');
   const noteInput = app.querySelector('[name="note"]');
 
+  // Bölge sayfalarından gelen ?yer=<ilçe> ile yer alanı ön-dolu gelir (yalnızca alan boşsa)
+  const prefill = new URLSearchParams(window.location.search).get('yer');
+  if (prefill && !placeInput.value) placeInput.value = clean(prefill, MAX_PLACE);
+
   let index = 0; // 0..2 adım, 3 sonuç
 
   const selected = (name) => {

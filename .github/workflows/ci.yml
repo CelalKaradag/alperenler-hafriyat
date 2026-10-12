@@ -39,3 +39,35 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  # Mobil Lighthouse (lighthouserc.json): ana sayfa, /galeri/, /iletisim/. Normal (taslaksız) build
+  # üzerinde, `astro preview` ile sunulan dist/ çıktısına karşı çalışır.
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.13.0'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # Eşikler: performans ≥ 0.9, erişilebilirlik ≥ 0.95, en iyi uygulamalar ≥ 0.95 (hata verir).
+      # SEO ≥ 0.9 yalnızca UYARI: site henüz yayında değil (site.publish.indexable=false), tüm sayfalar
+      # bilerek noindex olduğundan Lighthouse "taranabilir" denetiminde puan düşürür. Yayına alınıp
+      # indexable=true yapılınca lighthouserc.json içinde seo "warn" yerine "error" yapılmalıdır.
+      - run: npx lhci autorun
+
+      # Rapor (HTML + JSON) her durumda indirilebilir olsun
+      - name: Lighthouse raporunu yükle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 14
