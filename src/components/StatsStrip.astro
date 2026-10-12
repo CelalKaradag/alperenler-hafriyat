@@ -5,12 +5,17 @@ import Icon from './Icon.astro';
 
 {
   stats.length > 0 && (
-    <section class="stats" aria-label="Rakamlarla firma">
+    <section class="stats" aria-label="Rakamlarla firma" data-stats>
+      {/* Çok soluk dekoratif nokta dokusu (grafit, opacity ≈ .08); metni bozmaz, ekran okuyucuya görünmez */}
+      <div class="stats-texture" aria-hidden="true" />
       <ul class="container stats-grid">
         {stats.map((stat) => (
           <li class="stat">
             {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
-            <span class="stat-value">{stat.value}</span>
+            {/* HTML'de GERÇEK sayı yazılı (JS yoksa / ekran okuyucu / arama motoru); JS görünüme girince 0'dan sayar */}
+            <span class="stat-value" data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}>
+              {stat.value}
+            </span>
             <span class="stat-label">{stat.label}</span>
           </li>
         ))}

@@ -24,6 +24,7 @@ const lazyModules = [
   ['[data-gallery-grid="home"]', () => import('./gallery-carousel.js'), (m) => m.initGalleryCarousel(), true],
   ['[data-gallery-filters]', () => import('./gallery-filter.js'), (m) => m.initGalleryFilters(), true],
   ['[data-quote-wizard]', () => import('./quote-wizard.js'), (m) => m.initQuoteWizards()],
+  ['[data-stats]', () => import('./stats-counter.js'), (m) => m.initStatsCounter()],
 ];
 
 const INTERACTION_EVENTS = ['pointerdown', 'touchstart', 'keydown', 'scroll'];

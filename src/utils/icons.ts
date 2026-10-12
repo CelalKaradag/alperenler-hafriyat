@@ -27,6 +27,19 @@ export const iconPaths = {
   users:
     'M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20M10 11.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M14.8 5.3a3.2 3.2 0 0 1 0 6',
   check: 'M5 12.5l4.5 4.5L19 7',
+  // rakam şeridi (filo) ikonları: tek çizgi stili, 24×24, yuvarlak uç; elle çizildi
+  /** paletli ekskavatör: palet, kabin, bom + kol + kova */
+  fleetExcavator:
+    'M3.5 18.5h11a1.75 1.75 0 0 1 0 3.5h-11a1.75 1.75 0 0 1 0-3.5zM5 18.5V14h6l1.5 2.5v2M10.5 14L15 6l4.5 6M19.5 12l2 2.5H18',
+  /** JCB / kazıcı yükleyici: önde yükleme kepçesi, arkada kazıcı kol, iki teker */
+  fleetBackhoe:
+    'M11 18.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 19.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM5 18.5H2.5V14H17M6 14V7.5h5l2 3.5v3M13 11h4.5l2.5 5h2M6 9.5L3.5 5 2 9.5',
+  /** damperli kamyon: damper kasa, kabin, tekerler */
+  fleetDumpTruck:
+    'M2 6.5h11.5L12 14.5H2zM14 9.5h3.5l3 3.5v3.5H12M2 14.5v2h2.5M8.5 16.5h7M8.5 18.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM19.5 18.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
+  /** lowbed tır: alçak dorse üstünde iş makinesi, çekici kabin, tekerler */
+  fleetLowbed:
+    'M1.5 16h14M15.5 16V9.5H19l3 3.5V16h-6.5M3.5 16v-3h4.5v3M6.5 13l3-4.5 3 4M6.3 18.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0zM10.3 18.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0zM20.3 18.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0z',
 } as const;
 
 export type IconName = keyof typeof iconPaths;

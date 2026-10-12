@@ -217,6 +217,7 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
 
   // Ana sayfa sayı şeridi: sırayla 7 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır
   await page.goto('/');
+  await page.locator('[data-stats]').scrollIntoViewIfNeeded(); // sayaç görünüme girince 0'dan sayar; bitince son sayı
   const items = page.locator('.stats .stat');
   await expect(items).toHaveCount(4);
   const expected = [
@@ -231,6 +232,54 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   }
 });
 
+test('sayı şeridi: sarı bant, grafit metin, 4 ikon; masaüstü 4, tablet/mobil 2 sütun; taşma yok', async ({ page }) => {
+  for (const [width, columns] of [
+    [390, 2],
+    [768, 2],
+    [1366, 4],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    const strip = page.locator('[data-stats]');
+    await strip.scrollIntoViewIfNeeded();
+    await expect(strip.locator('.stat')).toHaveCount(4);
+    await expect(strip.locator('.stat-icon')).toHaveCount(4);
+    const css = await strip.evaluate((el) => {
+      const value = el.querySelector('.stat-value') as Element;
+      const label = el.querySelector('.stat-label') as Element;
+      const grid = el.querySelector('.stats-grid') as Element;
+      return {
+        bg: getComputedStyle(el).backgroundColor,
+        valueColor: getComputedStyle(value).color,
+        labelColor: getComputedStyle(label).color,
+        // auto-fit boş sütunları 0 px'e çöker: yalnızca genişliği > 0 olan sütunlar sayılır
+        columns: getComputedStyle(grid)
+          .gridTemplateColumns.trim()
+          .split(/\s+/)
+          .filter((track) => parseFloat(track) > 0).length,
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+        width: el.getBoundingClientRect().width,
+      };
+    });
+    expect(css.bg, 'zemin site sarısı').toBe('rgb(245, 180, 0)');
+    expect(css.valueColor, 'sayı grafit').toBe('rgb(20, 22, 26)');
+    expect(css.labelColor, 'etiket grafit').toBe('rgb(20, 22, 26)');
+    expect(css.columns, `${width}px sütun sayısı`).toBe(columns);
+    expect(css.overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
+    expect(Math.round(css.width), 'tam genişlik bant').toBe(width);
+  }
+});
+
+test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür (7/2/7/2)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('[data-stats]').scrollIntoViewIfNeeded();
+  // Tek ölçüm (bekleme/yeniden deneme yok): sayaç çalışmıyorsa ilk okumada son değer vardır
+  const values = await page.locator('[data-stats] .stat-value').evaluateAll((nodes) =>
+    nodes.map((node) => node.textContent?.trim()),
+  );
+  expect(values).toEqual(['7', '2', '7', '2']);
+});
 test('onaylı (normal build) sayfalarda "13 ton" geçmez', async ({ page, request }) => {
   const pages = await crawl(page);
   expect(pages.length).toBeGreaterThan(10);
