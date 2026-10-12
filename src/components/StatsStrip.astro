@@ -10,10 +10,15 @@ const groups = [
 
 {
   stats.length > 0 && (
-    <section class="stats" aria-label="Rakamlarla firma" data-stats>
+    <section class="stats" aria-labelledby="rakamlar-baslik" data-stats>
       {/* Çok soluk dekoratif nokta dokusu (grafit, opacity ≈ .08); metni bozmaz, ekran okuyucuya görünmez */}
       <div class="stats-texture" aria-hidden="true" />
       <div class="container stats-inner">
+        <div class="stats-head">
+          <p class="stats-eyebrow">Rakamlarla</p>
+          <h2 id="rakamlar-baslik">Alperenler Hafriyat</h2>
+        </div>
+
         {groups.map((group, index) => (
           <>
             {index > 0 && group.label && (
@@ -22,19 +27,33 @@ const groups = [
               </p>
             )}
             <ul class={`stats-grid stats-grid--${group.id}`} aria-label={group.label ?? undefined}>
-              {group.items.map((stat) => (
-                <li class="stat">
-                  {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
-                  {/* HTML'de GERÇEK (Türkçe biçimli) sayı yazılı: JS yoksa / ekran okuyucu / arama motoru bunu görür;
-                      JS görünüme girince 0'dan sayar (ara değerler aynı biçimde) */}
-                  <span
-                    class="stat-value"
-                    data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}
-                    data-suffix={stat.suffix}
-                  >
-                    {formatStatValue(stat.value)}{stat.suffix}
-                  </span>
-                  <span class="stat-label">{stat.label}</span>
+              {group.items.map((stat, i) => (
+                <li
+                  class:list={['stat', group.id === 'filo' && 'stat--card']}
+                  style={group.id === 'filo' ? `--i: ${i}` : undefined}
+                >
+                  {/* Üst grup: grafit daire rozet içinde sarı ikon; filo: grafit kartta sarı ikon */}
+                  {stat.icon &&
+                    (group.id === 'is' ? (
+                      <span class="stat-badge" aria-hidden="true">
+                        <Icon class="stat-icon" name={stat.icon} />
+                      </span>
+                    ) : (
+                      <Icon class="stat-icon" name={stat.icon} />
+                    ))}
+                  <div class="stat-text">
+                    {/* HTML'de GERÇEK (Türkçe biçimli) sayı yazılı: JS yoksa / ekran okuyucu / arama motoru bunu görür;
+                        JS görünüme girince 0'dan sayar (ara değerler aynı biçimde) */}
+                    <span
+                      class="stat-value"
+                      data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}
+                      data-suffix={stat.suffix}
+                    >
+                      {formatStatValue(stat.value)}{stat.suffix}
+                    </span>
+                    <span class="stat-label">{stat.label}</span>
+                    {stat.note && <span class="stat-note">{stat.note}</span>}
+                  </div>
                 </li>
               ))}
             </ul>

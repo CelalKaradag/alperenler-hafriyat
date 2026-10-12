@@ -30,16 +30,16 @@ export const iconPaths = {
   // rakam şeridi (filo) ikonları: tek çizgi stili, 24×24, yuvarlak uç; elle çizildi
   /** paletli ekskavatör: palet, kabin, bom + kol + kova */
   fleetExcavator:
-    'M3.5 18.5h11a1.75 1.75 0 0 1 0 3.5h-11a1.75 1.75 0 0 1 0-3.5zM5 18.5V14h6l1.5 2.5v2M10.5 14L15 6l4.5 6M19.5 12l2 2.5H18',
+    'M2.5 17.5h10a1.75 1.75 0 0 1 0 3.5h-10a1.75 1.75 0 0 1 0-3.5zM4 17.5V12h4.5l1.5 2.5v3M10 13l4.5-7 5 5.5M19.5 11.5l1.5 3h-3.5z',
   /** JCB / kazıcı yükleyici: önde büyük yükleme kepçesi + yükleyici kolu, arkada kazıcı kol, büyük arka teker, küçük ön teker, kabin */
   fleetBackhoe:
-    'M11 17a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0zM17 18.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM4.5 13.5V6h5.5l2 4v3.5M4.5 13.5H15M12 10h3.5l.5 3.5M14 11.5l6 1.5M19 12h4l-1.2 5H18.5zM4.5 8.5L2.5 5.5 1.5 10.5l2 .8',
+    'M10 17a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM18.5 18a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 14V6.5h4.5l1.5 4.5h3.5l1 3M4 14h11M10 17h4.5M15.5 12.5l3.5 2.5M18.5 13.5h4l-.5 4.5h-3zM6 9.5L3.5 5 1.5 9l1.5 1.5',
   /** damperli kamyon: damper kasa, kabin, tekerler */
   fleetDumpTruck:
     'M2 6.5h11.5L12 14.5H2zM14 9.5h3.5l3 3.5v3.5H12M2 14.5v2h2.5M8.5 16.5h7M8.5 18.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM19.5 18.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
   /** lowbed tır: uzun alçak dorse (arkası basamaklı), önde çekici kabin, dorse üstünde küçük paletli makine silueti, çok tekerlek */
   fleetLowbed:
-    'M1.5 17h2v-2h12M16 15V9h3.5l3 3.5V15H15.5M7.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM10.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM13.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM20.3 18.3a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0zM4.5 15v-1.5a.8.8 0 0 1 .8-.8h5.4a.8.8 0 0 1 .8.8V15M6 12.7v-1.9h2.8l.9 1.9M8.3 10.8l3.2-3 2 2.5M13.5 10.3l.8 1.4h-1.7',
+    'M1.5 15.5h12.5l2-2.5h6.5V9.5L20.5 7H17v6M5.4 18.5a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM9 18.5a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM17.4 18.5a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM21.4 18.5a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0zM3 13.5h7M4 13.5V10h3l1 1.5M8 11.5l2.5-3.5 2 3',
   /** tamamlanan iş: onay işaretli pano */
   statJobs:
     'M9 3h6v3H9zM9 4.5H7A1.5 1.5 0 0 0 5.5 6v14A1.5 1.5 0 0 0 7 21.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2M8.8 13.5l2.4 2.4 4.2-4.8',

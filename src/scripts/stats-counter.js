@@ -18,6 +18,24 @@ export function initStatsCounter() {
   const items = Array.from(root.querySelectorAll('[data-count]'));
   if (items.length === 0) return null;
 
+  // Filo kartları: görünüme girince sırayla (stagger CSS'te) hafifçe yukarı kayarak belirir.
+  // Gizli başlangıç durumu yalnızca burada "kurulur" (.is-armed): JS yoksa kartlar hep görünür.
+  let cardObserver = null;
+  const filoGrid = root.querySelector('.stats-grid--filo');
+  if (filoGrid && root.querySelector('.stat--card')) {
+    root.classList.add('is-armed');
+    cardObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          root.classList.add('is-in');
+          cardObserver.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    cardObserver.observe(filoGrid);
+  }
+
   const frames = new Set();
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
@@ -80,6 +98,7 @@ export function initStatsCounter() {
 
   return () => {
     prime.disconnect();
+    if (cardObserver) cardObserver.disconnect();
     count.disconnect();
     frames.forEach((id) => window.cancelAnimationFrame(id));
     // Sayfa geçişinde yarım kalan sayıyı son değere döndür

@@ -15,6 +15,7 @@
  */
 
 import type { IconName } from '../utils/icons';
+import { machines } from './machines';
 import { regions } from './regions';
 
 export type StatIcon = Extract<
@@ -39,6 +40,8 @@ export interface Stat {
   /** İsteğe bağlı son ek, örn. "+" (sayıyla birlikte gösterilir ve sayılırken korunur) */
   suffix?: string;
   label: string;
+  /** Etiketin altında küçük ikinci satır (yalnızca bu öğede gösterilir), örn. "22–35 ton" */
+  note?: string;
   icon?: StatIcon;
   /** 'is' = üst grup (büyük), 'filo' = alt grup ("Filomuz") */
   group: 'is' | 'filo';
@@ -47,6 +50,17 @@ export interface Stat {
 /** Gösterilecek sayı metni: tam sayılar Türkçe biçimde (1.653), diğerleri olduğu gibi */
 export const formatStatValue = (value: string): string =>
   /^\d+$/.test(value) ? new Intl.NumberFormat('tr-TR').format(Number(value)) : value;
+
+/** Ekskavatör ton aralığı: machines.ts'teki filo verisinden (en küçük–en büyük ton) türetilir; elle yazılmaz */
+const excavatorTons =
+  machines
+    .find((machine) => machine.slug === 'ekskavator-kiralama')
+    ?.fleet?.rows.map((row) => row.tons)
+    .filter((tons): tons is number => typeof tons === 'number') ?? [];
+const excavatorTonRange =
+  excavatorTons.length > 0
+    ? `${Math.min(...excavatorTons)}–${Math.max(...excavatorTons)} ton`
+    : undefined;
 
 /** Hizmet verilen (onaylı) ilçe sayısı: regions.ts'ten hesaplanır */
 const approvedRegionCount = regions.filter((region) => region.onaylandi).length;
@@ -59,7 +73,7 @@ export const stats: Stat[] = [
     ? [{ value: String(approvedRegionCount), label: 'İlçede hizmet', icon: 'pin' as const, group: 'is' as const }]
     : []),
   // Alt grup (filo)
-  { value: '7', label: 'Paletli ekskavatör', icon: 'fleetExcavator', group: 'filo' },
+  { value: '7', label: 'Paletli ekskavatör', note: excavatorTonRange, icon: 'fleetExcavator', group: 'filo' },
   { value: '2', label: 'JCB', icon: 'fleetBackhoe', group: 'filo' },
   { value: '7', label: 'Kamyon', icon: 'fleetDumpTruck', group: 'filo' },
   { value: '2', label: 'Lowbed tır', icon: 'fleetLowbed', group: 'filo' },

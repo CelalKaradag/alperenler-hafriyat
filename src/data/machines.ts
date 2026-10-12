@@ -32,7 +32,7 @@ export interface Machine {
   /** Galeri görseli (JPG; aynı adlı .webp varsa <picture> ile önce o) */
   image: string;
   /** Filo tablosu (müşteri onaylı adetler); yalnızca doğrulanmış makineler için */
-  fleet?: { title: string; rows: Array<{ label: string; count: number }> };
+  fleet?: { title: string; rows: Array<{ label: string; count: number; tons?: number }> };
   onaylandi: boolean;
 }
 
@@ -98,9 +98,9 @@ export const machines: Machine[] = [
     fleet: {
       title: 'Ekskavatör filomuz',
       rows: [
-        { label: '22 ton paletli ekskavatör', count: 3 },
-        { label: '30 ton paletli ekskavatör', count: 2 },
-        { label: '35 ton paletli ekskavatör', count: 2 },
+        { label: '22 ton paletli ekskavatör', count: 3, tons: 22 },
+        { label: '30 ton paletli ekskavatör', count: 2, tons: 30 },
+        { label: '35 ton paletli ekskavatör', count: 2, tons: 35 },
       ],
     },
     uses: [

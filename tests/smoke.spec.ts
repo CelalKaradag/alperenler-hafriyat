@@ -236,6 +236,8 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
     ['2', 'Lowbed tır'],
   ];
   for (let i = 0; i < expected.length; i += 1) {
+    // her öğe görünüme kaydırılır: sayaç öğe görününce (≥ %40) 0'dan sayar, bitince son sayı
+    await items.nth(i).scrollIntoViewIfNeeded();
     await expect(items.nth(i).locator('.stat-value')).toHaveText(expected[i][0]);
     await expect(items.nth(i).locator('.stat-label')).toHaveText(expected[i][1]);
   }
@@ -243,13 +245,11 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   await expect(page.locator('[data-stats] .stat-value', { hasText: '+' })).toHaveCount(0);
 });
 
-test('sayı şeridi: sarı bant, grafit metin, 7 ikon, iki grup ("Filomuz"); masaüstü 3 + 4 sütun, tablet/mobil 2 sütun + ortalı tek kalan; taşma yok', async ({
-  page,
-}) => {
+test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo grafit kartlı; sütunlar, taşma, renkler', async ({ page }) => {
   for (const [width, isColumns, filoColumns] of [
-    [390, 2, 2],
+    [390, 2, 1],
     [768, 2, 2],
-    [1024, 3, 4],
+    [1024, 3, 2],
     [1366, 3, 4],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
@@ -258,40 +258,95 @@ test('sayı şeridi: sarı bant, grafit metin, 7 ikon, iki grup ("Filomuz"); mas
     await strip.scrollIntoViewIfNeeded();
     await expect(strip.locator('.stat')).toHaveCount(7);
     await expect(strip.locator('.stat-icon')).toHaveCount(7);
-    // İki grup görünür; alt grubun üstünde "Filomuz" etiketi
+
+    // Başlık: eyebrow "RAKAMLARLA" + h2 "Alperenler Hafriyat"
+    await expect(strip.locator('.stats-eyebrow')).toHaveText('Rakamlarla');
+    await expect(strip.locator('h2')).toHaveText('Alperenler Hafriyat');
+    // İki grup + "Filomuz" etiketi
     await expect(strip.locator('.stats-grid--is')).toBeVisible();
     await expect(strip.locator('.stats-grid--filo')).toBeVisible();
     await expect(strip.locator('.stats-group-label')).toHaveText('Filomuz');
     await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(3);
-    await expect(strip.locator('.stats-grid--filo .stat')).toHaveCount(4);
+    await expect(strip.locator('.stats-grid--filo .stat--card')).toHaveCount(4);
+    // Kartlar giriş animasyonundan sonra tam görünür (opacity 1)
+    await expect
+      .poll(() => strip.locator('.stat--card').last().evaluate((el) => getComputedStyle(el).opacity))
+      .toBe('1');
 
     const css = await strip.evaluate((el) => {
-      const value = el.querySelector('.stat-value') as Element;
-      const label = el.querySelector('.stat-label') as Element;
+      const q = (selector: string) => el.querySelector(selector) as Element;
+      const style = (selector: string) => getComputedStyle(q(selector));
       // auto-fit boş sütunları 0 px'e çöker: yalnızca genişliği > 0 olan sütunlar sayılır
       const tracks = (selector: string) =>
-        getComputedStyle(el.querySelector(selector) as Element)
+        style(selector)
           .gridTemplateColumns.trim()
           .split(/\s+/)
           .filter((track) => parseFloat(track) > 0).length;
-      const valueBox = value.getBoundingClientRect();
+      const badge = q('.stat-badge').getBoundingClientRect();
+      const card = q('.stat--card');
+      const cardStyle = getComputedStyle(card);
+      const divider = getComputedStyle(q('.stats-grid--is .stat + .stat'), '::before');
       return {
         bg: getComputedStyle(el).backgroundColor,
-        valueColor: getComputedStyle(value).color,
-        labelColor: getComputedStyle(label).color,
+        clip: getComputedStyle(el).clipPath,
+        valueColor: style('.stat-value').color,
+        labelColor: style('.stat-label').color,
+        isValueSize: parseFloat(style('.stats-grid--is .stat-value').fontSize),
+        isLabelSize: parseFloat(style('.stats-grid--is .stat-label').fontSize),
         isColumns: tracks('.stats-grid--is'),
         filoColumns: tracks('.stats-grid--filo'),
+        badgeW: badge.width,
+        badgeH: badge.height,
+        badgeBg: style('.stat-badge').backgroundColor,
+        badgeIconColor: style('.stat-badge .stat-icon').color,
+        badgeIconW: q('.stat-badge .stat-icon').getBoundingClientRect().width,
+        cardBg: cardStyle.backgroundColor,
+        cardRadius: cardStyle.borderRadius,
+        cardShadow: cardStyle.boxShadow,
+        cardIconColor: getComputedStyle(card.querySelector('.stat-icon') as Element).color,
+        cardIconW: (card.querySelector('.stat-icon') as Element).getBoundingClientRect().width,
+        cardValueColor: getComputedStyle(card.querySelector('.stat-value') as Element).color,
+        cardValueSize: parseFloat(getComputedStyle(card.querySelector('.stat-value') as Element).fontSize),
+        cardLabelSize: parseFloat(getComputedStyle(card.querySelector('.stat-label') as Element).fontSize),
+        dividerContent: divider.content,
+        dividerWidth: divider.width,
         overflow: document.documentElement.scrollWidth - window.innerWidth,
         width: el.getBoundingClientRect().width,
-        // "1.653" tek satır: yükseklik yazı boyutunun ~1.3 katını aşmaz
-        firstValueLines: valueBox.height / parseFloat(getComputedStyle(value).fontSize),
+        // "1.653" tek satır: yükseklik yazı boyutunun ~1.4 katını aşmaz
+        firstValueLines:
+          q('.stat-value').getBoundingClientRect().height / parseFloat(style('.stat-value').fontSize),
       };
     });
     expect(css.bg, 'zemin site sarısı').toBe('rgb(245, 180, 0)');
+    expect(css.clip, 'üst/alt kenar eğimli (clip-path)').toContain('polygon');
     expect(css.valueColor, 'sayı grafit').toBe('rgb(20, 22, 26)');
     expect(css.labelColor, 'etiket grafit').toBe('rgb(20, 22, 26)');
+    expect(css.isValueSize, 'üst grup sayısı ≥ 3rem').toBeGreaterThanOrEqual(48);
+    expect(css.isLabelSize, 'etiket 1.0625rem').toBeCloseTo(17, 0);
+    // Rozet: 72 px grafit daire, içinde 36 px sarı ikon
+    expect(Math.round(css.badgeW)).toBe(72);
+    expect(Math.round(css.badgeH)).toBe(72);
+    expect(css.badgeBg).toBe('rgb(20, 22, 26)');
+    expect(css.badgeIconColor).toBe('rgb(245, 180, 0)');
+    expect(Math.round(css.badgeIconW)).toBe(36);
+    // Filo kartı: grafit, radius 14 px, gölge; 56 px sarı ikon; sayı 2.5rem kum; etiket .9375rem
+    expect(css.cardBg).toBe('rgb(20, 22, 26)');
+    expect(css.cardRadius).toBe('14px');
+    expect(css.cardShadow).not.toBe('none');
+    expect(css.cardIconColor).toBe('rgb(245, 180, 0)');
+    expect(Math.round(css.cardIconW)).toBe(56);
+    expect(css.cardValueColor).toBe('rgb(239, 235, 228)');
+    expect(css.cardValueSize).toBe(40);
+    expect(css.cardLabelSize).toBeCloseTo(15, 0);
+    // Dikey ayraç yalnızca masaüstünde (≥ 64em)
+    if (width >= 1024) {
+      expect(css.dividerContent).not.toBe('none');
+      expect(css.dividerWidth).toBe('1px');
+    } else {
+      expect(css.dividerContent === 'none' || css.dividerContent === 'normal').toBe(true);
+    }
     expect(css.isColumns, `${width}px üst grup sütun`).toBe(isColumns);
-    expect(css.filoColumns, `${width}px alt grup (filo) sütun`).toBe(filoColumns);
+    expect(css.filoColumns, `${width}px filo kart sütun`).toBe(filoColumns);
     expect(css.overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
     expect(Math.round(css.width), 'tam genişlik bant').toBe(width);
     expect(css.firstValueLines, `${width}px: 1.653 tek satır`).toBeLessThan(1.4);
@@ -302,21 +357,34 @@ test('sayı şeridi: sarı bant, grafit metin, 7 ikon, iki grup ("Filomuz"); mas
         .evaluateAll((nodes) => nodes.map((n) => Math.round(n.getBoundingClientRect().top)));
     const isTops = await topsOf('.stats-grid--is .stat');
     const filoTops = await topsOf('.stats-grid--filo .stat');
-    if (width >= 1024) {
-      expect(new Set(isTops).size, `${width}px üst grup tek satır: ${isTops.join(', ')}`).toBe(1);
-      expect(new Set(filoTops).size, `${width}px alt grup tek satır: ${filoTops.join(', ')}`).toBe(1);
-    } else {
-      // 2 sütun: üst grup 2 + 1 (tek kalan ortalı), alt grup 2 + 2
-      expect(new Set(isTops).size, `${width}px üst grup 2 satır`).toBe(2);
-      expect(new Set(filoTops).size, `${width}px alt grup 2 satır`).toBe(2);
+    const rows = (tops: number[]) => new Set(tops).size;
+    expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(width >= 1024 ? 1 : 2);
+    expect(rows(filoTops), `${width}px filo satır: ${filoTops.join(', ')}`).toBe(4 / filoColumns);
+    if (width < 1024) {
+      // üst grupta tek kalan öğe ortalı
       const last = (await strip.locator('.stats-grid--is .stat').last().boundingBox()) as { x: number; width: number };
       expect(Math.abs(last.x + last.width / 2 - width / 2), 'tek kalan öğe ortalı').toBeLessThanOrEqual(2);
     }
-    // Gruplar alt alta: alt grup üst grubun altında
+    // Gruplar alt alta
     expect(Math.min(...filoTops)).toBeGreaterThan(Math.max(...isTops));
   }
 });
 
+test('sayı şeridi: "22–35 ton" notu yalnızca ekskavatör kartında (machines.ts filo verisinden)', async ({ page }) => {
+  await page.goto('/');
+  const notes = page.locator('[data-stats] .stat-note');
+  await expect(notes).toHaveCount(1);
+  await expect(notes).toHaveText('22–35 ton');
+  await expect(page.locator('[data-stats] .stat--card').first()).toContainText('Paletli ekskavatör');
+  await expect(page.locator('[data-stats] .stat--card').first().locator('.stat-note')).toHaveCount(1);
+  // not rengi kum, opacity .75
+  const note = await notes.evaluate((el) => ({
+    color: getComputedStyle(el).color,
+    opacity: getComputedStyle(el).opacity,
+  }));
+  expect(note.color).toBe('rgb(239, 235, 228)');
+  expect(note.opacity).toBe('0.75');
+});
 test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görünür (1.653 / 1.500 / ilçe / 7 / 2 / 7 / 2)', async ({
   page,
 }) => {
@@ -332,6 +400,14 @@ test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görün
   expect(values[1]).toBe('1.500');
   expect(Number(values[2])).toBeGreaterThan(0); // ilçe sayısı
   expect(values.slice(3)).toEqual(['7', '2', '7', '2']);
+  // Hareket azaltmada kartlar gizlenip kaydırılmaz: ilk okumada tam görünür
+  const cardStates = await page.locator('[data-stats] .stat--card').evaluateAll((nodes) =>
+    nodes.map((n) => ({ opacity: getComputedStyle(n).opacity, transform: getComputedStyle(n).transform })),
+  );
+  for (const state of cardStates) {
+    expect(state.opacity).toBe('1');
+    expect(state.transform).toBe('none');
+  }
 });
 
 test('sayı şeridi: sayaç ara değerleri de Türkçe biçimli (1.234 gibi) ve sonunda 1.653', async ({ page }) => {
