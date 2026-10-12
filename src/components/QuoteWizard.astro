@@ -3,6 +3,7 @@ import { visibleServices } from '../data/services';
 import { site, whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
 
 // WhatsApp numarası tanımlıysa wa.me tabanı; mesajı betik ekler (hiçbir veri sunucuya gitmez).
 const waBase = site.whatsappNumber ? `https://wa.me/${site.whatsappNumber.replace(/\D/g, '')}` : '';
@@ -161,19 +162,7 @@ const textOnly = visibleServices.length === 0;
               rel="noopener"
               aria-label="WhatsApp’tan gönder (yeni sekmede açılır)"
             >
-              <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path
-                  d="M12 3.2a8.8 8.8 0 0 0-7.5 13.4L3.2 20.8l4.3-1.1A8.8 8.8 0 1 0 12 3.2z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M9 8.2c-.4.4-.6 1-.3 1.8.7 1.9 2.2 3.4 4.2 4.2.8.3 1.4.1 1.8-.3l.5-.7c.2-.3.1-.6-.2-.8l-1.3-.7c-.3-.1-.6 0-.8.2l-.3.3c-1.1-.4-2-1.3-2.4-2.4l.3-.3c.2-.2.3-.5.2-.8l-.7-1.3c-.2-.3-.5-.4-.8-.2z"
-                  fill="currentColor"
-                />
-              </svg>
+              <WhatsAppIcon />
               WhatsApp’tan gönder
             </a>
           )

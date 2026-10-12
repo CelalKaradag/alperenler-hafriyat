@@ -12,13 +12,24 @@ export function initFloatingActions() {
 
   let heroVisible = Boolean(hero);
   let ticking = false;
+  let pulsed = false;
 
   const update = () => {
     ticking = false;
     const y = window.scrollY;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     // Hero olan sayfalarda hero görünürken gizli; hero olmayan sayfalarda biraz kaydırınca belirir
-    if (whatsapp) whatsapp.classList.toggle('is-shown', hero ? !heroVisible : y > 240);
+    if (whatsapp) {
+      const shown = hero ? !heroVisible : y > 240;
+      whatsapp.classList.toggle('is-shown', shown);
+      // İlk 600 px'ten sonra yazı kısmı kapanır, yalnızca ikon kalır (hover/odakta açılır)
+      whatsapp.classList.toggle('is-compact', y > 600);
+      // Halka nabzı: ilk görünüşte tek sefer (2 tekrar), sonra durur
+      if (shown && !pulsed) {
+        pulsed = true;
+        whatsapp.classList.add('is-pulsing');
+      }
+    }
     if (toTop) toTop.classList.toggle('is-shown', max > 0 && y > max / 2);
   };
 

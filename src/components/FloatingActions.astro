@@ -2,12 +2,14 @@
 import { whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
 ---
 
 <!--
   Masaüstü (48em üstü) yüzen düğmeler. Mobilde yok (alt çubuk var).
-  Görünürlüğü src/scripts/floating-actions.js yönetir: WhatsApp hero görünürken gizli,
-  "yukarı çık" sayfa yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
+  Görünürlüğü src/scripts/floating-actions.js yönetir: WhatsApp hero görünürken gizli, aşağı inince belirir;
+  ilk 600 px'ten sonra yazı kısmı kapanıp yalnızca ikon kalır (hover/odakta açılır); "yukarı çık" sayfa
+  yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
 -->
 <div class="floating-actions" data-floating>
   <button class="to-top" type="button" data-to-top aria-label="Sayfanın başına çık">
@@ -15,8 +17,19 @@ import WhatsAppButton from './WhatsAppButton.astro';
   </button>
   {
     whatsappUrl && (
-      <WhatsAppButton class="wa-float" href={whatsappUrl}>
-        <span class="wa-float-label" aria-hidden="true">WhatsApp ile yazın</span>
+      <WhatsAppButton
+        class="wa-float"
+        href={whatsappUrl}
+        icon={false}
+        label="WhatsApp ile teklif için yazın"
+      >
+        <span class="wa-float-icon">
+          <WhatsAppIcon />
+        </span>
+        <span class="wa-float-text" aria-hidden="true">
+          <span class="wa-float-small">WhatsApp</span>
+          <span class="wa-float-big">Teklif için yazın</span>
+        </span>
       </WhatsAppButton>
     )
   }

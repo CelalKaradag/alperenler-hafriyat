@@ -17,6 +17,15 @@
   min-width: 0;
 }
 
+/* WhatsApp: koyu zemin, #25D366 ikon, beyaz yazı ("Ara" sarı kalır) */
+.call-bar .btn-wa {
+  color: #fff;
+}
+
+.call-bar .btn-wa .wa-icon {
+  color: #25d366;
+}
+
 @media (min-width: 48em) {
   .call-bar {
     display: none;

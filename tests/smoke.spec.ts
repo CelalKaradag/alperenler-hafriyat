@@ -201,6 +201,34 @@ test('teklif sihirbazı: 3 adım doldurulur, WhatsApp bağlantısında mesaj olu
   expect(message).toContain('Acil');
 });
 
+test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kaydırınca ikona daralır, hover\'da açılır', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('/');
+  const wa = page.locator('.wa-float');
+  await expect(wa).toHaveAttribute('aria-label', 'WhatsApp ile teklif için yazın');
+  await expect(wa).toHaveAttribute('href', new RegExp(`^${WA_BASE.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`));
+
+  // Hero görünürken gizli; aşağı inince belirir, 600 px sonrası yalnızca ikon
+  await page.evaluate(() => window.scrollTo(0, 1600));
+  await expect(wa).toBeVisible();
+  await expect(wa).toHaveClass(/is-compact/);
+  await expect.poll(async () => Math.round(((await wa.boundingBox()) as { width: number }).width)).toBeLessThanOrEqual(60);
+  await expect(page.locator('.to-top')).toBeVisible();
+
+  await wa.hover();
+  await expect(wa.locator('.wa-float-big')).toHaveText('Teklif için yazın');
+  await expect.poll(async () => ((await wa.boundingBox()) as { width: number }).width).toBeGreaterThan(120);
+});
+
+test('mobilde yüzen düğmeler yok, alt çubukta WhatsApp bağlantısı var', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.floating-actions')).toBeHidden();
+  await expect(page.locator('.call-bar a[href^="https://wa.me/"]')).toBeVisible();
+});
+
 test.describe('masaüstü header tek satır', () => {
   for (const size of [
     { width: 1366, height: 768 },

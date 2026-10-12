@@ -18,10 +18,13 @@
   }
 }
 
+/* Odak halkası: beyaz halka + koyu dış hale (açık ve koyu her zeminde görünür) */
 .floating-actions :focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 7px rgba(20, 22, 26, 0.92);
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px rgba(20, 22, 26, 0.92),
+    0 0 0 7px rgba(20, 22, 26, 0.92);
 }
 
 .to-top,
@@ -32,7 +35,9 @@
   transition:
     opacity 0.3s ease,
     transform 0.3s ease,
-    visibility 0.3s ease;
+    visibility 0.3s ease,
+    box-shadow 0.25s ease,
+    padding 0.3s ease;
 }
 
 .to-top.is-shown,
@@ -42,17 +47,21 @@
   transform: none;
 }
 
+/* "Yukarı çık": koyu cam daire, WhatsApp düğmesinin üstünde; kompakt WhatsApp dairesiyle aynı eksende */
 .to-top {
   display: grid;
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
+  margin-right: 0.375rem; /* (56 − 44) / 2 */
   padding: 0;
-  background: var(--surface-2);
+  background: rgba(20, 22, 26, 0.55);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2);
   color: var(--on-dark);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
 
@@ -61,49 +70,134 @@
   color: var(--accent);
 }
 
+/* WhatsApp: hap düğme, solda ikon, sağda iki satır yazı */
 .wa-float {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 3.5rem;
   height: 3.5rem;
-  padding: 0 0.85rem;
-  background: #1fa855;
+  padding: 10px 18px 10px 12px;
+  /* Koyu yeşil: beyaz yazı kontrastı ≈5.4:1 (WCAG AA) */
+  background: linear-gradient(180deg, #0f7a40, #11803f);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 10px 30px -8px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.25);
   color: #fff;
   border-radius: 999px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
   text-decoration: none;
-  font-weight: 700;
   white-space: nowrap;
 }
 
-.wa-float:hover {
-  background: #188a46;
+.wa-float.is-shown:hover {
+  background: linear-gradient(180deg, #11803f, #138a47);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 16px 38px -8px rgba(0, 0, 0, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.28);
+}
+
+.wa-float.is-shown:active {
+  transform: scale(0.97);
+}
+
+.wa-float:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(20, 22, 26, 0.92),
+    0 0 0 7px rgba(20, 22, 26, 0.92);
+}
+
+.wa-float-icon {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
 }
 
 .wa-float .wa-icon {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 22px;
+  height: 22px;
   margin: 0;
   color: #fff;
 }
 
-/* hover/odakta etiket sola doğru açılır */
-.wa-float-label {
-  max-width: 0;
-  overflow: hidden;
+/* Tek seferlik yumuşak halka nabzı (2 tekrar, sonra durur) */
+.wa-float-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
   opacity: 0;
-  transition:
-    max-width 0.3s ease,
-    opacity 0.2s ease,
-    margin 0.3s ease;
+  pointer-events: none;
 }
 
-.wa-float:hover .wa-float-label,
-.wa-float:focus-visible .wa-float-label {
+.wa-float.is-pulsing .wa-float-icon::after {
+  animation: wa-ring 1.6s ease-out 0.4s 2 both;
+}
+
+@keyframes wa-ring {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+.wa-float-text {
+  display: grid;
   max-width: 12rem;
   margin-left: 0.6rem;
-  margin-right: 0.2rem;
+  line-height: 1.15;
+  text-align: left;
+  overflow: hidden;
+  transition:
+    max-width 0.3s ease,
+    margin 0.3s ease,
+    opacity 0.2s ease;
+}
+
+.wa-float-small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.wa-float-big {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* İlk 600 px'ten sonra: yalnızca yuvarlak ikon; hover/odakta yazı tekrar açılır */
+.wa-float.is-compact {
+  padding: 10px 12px;
+}
+
+.wa-float.is-compact .wa-float-text {
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+}
+
+.wa-float.is-compact:hover,
+.wa-float.is-compact:focus-visible {
+  padding: 10px 18px 10px 12px;
+}
+
+.wa-float.is-compact:hover .wa-float-text,
+.wa-float.is-compact:focus-visible .wa-float-text {
+  max-width: 12rem;
+  margin-left: 0.6rem;
   opacity: 1;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .wa-float.is-pulsing .wa-float-icon::after {
+    animation: none;
+  }
+}

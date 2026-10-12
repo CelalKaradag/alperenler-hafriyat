@@ -1,0 +1,19 @@
+---
+import { whatsappPath } from '../utils/icons';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class:list={['wa-icon', className]}
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={whatsappPath}></path>
+</svg>
