@@ -1,6 +1,6 @@
 ---
-// GEÇİCİ işaret: firma logosu gelince değiştirilecek (bkz. README).
-// Üç iç içe eş yükselti çizgisinden oluşan tepe; aynı zamanda "A" harfini andırır. Tek renk (sarı).
+// Firma logo işareti (public/images/logo/logo-isaret-sari.svg ile aynı çizim, viewBox 0 0 100 100).
+// Renk `currentColor` ile gelir: header/footer'da sarı (.brand-mark), başka yerde sınıfla değiştirilebilir.
 interface Props {
   class?: string;
 }
@@ -10,16 +10,17 @@ const { class: className } = Astro.props;
 
 <svg
   class:list={['logo-mark', className]}
-  viewBox="0 0 32 32"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2.2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+  viewBox="0 0 100 100"
+  fill="currentColor"
   aria-hidden="true"
   focusable="false"
 >
-  <path d="M3 27 16 5l13 22"></path>
-  <path d="M8.5 27 16 14l7.5 13"></path>
-  <path d="M13.5 27 16 22.5l2.5 4.5"></path>
+  <path d="M3 96 L42 6 L56 6 L78 46 L65 53 L49 24 L17 96 Z"></path>
+  <path
+    d="M64 52 L84 40 C96 48 100 66 92 86 L62 86 C70 80 74 74 74 67 C74 60 70 55 64 52 Z"
+  ></path>
+  <path
+    d="M63 86 L68.6 86 L67.6 96 L64 96 Z M70.4 86 L76 86 L75 96 L71.4 96 Z M77.8 86 L83.4 86 L82.4 96 L78.8 96 Z M85.2 86 L90.8 86 L89.8 96 L86.2 96 Z"
+  ></path>
+  <rect x="24" y="63" width="45" height="8"></rect>
 </svg>

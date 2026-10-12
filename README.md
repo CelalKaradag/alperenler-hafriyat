@@ -40,7 +40,7 @@ Hizmetler [src/data/services.ts](src/data/services.ts) içindedir. Şu an 8 hizm
 - Taslak metinlerde deneyim, makine sayısı, süre, fiyat, garanti veya "en iyi/lider" ifadesi bilerek yoktur; eklenmemelidir.
 - `keywords` alanı yalnızca veri olarak durur; sayfada görünür liste olarak basılmaz ve meta keywords eklenmez.
 
-Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical` ve `og:url` üretilir.
+Alan adı: [astro.config.mjs](astro.config.mjs) içindeki `site` alanı. Tanımlanınca `canonical`, `og:url`, `og:image` ve JSON-LD `url` üretilir. **Şu an önizleme adresi (`https://alperenler-hafriyat.netlify.app`) yazılıdır; gerçek alan adıyla değiştirilmelidir.** Sayfalar `noindex` kalır (`site.publish.indexable: false`).
 
 ## Görseller (public/images/)
 
@@ -130,10 +130,8 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 
 ## Logo, favicon, paylaşım görseli
 
-- [LogoMark.astro](src/components/LogoMark.astro) **geçici** bir işarettir (iç içe üç eş yükselti çizgisinden tepe / "A"). Firma logosu gelince değiştirilecek; header, footer ve `public/favicon.svg` aynı işareti kullanır.
-- `apple-touch-icon.png` (180×180) üretilmedi. Gerekirse `public/favicon.svg` dosyasını herhangi bir araçla (ör. Inkscape, Squoosh, tarayıcıda SVG'yi PNG'ye dışa aktarma) 180×180 PNG'ye çevirip `public/apple-touch-icon.png` olarak kaydedin; dosya varsa `<link rel="apple-touch-icon">` kendiliğinden eklenir.
-- **`public/og-image.png` bekleniyor** (1200×630 PNG). Dosya varsa **ve** `astro.config.mjs` içinde `site` tanımlıysa `og:image` etiketleri basılır (mutlak adres gerektiği için); aksi halde basılmaz.
-
+- **Logo:** firmanın logosu `public/images/logo/` altındadır (`logo-isaret-sari|beyaz|siyah.svg`, `logo-yatay-acik|koyu-zemin.svg`, `logo-dikey-acik|koyu-zemin.svg`). Site içindeki işaret [LogoMark.astro](src/components/LogoMark.astro) olarak inline SVG'dir (`logo-isaret-sari.svg` ile aynı çizim, `viewBox 0 0 100 100`, `fill="currentColor"`); header ve footer'da yazının solunda sarı görünür. İşaret değişirse hem bu dosya hem `public/favicon.svg` güncellenmelidir.
+- `public/favicon.svg`, `public/apple-touch-icon.png` (180×180) ve `public/og-image.png` (1200×630) mevcuttur. `apple-touch-icon.png` dosyası varsa `<link rel="apple-touch-icon">` kendiliğinden basılır. `og:image` etiketleri dosya varsa **ve** `astro.config.mjs` içinde `site` tanımlıysa basılır (mutlak adres gerektiği için); şu an önizleme adresi tanımlıdır.
 ## Yapısal veri (JSON-LD) ve sayfa geçişleri
 
 - Hepsi [src/utils/schema.ts](src/utils/schema.ts) içinde üretilir. Ana sayfa ve iletişim: `GeneralContractor` (ad, unvan, telefon, adres). Onaylı hizmet detaylarında `Service`, onaylı SSS varsa `FAQPage`. `url` yalnızca `site` (alan adı) tanımlıysa, `sameAs` yalnızca `site.ts`'de `sameAs` doluysa eklenir. `geo`, `openingHours`, `priceRange`, `aggregateRating`, `review` bilerek yoktur.
@@ -195,7 +193,7 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 
 - Hizmet listesi ve hizmet bölgeleri
 - E-posta, çalışma saatleri, deneyim yılı, makine sayısı
-- Logo (şimdilik geçici tipografik "ALPERENLER / HAFRİYAT"; nihai logo değildir)
+- ~~Logo~~ (eklendi; logo dosyaları `public/images/logo/` altında)
 - Gerçek fotoğraflar (açılış alanındaki SVG yalnızca dekoratiftir, gerçek proje/makine değildir)
 - Alan adı
 - Hizmetlerin firma tarafından onaylanması (8 taslak hizmet `onaylandi: false`)
