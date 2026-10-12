@@ -33,11 +33,7 @@
   object-fit: cover;
 }
 
-/* videolar bu şeritte her ekranda poster + oynat ikonu (lightbox'ta oynar) */
-.gallery-grid--related .gallery-video {
-  display: none;
-}
-
+/* videolar her ekranda poster + oynat ikonu (lightbox'ta oynar) */
 .gallery-grid--related .gallery-item .gallery-open--video {
   display: block;
 }

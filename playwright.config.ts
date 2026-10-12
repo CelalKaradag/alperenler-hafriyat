@@ -22,7 +22,8 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
-  use: { trace: 'retain-on-failure' },
+  // Rapor boyutu küçük kalsın: video yok, ekran görüntüsü yalnızca hatada, iz yalnızca hatada
+  use: { trace: 'retain-on-failure', video: 'off', screenshot: 'only-on-failure' },
   projects: [
     { name: 'normal', testMatch: /smoke\.spec\.ts/, use: { ...desktop, baseURL: NORMAL } },
     {

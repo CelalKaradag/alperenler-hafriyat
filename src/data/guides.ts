@@ -213,7 +213,7 @@ export const guides: Guide[] = [
         title: 'Belge ve kayıt',
         paragraphs: [
           'Bazı yerlerde hafriyatın döküm alanına teslim edildiğini gösteren belge veya kayıt istenebilir. Hangi belgelerin gerektiğini ve nasıl alınacağını belediyeden öğrenmek, işin sonradan sorun çıkarmamasını sağlar.',
-          'Taşımayı yapan ekiple belge konusunu işe başlamadan konuşmak, kimin neyi hazırlayacağını netleştirir.',
+          'Taşımayı yapan ekiple belge konusunu işe başlamadan konuşmak, kimin neyi hazırlayacağını netleştirir. Belgelerin bir kopyasını saklamak da ileride bir soru çıkarsa işinizi kolaylaştırır.',
         ],
       },
       {
@@ -226,6 +226,14 @@ export const guides: Guide[] = [
           'Kamyonun sahaya giriş çıkışını önceden düşünmemek',
           'Yüklerin üstünü örtmeyi ve yolu temiz tutmayı ihmal etmek',
           'Taşıma teklifi alırken malzemenin türünü doğru söylememek',
+        ],
+      },
+      {
+        id: 'planli-calisma',
+        title: 'Planlı çalışmanın faydası',
+        paragraphs: [
+          'Hafriyat ve moloz taşıma, birbirine bağlı birkaç adımdan oluşur: yükleme, taşıma, döküm alanına varış ve dönüş. Bu zincirde bir adım aksarsa diğerleri de bekler. Örneğin döküm alanı belli değilse kamyonlar yüklü hâlde bekleyebilir, yükleme makinesi boşta kalabilir.',
+          'İşe başlamadan önce kazının veya yıkımın hangi günlerde yapılacağını, taşımanın hangi günlerde sürebileceğini ve sahaya kaç araç girebileceğini konuşmak işin düzenli ilerlemesine yardımcı olur. Hava koşulları nedeniyle plan değişebilir; bu durumda iletişimde kalmak en önemli noktadır. Planı yazılı veya mesajla teyit etmek, sonradan yanlış anlaşılmaları da önler.',
         ],
       },
       {
@@ -314,6 +322,14 @@ export const guides: Guide[] = [
         paragraphs: [
           'Makine seçiminde en sık karşılaşılan sorun, işin ayrıntısı anlatılmadan "kepçe lazım" demekle yetinilmesidir. Böyle bir durumda sahaya uygun olmayan bir makine gelebilir ve ikinci kez organizasyon gerekebilir.',
           'Bir diğer hata, kaya ya da beton çıkma ihtimalini söylememektir. Kırıcı uç gerekirse baştan bilinmesi hem planı hem de çalışma düzenini kolaylaştırır.',
+        ],
+      },
+      {
+        id: 'saha-iletisimi',
+        title: 'Sahadaki iletişim',
+        paragraphs: [
+          'Makine sahaya geldiğinde operatörün neyi, nereden ve hangi ölçüde kazacağını bilmesi gerekir. Sahayı işaretlemek, kazılmayacak yerleri (komşu duvar, hat, ağaç gibi) belirtmek ve çıkan toprağın nereye yığılacağını göstermek hem hızı hem güvenliği artırır.',
+          'İş sırasında bir değişiklik gerekirse ya da beklenmeyen bir durumla karşılaşılırsa çalışmayı durdurup konuşmak, tahminle devam etmekten çoğu zaman daha doğrudur. Özellikle yer altında bilinmeyen bir hat ya da yapı çıkarsa kazıya ara verilmelidir. Bu durumda ilgili kurumla görüşmeden çalışmaya devam etmek hem güvenlik hem de sorumluluk açısından sakıncalıdır.',
         ],
       },
       {
@@ -414,7 +430,23 @@ export const guides: Guide[] = [
         title: 'Teklif için hangi bilgiler verilir?',
         paragraphs: [
           'Yıkım teklifi için binanın bulunduğu yer, kaç katlı olduğu, yapısının türü (betonarme, yığma ya da başka) ve çevredeki yapılarla ilişkisi yararlı bilgilerdir. Fotoğraf göstermek de ekibin işi anlamasını kolaylaştırır.',
-          'Kesin yöntem ve teklif, sahanın görülmesinden sonra netleşir.',
+          'Kesin yöntem ve teklif, sahanın görülmesinden sonra netleşir. Binanın etrafındaki boş alanı, yola ve komşu yapılara olan yakınlığı da anlatmanız yararlı olur.',
+        ],
+      },
+      {
+        id: 'yikim-sirasi',
+        title: 'Yıkım hangi sırayla ilerler?',
+        paragraphs: [
+          'Yıkım genellikle bir sıraya göre yapılır: önce sahanın hazırlanması ve çevrenin işaretlenmesi, sonra binanın içindeki sökülebilir malzemelerin çıkarılması, ardından yapının kontrollü biçimde indirilmesi ve en son molozun yüklenip taşınması. Bu sıra binanın yapısına göre değişebilir.',
+          'Her aşamada çevrenin ve çalışanların güvenliği önceliklidir. Yıkım sırasında yoldan geçen kişilerin ve komşuların korunması için sahanın dışına yetkisiz giriş engellenmelidir.',
+        ],
+      },
+      {
+        id: 'sahada-dikkat',
+        title: 'Yıkım sırasında sahada dikkat edilecekler',
+        paragraphs: [
+          'Yıkım sürerken sahada yeterli aydınlatma, uygun kişisel koruyucu donanım ve makineler arasında güvenli mesafe bulunmalıdır. Rüzgârlı günlerde toz ve savrulan parçalar çevreyi etkileyebileceğinden, çalışmayı o günün koşullarına göre değerlendirmek gerekir.',
+          'Yıkım ekibinin ve sahip olduğunuz sorumluluğun sınırlarını baştan konuşmak, sonradan çıkabilecek anlaşmazlıkları azaltır. Hangi işlerin yıkım kapsamında olduğunu, hangilerinin ayrıca yapılacağını önceden netleştirin. Örneğin molozun yüklenmesi, temelin sökülmesi ve sahanın düzeltilmesi ayrı kalemler olarak konuşulabilir.',
         ],
       },
       {

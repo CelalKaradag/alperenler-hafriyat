@@ -14,8 +14,7 @@ export function initLightbox() {
   if (openers.length === 0) return null;
 
   // Gezilecek öğeler: filtreyle gizlenmemiş ve ekranda gerçekten görünen düğmeler.
-  // (Masaüstünde video kendi yerinde oynar; mobilde video düğmesi lightbox'ta oynatır,
-  // bu yüzden "gallery-open--video" düğmeleri yalnızca mobilde görünür sayılır.)
+  // (Videolar her ekranda poster düğmesidir; <video> yalnızca burada, tıklanınca yüklenir.)
   const visibleOpeners = () =>
     openers.filter((button) => {
       const item = button.closest('.gallery-item');

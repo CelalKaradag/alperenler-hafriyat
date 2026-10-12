@@ -191,7 +191,7 @@ Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştı
 
 ## GitHub Actions (CI)
 
-[.github/workflows/ci.yml](.github/workflows/ci.yml): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`; ayrıca ayrı bir `lighthouse` işi (bkz. Lighthouse CI). Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
+[.github/workflows/ci.yml](.github/workflows/ci.yml) (`ubuntu-24.04`; `actions/checkout`, `setup-node` ve `upload-artifact` Node 24 çalıştıran `@v7` sürümleri): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`; ayrıca ayrı bir `lighthouse` işi (bkz. Lighthouse CI). Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
 
 ## Netlify önizleme
 
@@ -238,6 +238,7 @@ Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştı
 
 - Piksel boyutları (CLS olmasın diye `width`/`height`) paket eklenmeden dosyadan okunur ([image-size.ts](src/utils/image-size.ts): JPEG başlığı + EXIF yönü); video boyutu poster görselinden alınır. İsterseniz `width`/`height` elle de yazılabilir.
 - Ana sayfa "Sahadan" yalnızca `featured: true` olan en çok 6 öğeyi gösterir ve "Tüm fotoğraf ve videolar" bağlantısıyla `/galeri/` sayfasına gider. `/galeri/` hepsini, Tümü / Fotoğraflar / Videolar filtresiyle (JavaScript yoksa filtre gizli, hepsi görünür) gösterir; ilk 3 öğe hemen, kalanı lazy yüklenir; videolar `preload="none"`. Lightbox yalnızca görünür (filtrelenmemiş) görseller arasında gezinir.
+- **Performans:** `/galeri/` ilk ekranında yalnızca ilk 2 görsel eager (+ `fetchpriority="high"`), kalanı lazy; `sizes` kart genişliğine göre (mobilde 2 sütun ≈ 50vw → 480w türev). Videolar her ekranda yalnızca küçük poster `<img loading="lazy">` + oynat ikonudur; `<video>` sayfada yoktur, tıklanınca lightbox içinde yüklenir. Lightbox, filtre ve şerit betikleri tarayıcı boşta kalınca ya da ilk etkileşimde yüklenir (erken tıklama betik gelince yeniden uygulanır). Öğelere `content-visibility: auto` + `contain-intrinsic-size` verilmiştir.
 - Dosyası bulunmayan öğe atlanır; hiç öğe yoksa bölüm ve menüdeki "Galeri" görünmez (dev'de menü için yeni medyadan sonra sunucuyu yeniden başlatın).
 - Konum, tarih, müşteri adı veya "projemiz" gibi iddia yazılmaz.
 

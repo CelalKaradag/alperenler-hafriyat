@@ -7,12 +7,12 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '24.13.0'
           cache: npm
@@ -34,7 +34,7 @@ jobs:
       # Test geçse de geçmese de yüklenir; tek artifact (zip) olarak indirilir.
       - name: Ekran görüntülerini yükle
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots
           path: screenshots/
@@ -44,7 +44,7 @@ jobs:
       # Test başarısız olursa rapor ve izler indirilebilir olsun
       - name: Test raporunu yükle
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: |
@@ -55,12 +55,12 @@ jobs:
   # Mobil Lighthouse (lighthouserc.json): ana sayfa, /galeri/, /iletisim/. Normal (taslaksız) build
   # üzerinde, `astro preview` ile sunulan dist/ çıktısına karşı çalışır.
   lighthouse:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '24.13.0'
           cache: npm
@@ -78,8 +78,9 @@ jobs:
       # Rapor (HTML + JSON) her durumda indirilebilir olsun
       - name: Lighthouse raporunu yükle
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lighthouse-report
           path: .lighthouseci/
+          include-hidden-files: true # .lighthouseci gizli klasör
           retention-days: 14

@@ -31,18 +31,29 @@
   color: var(--text-muted);
 }
 
-/* Masaüstü: video kendi yerinde oynar; mobil video düğmesi ve sayaç yok */
+/* Videolar her ekranda poster + oynat ikonudur (lightbox'ta oynar); sayaç yalnızca mobil şeritte */
+.gallery-open--video {
+  cursor: pointer;
+}
+
 @media (min-width: 48em) {
-  .gallery-item .gallery-open--video,
   .gallery-counter {
     display: none;
   }
 }
 
+/* Ekran dışı galeri öğelerinin render maliyetini erteler (taşma/hizayı bozmadan, son boyutu hatırlar) */
+.gallery-grid--page .gallery-item,
+.gallery-grid--home .gallery-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 18rem;
+}
+
 /* Mobil (48em altı) */
 @media (max-width: 47.99em) {
-  .gallery-video {
-    display: none; /* video, poster + oynat ikonuyla lightbox'ta oynar */
+  .gallery-grid--page .gallery-item,
+  .gallery-grid--home .gallery-item {
+    contain-intrinsic-size: auto 10rem; /* kare/4:5 kartlarda aspect-ratio zaten yer ayırır */
   }
 
   .gallery-grid {

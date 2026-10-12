@@ -32,9 +32,20 @@ const entries =
 const photoCount = entries.filter((entry) => entry.kind === 'image').length;
 const videoCount = entries.length - photoCount;
 
-// Sayfa üstündeki ilk satır (masaüstünde 3 öğe) hemen yüklenir, kalan her şey lazy.
+// /galeri/ ilk ekranında yalnızca ilk 2 görsel eager (+ fetchpriority high), kalan her şey lazy.
 // Ana sayfada galeri sayfanın aşağısındadır: hepsi lazy.
-const eagerCount = variant === 'page' ? 3 : 0;
+const eagerCount = variant === 'page' ? 2 : 0;
+
+// Görüntülenen genişliğe göre `sizes` (≈ kart genişliği; mobilde 480w, masaüstünde 960w seçilsin):
+//  - page: 48em altında 2 sütun (≈ 50vw), 48–64em'de 2 sütun, 64em üstünde 3 sütun
+//  - home: mobilde şerit kartı %78, 40em+ 2 sütun, 64em+ 3 sütun
+//  - related/strip: mobilde 2 sütun, masaüstünde 4 sütun
+const sizes =
+  variant === 'page'
+    ? '(min-width: 64em) 33vw, 50vw'
+    : look === 'related'
+      ? '(min-width: 48em) 25vw, 50vw'
+      : '(min-width: 64em) 33vw, (min-width: 40em) 50vw, 78vw';
 
 // Filtre çubuğu JavaScript yoksa gizli kalır (hepsi görünür); gallery-filter.js açar.
 let hasImages = false;
@@ -108,7 +119,8 @@ let hasImages = false;
                       width={entry.width}
                       height={entry.height}
                       loading={i < eagerCount ? 'eager' : 'lazy'}
-                      sizes={`(min-width: 64em) ${look === 'related' ? '25vw' : '33vw'}, (min-width: 40em) 50vw, 78vw`}
+                      fetchpriority={i < eagerCount ? 'high' : undefined}
+                      sizes={sizes}
                     />
                   </button>
                 </li>
@@ -117,22 +129,8 @@ let hasImages = false;
             hasImages = true;
             return (
               <li class="gallery-item" data-kind="video">
-                {/* Masaüstü: kendi yerinde oynatılan video (preload="none", poster, muted, controls) */}
-                <figure class="gallery-video">
-                  <video
-                    controls
-                    muted
-                    preload="none"
-                    playsinline
-                    width={entry.width}
-                    height={entry.height}
-                    poster={entry.posterSmall}
-                    aria-label={entry.title}
-                  >
-                    <source src={entry.src} type="video/mp4" />
-                  </video>
-                </figure>
-                {/* Mobil: poster + oynat ikonu; dokununca lightbox içinde oynar */}
+                {/* Her ekranda: yalnızca küçük poster (lazy <img>) + oynat ikonu. <video> öğesi sayfada YOK;
+                    tıklanınca lightbox içinde oluşturulur/yüklenir (ilk yüklemede hiç video veya video posteri inmez) */}
                 <button
                   type="button"
                   class="gallery-open gallery-open--video"
@@ -152,7 +150,8 @@ let hasImages = false;
                       alt=""
                       width={entry.width}
                       height={entry.height}
-                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 78vw"
+                      loading={i < eagerCount ? 'eager' : 'lazy'}
+                      sizes={sizes}
                     />
                   )}
                   <span class="gallery-play" aria-hidden="true">
