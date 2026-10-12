@@ -133,11 +133,6 @@
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
 }
 
-.service-card--img .service-card-icon {
-  color: #fff;
-  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.65));
-}
-
 .service-card--img .service-card-body {
   padding-top: 1.25rem;
 }
@@ -322,10 +317,6 @@
     align-self: end;
     font-size: 0.75rem;
     text-shadow: none;
-  }
-
-  .service-card--img .service-card-icon {
-    display: none;
   }
 
   .service-card--img h3 {

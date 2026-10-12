@@ -33,7 +33,8 @@ const number = String(index).padStart(2, '0');
   <div class="service-card-body">
     <div class="service-card-top">
       <span class="service-card-number" aria-hidden="true">{number}</span>
-      <Icon class="service-card-icon" name={service.icon} />
+      {/* Görsel varsa ikon basılmaz; yalnızca görselsiz (yedek) kartta kalır */}
+      {!image && <Icon class="service-card-icon" name={service.icon} />}
     </div>
     {!service.onaylandi && <span class="draft-badge">TASLAK</span>}
     <h3>
