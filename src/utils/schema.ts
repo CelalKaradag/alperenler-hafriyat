@@ -23,7 +23,7 @@ function organization(base?: URL): JsonObject {
   const data: JsonObject = {
     '@type': 'GeneralContractor',
     name: site.name,
-    legalName: site.legalName,
+    legalName: site.registeredName,
     telephone,
     address: {
       '@type': 'PostalAddress',
@@ -35,6 +35,9 @@ function organization(base?: URL): JsonObject {
   };
   const url = pageUrl(base, '/');
   if (url) data.url = url;
+  // logo mutlak adres ister: yalnızca alan adı (base) tanımlıysa
+  const logo = pageUrl(base, '/images/logo/alperenler-logo-720.jpg');
+  if (logo) data.logo = logo;
   // geo YALNIZCA doğrulanmış koordinat tanımlıysa eklenir
   if (site.mapCoords) {
     data.geo = {

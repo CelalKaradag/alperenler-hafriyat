@@ -1,0 +1,34 @@
+---
+// Müşterinin ORİJİNAL logosu. Görsele dokunulmaz: kırpma, filtre, mask, object-fit YOK; yalnızca olduğu gibi gösterilir.
+// Dosyalar: public/images/logo/alperenler-logo-{360,720,1536}.{webp,jpg} (oran 3:2).
+interface Props {
+  class?: string;
+  /** true: koyu zeminlerde (header, footer) logonun kendi zemin rengindeki (#f8f8f8) yuvarlak köşeli kart içinde */
+  card?: boolean;
+  loading?: 'eager' | 'lazy';
+  /** Görüntülenen genişliğe göre `sizes` */
+  sizes?: string;
+}
+
+const { class: className, card = true, loading = 'lazy', sizes = '240px' } = Astro.props;
+
+const base = '/images/logo/alperenler-logo';
+const set = (ext: 'webp' | 'jpg') =>
+  [360, 720, 1536].map((w) => `${base}-${w}.${ext} ${w}w`).join(', ');
+---
+
+<span class:list={['brand-logo', card && 'logo-card', className]}>
+  <picture>
+    <source type="image/webp" srcset={set('webp')} sizes={sizes} />
+    <img
+      src={`${base}-720.jpg`}
+      srcset={set('jpg')}
+      sizes={sizes}
+      width="720"
+      height="480"
+      alt="Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu"
+      loading={loading}
+      decoding="async"
+    />
+  </picture>
+</span>

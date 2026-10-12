@@ -57,6 +57,27 @@
   margin-top: 1.1rem;
 }
 
+/* Footer logosu: kart genişliği ≈ 240 px; mobilde ortalı */
+.brand-logo--footer {
+  width: 240px;
+  max-width: 100%;
+}
+
+@media (max-width: 39.99em) {
+  .footer-brand {
+    text-align: center;
+  }
+
+  .brand-logo--footer {
+    display: flex;
+    margin-inline: auto;
+  }
+
+  .footer-brand .footer-legal {
+    margin-inline: auto;
+  }
+}
+
 @media (min-width: 40em) {
   .footer-cols {
     grid-template-columns: repeat(2, 1fr);

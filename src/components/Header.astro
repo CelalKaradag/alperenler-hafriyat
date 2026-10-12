@@ -2,7 +2,7 @@
 import { navItems } from '../data/nav';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
-import LogoMark from './LogoMark.astro';
+import BrandLogo from './BrandLogo.astro';
 
 const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isCurrent = (href: string) => {
@@ -15,7 +15,7 @@ const isCurrent = (href: string) => {
   <a class="skip-link" href="#icerik">İçeriğe geç</a>
   <div class="container header-inner">
     <a class="brand" href="/" aria-label={`${site.name} – Ana Sayfa`}>
-      <LogoMark class="brand-mark" />
+      <BrandLogo class="brand-logo--header" loading="eager" sizes="(min-width: 48em) 81px, 63px" />
       <span class="brand-text">
         <span class="brand-top">ALPERENLER</span>
         <span class="brand-bottom">HAFRİYAT</span>

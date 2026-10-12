@@ -304,5 +304,46 @@
       960,
       1280
     ]
+  },
+  "/images/logo/alperenler-logo-1536.jpg": {
+    "key": "alperenler-logo-1536",
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8f8f8",
+    "widths": [
+      480,
+      960,
+      1536
+    ]
+  },
+  "/images/logo/alperenler-logo-360.jpg": {
+    "key": "alperenler-logo-360",
+    "width": 360,
+    "height": 240,
+    "color": "#f8f8f8",
+    "widths": [
+      360
+    ]
+  },
+  "/images/logo/alperenler-logo-720.jpg": {
+    "key": "alperenler-logo-720",
+    "width": 720,
+    "height": 480,
+    "color": "#f8f8f8",
+    "widths": [
+      480,
+      720
+    ]
+  },
+  "/images/logo/alperenler-logo-orijinal.jpg": {
+    "key": "alperenler-logo-orijinal",
+    "width": 1536,
+    "height": 1024,
+    "color": "#f8f8f8",
+    "widths": [
+      480,
+      960,
+      1536
+    ]
   }
 }

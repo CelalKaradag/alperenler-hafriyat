@@ -7,6 +7,7 @@ import { visibleRegions } from '../data/regions';
 import { visibleServices } from '../data/services';
 import { site, whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
+import BrandLogo from './BrandLogo.astro';
 import LogoMark from './LogoMark.astro';
 import MapBand from './MapBand.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
@@ -47,13 +48,7 @@ const hasServices = visibleServices.length > 0;
 
   <div class:list={['container', 'footer-cols', hasServices && 'footer-cols--services']}>
     <div class="footer-brand">
-      <p class="brand" aria-hidden="true">
-        <LogoMark class="brand-mark" />
-        <span class="brand-text">
-          <span class="brand-top">ALPERENLER</span>
-          <span class="brand-bottom">HAFRİYAT</span>
-        </span>
-      </p>
+      <BrandLogo class="brand-logo--footer" sizes="240px" />
       <p class="footer-legal">
         {site.legalName}, Malatya genelinde hizmet veriyor; merkez: Yeşilyurt. İhtiyacınızı konuşmak için bizi arayabilirsiniz.
       </p>
@@ -117,7 +112,7 @@ const hasServices = visibleServices.length > 0;
   </div>
 
   <div class="container footer-bottom">
-    <p>© {year} {site.legalName}</p>
+    <p>© {year} {site.registeredName}</p>
     <a href="/gizlilik/">Gizlilik ve Çerezler</a>
   </div>
 

@@ -122,6 +122,38 @@ test('WhatsApp ikonları görünür: svg > 10×10 px ve path dolgusu "none" değ
   expect(checked, 'hiç görünür WhatsApp bağlantısı bulunamadı').toBeGreaterThan(0);
 });
 
+test('favicon.ico ve site.webmanifest 200 döner; head bağlantıları var', async ({ page, request }) => {
+  for (const path of ['/favicon.ico', '/favicon-32.png', '/apple-touch-icon.png', '/site.webmanifest', '/og-image.png']) {
+    const response = await request.get(path);
+    expect(response.status(), `${path} durum kodu`).toBe(200);
+  }
+  await page.goto('/');
+  await expect(page.locator('link[rel="icon"][href="/favicon.ico"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="manifest"][href="/site.webmanifest"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="icon"][href="/favicon.svg"]')).toHaveCount(0);
+});
+
+test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmamış', async ({ page }) => {
+  await page.goto('/');
+  const logo = page.locator('.site-header .brand-logo img');
+  await expect(logo).toBeVisible();
+  await expect
+    .poll(() => logo.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth))
+    .toBeGreaterThan(0);
+  await expect(logo).toHaveAttribute('alt', 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu');
+  await expect(logo).toHaveAttribute('decoding', 'async');
+  await expect(logo).toHaveAttribute('loading', 'eager');
+  // Görsele dokunulmaz: kırpma/filtre/mask/cover yok, oran 3:2
+  const style = await logo.evaluate((img) => {
+    const css = getComputedStyle(img);
+    return { fit: css.objectFit, filter: css.filter, mask: css.maskImage || css.webkitMaskImage };
+  });
+  expect(style.fit).not.toBe('cover');
+  expect(style.filter).toBe('none');
+  const box = (await logo.boundingBox()) as { width: number; height: number };
+  expect(box.width / box.height).toBeCloseTo(1.5, 1);
+});
+
 test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerde geçmez', async ({ page, request }) => {
   await page.goto('/');
   const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandLogo from '../components/BrandLogo.astro';
 import GallerySection from '../components/GallerySection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import Icon from '../components/Icon.astro';
@@ -71,6 +72,10 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
         <div class="btn-row">
           <a class="btn btn-dark" href="/iletisim/">İletişim Bilgileri</a>
         </div>
+      </div>
+
+      <div class="about-logo">
+        <BrandLogo sizes="(min-width: 56em) 420px, 90vw" />
       </div>
     </div>
   </section>
