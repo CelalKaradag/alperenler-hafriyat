@@ -13,8 +13,12 @@ import Icon from './Icon.astro';
           <li class="stat">
             {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
             {/* HTML'de GERÇEK sayı yazılı (JS yoksa / ekran okuyucu / arama motoru); JS görünüme girince 0'dan sayar */}
-            <span class="stat-value" data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}>
-              {stat.value}
+            <span
+              class="stat-value"
+              data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}
+              data-suffix={stat.suffix}
+            >
+              {stat.value}{stat.suffix}
             </span>
             <span class="stat-label">{stat.label}</span>
           </li>

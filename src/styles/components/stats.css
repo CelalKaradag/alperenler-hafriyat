@@ -29,10 +29,26 @@
   text-align: center;
 }
 
+/* Mobil/tablet: öğe sayısı tekse son öğe iki sütunu kaplayıp ortalanır (2 + 2 + 1) */
+.stat:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* Masaüstü: öğeler tek satırda dengeli (5 öğe sığar); auto-fit boş sütunları çökertir */
 @media (min-width: 64em) {
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-    gap: 2rem 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 2rem 2rem;
+  }
+
+  .stat:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
+@media (min-width: 80em) {
+  .stats-grid {
+    column-gap: 3rem;
   }
 }
 

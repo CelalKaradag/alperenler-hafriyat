@@ -21,11 +21,12 @@ export function initStatsCounter() {
 
   function animate(el) {
     const target = Number(el.dataset.count);
-    const final = el.dataset.final || String(target); // HTML'deki gerçek metin (prime adımında saklanır)
+    const suffix = el.dataset.suffix || '';
+    const final = el.dataset.final || String(target) + suffix; // HTML'deki gerçek metin (prime adımında saklanır)
     const start = performance.now();
     const step = (now) => {
       const progress = Math.min(1, (now - start) / DURATION);
-      el.textContent = String(Math.round(target * easeOut(progress)));
+      el.textContent = String(Math.round(target * easeOut(progress))) + suffix; // son ek (örn. "+") sayılırken de korunur
       if (progress < 1) {
         frames.add(window.requestAnimationFrame(step));
       } else {
@@ -42,8 +43,8 @@ export function initStatsCounter() {
       for (const entry of entries) {
         if (entry.isIntersecting && !primed.has(entry.target)) {
           primed.add(entry.target);
-          entry.target.dataset.final = entry.target.textContent;
-          entry.target.textContent = '0';
+          entry.target.dataset.final = entry.target.textContent.trim();
+          entry.target.textContent = '0' + (entry.target.dataset.suffix || '');
           prime.unobserve(entry.target);
         }
       }
@@ -60,7 +61,7 @@ export function initStatsCounter() {
           counted.add(entry.target);
           if (!primed.has(entry.target)) {
             primed.add(entry.target);
-            entry.target.dataset.final = entry.target.textContent;
+            entry.target.dataset.final = entry.target.textContent.trim();
           }
           count.unobserve(entry.target);
           animate(entry.target);

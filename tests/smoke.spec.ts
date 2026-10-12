@@ -196,7 +196,7 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
   expect(box.width / box.height).toBeCloseTo(1.5, 1);
 });
 
-test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sayı şeridi 7-2-7-2', async ({ page }) => {
+test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sayı şeridi 7-2-7-2-13', async ({ page }) => {
   await page.goto('/makine-kiralama/ekskavator-kiralama/');
   const fleet = page.locator('[data-fleet]');
   await expect(fleet).toBeVisible();
@@ -215,16 +215,22 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   await page.goto('/makine-kiralama/kiralik-kepce-jcb/');
   await expect(page.locator('main')).toContainText('Filomuzda 2 adet JCB');
 
-  // Ana sayfa sayı şeridi: sırayla 7 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır
+  // Onaylı ilçe sayısı: /bolgeler/ listesindeki ilçe bağlantıları (regions.ts'ten; elle yazılmaz)
+  await page.goto('/bolgeler/');
+  const regionCount = await page.locator('main .link-list li').count();
+  expect(regionCount).toBeGreaterThan(0);
+
+  // Ana sayfa sayı şeridi: sırayla 7 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır, N · İlçede hizmet
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded(); // sayaç görünüme girince 0'dan sayar; bitince son sayı
   const items = page.locator('.stats .stat');
-  await expect(items).toHaveCount(4);
+  await expect(items).toHaveCount(5);
   const expected = [
     ['7', 'Paletli ekskavatör'],
     ['2', 'JCB'],
     ['7', 'Kamyon'],
     ['2', 'Lowbed tır'],
+    [String(regionCount), 'İlçede hizmet'],
   ];
   for (let i = 0; i < expected.length; i += 1) {
     await expect(items.nth(i).locator('.stat-value')).toHaveText(expected[i][0]);
@@ -232,18 +238,19 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   }
 });
 
-test('sayı şeridi: sarı bant, grafit metin, 4 ikon; masaüstü 4, tablet/mobil 2 sütun; taşma yok', async ({ page }) => {
+test('sayı şeridi: sarı bant, grafit metin, 5 ikon; masaüstü 5 sütun tek satır, tablet/mobil 2 sütun + ortalı son öğe; taşma yok', async ({ page }) => {
   for (const [width, columns] of [
     [390, 2],
     [768, 2],
-    [1366, 4],
+    [1024, 5],
+    [1366, 5],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     const strip = page.locator('[data-stats]');
     await strip.scrollIntoViewIfNeeded();
-    await expect(strip.locator('.stat')).toHaveCount(4);
-    await expect(strip.locator('.stat-icon')).toHaveCount(4);
+    await expect(strip.locator('.stat')).toHaveCount(5);
+    await expect(strip.locator('.stat-icon')).toHaveCount(5);
     const css = await strip.evaluate((el) => {
       const value = el.querySelector('.stat-value') as Element;
       const label = el.querySelector('.stat-label') as Element;
@@ -267,10 +274,19 @@ test('sayı şeridi: sarı bant, grafit metin, 4 ikon; masaüstü 4, tablet/mobi
     expect(css.columns, `${width}px sütun sayısı`).toBe(columns);
     expect(css.overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
     expect(Math.round(css.width), 'tam genişlik bant').toBe(width);
+    const tops = await strip.locator('.stat').evaluateAll((nodes) => nodes.map((n) => Math.round(n.getBoundingClientRect().top)));
+    if (columns === 5) {
+      expect(new Set(tops).size, `${width}px: 5 öğe tek satırda: ${tops.join(', ')}`).toBe(1);
+    } else {
+      // 2 sütun: 2 + 2 + 1; tek kalan son öğe sayfa ortasında
+      expect(new Set(tops).size, `${width}px: 3 satır: ${tops.join(', ')}`).toBe(3);
+      const last = (await strip.locator('.stat').last().boundingBox()) as { x: number; width: number };
+      expect(Math.abs(last.x + last.width / 2 - width / 2), 'son öğe ortalı').toBeLessThanOrEqual(2);
+    }
   }
 });
 
-test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür (7/2/7/2)', async ({ page }) => {
+test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür (7/2/7/2/13)', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded();
@@ -278,7 +294,9 @@ test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür
   const values = await page.locator('[data-stats] .stat-value').evaluateAll((nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  expect(values).toEqual(['7', '2', '7', '2']);
+  expect(values).toHaveLength(5);
+  expect(values.slice(0, 4)).toEqual(['7', '2', '7', '2']);
+  expect(Number(values[4])).toBeGreaterThan(0); // ilçe sayısı
 });
 test('onaylı (normal build) sayfalarda "13 ton" geçmez', async ({ page, request }) => {
   const pages = await crawl(page);
