@@ -1,0 +1,33 @@
+---
+import type { IconName } from '../utils/icons';
+import Icon from './Icon.astro';
+
+interface Props {
+  heading: string;
+  items: Array<{ href: string; title: string; icon: IconName; draft?: boolean }>;
+}
+
+const { heading, items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <div class="related-block">
+      <h2>{heading}</h2>
+      <ul class="link-list">
+        {
+          items.map((item) => (
+            <li>
+              <a href={item.href}>
+                <Icon name={item.icon} />
+                <span>{item.title}</span>
+                {item.draft && <span class="draft-badge">TASLAK</span>}
+                <Icon class="link-list-arrow" name="arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  )
+}

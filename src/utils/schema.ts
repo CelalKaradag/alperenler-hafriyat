@@ -81,3 +81,20 @@ export function faqSchema(faqs: Faq[]): JsonObject {
 export function toJsonLd(data: JsonObject): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
+
+/**
+ * BreadcrumbList: öğeler mutlak adres gerektirir, bu yüzden `site` (alan adı) tanımlı değilse
+ * çağıran taraf JSON-LD basmamalıdır. Yalnızca onaylı sayfalar için kullanılır.
+ */
+export function breadcrumbSchema(items: Array<{ name: string; path: string }>, base: URL): JsonObject {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: new URL(item.path, base).href,
+    })),
+  };
+}

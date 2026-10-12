@@ -6,12 +6,15 @@ import Icon from './Icon.astro';
 import Picture from './Picture.astro';
 
 interface Props {
-  service: Service;
+  /** Hizmet veya makine (aynı alanlar) */
+  service: Pick<Service, 'slug' | 'title' | 'summary' | 'icon' | 'image' | 'onaylandi'>;
   /** 1'den başlayan sıra; "01", "02" ... olarak gösterilir */
   index: number;
+  /** Detay sayfası klasörü (varsayılan hizmetler) */
+  basePath?: string;
 }
 
-const { service, index } = Astro.props;
+const { service, index, basePath = '/hizmetler/' } = Astro.props;
 const image = publicFileExists(service.image) ? service.image : null;
 const size = image ? imageSize(image) : null;
 const number = String(index).padStart(2, '0');
@@ -38,7 +41,7 @@ const number = String(index).padStart(2, '0');
     </div>
     {!service.onaylandi && <span class="draft-badge">TASLAK</span>}
     <h3>
-      <a href={`/hizmetler/${service.slug}/`}>{service.title}</a>
+      <a href={`${basePath}${service.slug}/`}>{service.title}</a>
     </h3>
     <p>{service.summary}</p>
     <span class="service-card-more" aria-hidden="true">

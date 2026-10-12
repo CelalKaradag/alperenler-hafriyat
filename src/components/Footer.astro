@@ -1,5 +1,7 @@
 ---
 import { navItems } from '../data/nav';
+import { visibleMachines } from '../data/machines';
+import { guideVisible } from '../data/price-guide';
 import { visibleServices } from '../data/services';
 import { site, whatsappUrl } from '../data/site';
 import LogoMark from './LogoMark.astro';
@@ -75,6 +77,20 @@ const hasServices = visibleServices.length > 0;
                 <a href={`/hizmetler/${service.slug}/`}>{service.title}</a>
               </li>
             ))}
+            {
+              visibleMachines.length > 0 && (
+                <li>
+                  <a href="/makine-kiralama/">Makine kiralama</a>
+                </li>
+              )
+            }
+            {
+              guideVisible && (
+                <li>
+                  <a href="/hafriyat-fiyatlari/">Hafriyat fiyatları</a>
+                </li>
+              )
+            }
           </ul>
         </nav>
       )

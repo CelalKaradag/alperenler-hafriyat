@@ -195,6 +195,27 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 - Dosyası bulunmayan öğe atlanır; hiç öğe yoksa bölüm ve menüdeki "Galeri" görünmez (dev'de menü için yeni medyadan sonra sunucuyu yeniden başlatın).
 - Konum, tarih, müşteri adı veya "projemiz" gibi iddia yazılmaz.
 
+## Makine kiralama sayfaları, fiyat rehberi, sitemap
+
+- **Makine kiralama** ([src/data/machines.ts](src/data/machines.ts)): `/makine-kiralama/` (liste) ve `/makine-kiralama/<slug>/` (kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör, hafriyat kamyonu). Hepsi `onaylandi: false`; yalnızca `showDrafts` iken (dev veya `PUBLIC_SHOW_DRAFTS=true` önizleme) üretilir ve "TASLAK" rozeti ile "Bu makinenin firmada bulunduğu onaylanmadı." notunu taşır. **Hangi makinelerin gerçekten bulunduğu firmadan doğrulanmadan `onaylandi: true` yapılmamalıdır.** Metinlerde rakam, fiyat, süre veya model iddiası yoktur; WhatsApp mesajı makine adına özeldir. Listeye `/hizmetler/` sayfasındaki "Makine kiralama" bölümünden ve footer'dan ulaşılır; hizmet ve makine sayfaları birbirine "İlgili" bağlantılarıyla bağlıdır.
+- **Fiyat rehberi** ([src/data/price-guide.ts](src/data/price-guide.ts)): `/hafriyat-fiyatlari/`, `onaylandi: false`. Rakamsızdır; metreküp bazlı kazı, saatlik/günlük makine, kamyon sefer ve yıkım işlerinde fiyatı etkileyen etkenleri anlatır; içindekiler listesi, SSS ve teklif sihirbazı içerir. SSS maddeleri de `onaylandi` taşır; `FAQPage` JSON-LD yalnızca onaylılardan üretilir.
+- **Taslak sayfalar `noindex`** olur (site yayına çıksa bile onaylanana kadar). `BreadcrumbList` JSON-LD hizmet, makine ve rehber sayfalarında yalnızca onaylı sayfalar için ve `astro.config.mjs` içinde `site` tanımlıysa basılır.
+- **`/robots.txt`** ([robots.txt.ts](src/pages/robots.txt.ts)): `site.publish.indexable: false` iken `Disallow: /`; `true` iken `Allow: /` ve `Sitemap:` satırı.
+- **`/sitemap.xml`** ([[feed].xml.ts](src/pages/[feed].xml.ts), kendi yazımımız, `@astrojs/sitemap` yok): yalnızca `indexable: true` iken üretilir; hiçbir taslak sayfa girmez (yalnızca `onaylandi: true` hizmet/makine/rehber, `/gizlilik/` ve 404 hariç).
+
+## Yayına alma kontrol listesi
+
+1. **Alan adı:** satın alın ve DNS/Netlify ayarlarını yapın.
+2. **`astro.config.mjs` → `site`:** önizleme adresini gerçek alan adıyla değiştirin (canonical, `og:url`, `og:image`, sitemap, JSON-LD buna bağlıdır).
+3. **`PUBLIC_SHOW_DRAFTS`:** Netlify ortamında `false` yapın veya silin (`netlify.toml` ve Netlify panelinde); taslaklar yayına girmesin.
+4. **`netlify.toml`:** `[[headers]]` altındaki `X-Robots-Tag: noindex, nofollow` bloğunu kaldırın.
+5. **`src/data/site.ts` → `publish.indexable: true`:** sitemap ve `robots.txt` bu ayarla açılır, sayfalar `index` olur (gizlilik sayfası `noindex` kalır).
+6. **Onaylanan içerikler:** firmanın doğruladığı hizmet, SSS, makine, güven şeridi maddeleri ve fiyat rehberi için `onaylandi: true` yapın; doğrulanmayanlar `false` kalsın.
+7. **Gizlilik sayfası:** `[firma tarafından doldurulacak]` yer tutucularını (barındırma sağlayıcısı, ticari unvan, vergi no, KVKK veri sorumlusu, tarih) doldurun; metin hukuki onaydan geçsin.
+8. **Google Search Console:** mülkü ekleyin, `sitemap.xml`'i gönderin.
+9. **Google İşletme Profili:** profili doğrulayın; bağlantıyı `site.ts` içindeki `mapsPlaceUrl`'e, doğrulanmış koordinatı `mapCoords`'a yazın.
+10. **Son kontrol:** `npm run build && npm run preview` ile gözden geçirin; sayfa kaynağında `noindex` kalmadığını, `/robots.txt` ve `/sitemap.xml` çıktısını ve Lighthouse sonucunu doğrulayın.
+
 ## Henüz doğrulanmamış / eksik içerik
 
 - Hizmet listesi ve hizmet bölgeleri

@@ -1,4 +1,5 @@
 ---
+import { guideVisible } from '../data/price-guide';
 import { defaultPriceFactors } from '../data/services';
 import Icon from './Icon.astro';
 import QuoteWizard from './QuoteWizard.astro';
@@ -41,6 +42,15 @@ const { tone = 'light' } = Astro.props;
         <p class="price-note">
           Bu bilgilerle teklif mesajınızı sihirbazla hazırlayın veya doğrudan arayın.
         </p>
+        {
+          guideVisible && (
+            <p class="price-note">
+              <a class="text-link" href="/hafriyat-fiyatlari/">
+                Hafriyat fiyatları nasıl belirlenir?<span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
+          )
+        }
       </div>
 
       <QuoteWizard />

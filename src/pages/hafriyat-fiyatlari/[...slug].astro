@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import QuoteWizard from '../../components/QuoteWizard.astro';
+import TopoArt from '../../components/TopoArt.astro';
+import {
+  approvedGuideFaqs,
+  guideVisible,
+  priceGuide,
+  visibleGuideFaqs,
+} from '../../data/price-guide';
+import { breadcrumbSchema, faqSchema } from '../../utils/schema';
+
+// /hafriyat-fiyatlari/ yalnızca onaylıysa veya showDrafts (dev / önizleme build'i) iken üretilir.
+export function getStaticPaths() {
+  return guideVisible ? [{ params: { slug: undefined } }] : [];
+}
+
+const sections = priceGuide.sections;
+const tocItems = [
+  ...sections.map((section) => ({ id: section.id, title: section.title })),
+  ...(visibleGuideFaqs.length > 0 ? [{ id: 'sss', title: 'Sık sorulan sorular' }] : []),
+  { id: 'teklif', title: 'Teklifinizi hazırlayın' },
+];
+---
+
+<BaseLayout
+  title={priceGuide.seoTitle}
+  description={priceGuide.description}
+  noindex={!priceGuide.onaylandi}
+>
+  <Fragment slot="head">
+    {approvedGuideFaqs.length > 0 && <JsonLd data={faqSchema(approvedGuideFaqs)} />}
+    {
+      priceGuide.onaylandi && Astro.site && (
+        <JsonLd
+          data={breadcrumbSchema(
+            [
+              { name: 'Ana Sayfa', path: '/' },
+              { name: 'Hafriyat fiyatları', path: '/hafriyat-fiyatlari/' },
+            ],
+            Astro.site,
+          )}
+        />
+      )
+    }
+  </Fragment>
+
+  <section class="page-head on-dark">
+    <TopoArt variant="soft" />
+    <div class="container narrow">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Ana Sayfa</a></li>
+          <li aria-current="page">Hafriyat fiyatları</li>
+        </ol>
+      </nav>
+      <h1>{priceGuide.title}</h1>
+      <p class="lead">{priceGuide.lead}</p>
+      {!priceGuide.onaylandi && <p><span class="draft-badge">TASLAK</span></p>}
+    </div>
+  </section>
+
+  <section class="section section-light">
+    <div class="container narrow prose">
+      <nav class="toc" aria-label="İçindekiler">
+        <h2>İçindekiler</h2>
+        <ol>
+          {
+            tocItems.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>{item.title}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      {
+        sections.map((section) => (
+          <section id={section.id} class="guide-section" aria-labelledby={`${section.id}-baslik`}>
+            <h2 id={`${section.id}-baslik`}>{section.title}</h2>
+            <p>{section.intro}</p>
+            <ul class="check-list">
+              {section.factors.map((factor) => (
+                <li>
+                  <Icon name="check" />
+                  <span>{factor}</span>
+                </li>
+              ))}
+            </ul>
+            {'note' in section && section.note && <p class="guide-note">{section.note}</p>}
+          </section>
+        ))
+      }
+
+      {
+        visibleGuideFaqs.length > 0 && (
+          <section id="sss" class="guide-section" aria-labelledby="sss-baslik">
+            <h2 id="sss-baslik">Sık sorulan sorular</h2>
+            <div class="faq-list">
+              {visibleGuideFaqs.map((item) => (
+                <details class="faq-item">
+                  <summary>
+                    <span class="faq-question">
+                      {item.question}
+                      {!item.onaylandi && <span class="draft-badge">TASLAK</span>}
+                    </span>
+                    <span class="faq-toggle" aria-hidden="true" />
+                  </summary>
+                  <div class="faq-answer">
+                    <p>{item.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </div>
+  </section>
+
+  <section id="teklif" class="section section-paper" aria-labelledby="rehber-teklif-baslik">
+    <div class="container quote-page-narrow">
+      <div class="section-head">
+        <p class="eyebrow">Teklif Al</p>
+        <h2 id="rehber-teklif-baslik">Teklifinizi hazırlayın</h2>
+        <p class="lead">İşin türünü ve yerini seçin; mesajınız hazır olsun. Rakam, işi öğrendikten sonra verilir.</p>
+      </div>
+      <QuoteWizard />
+    </div>
+  </section>
+</BaseLayout>

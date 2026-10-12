@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import Icon from '../../components/Icon.astro';
+import TopoArt from '../../components/TopoArt.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import Picture from '../../components/Picture.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import {
+  machineCommonNeeds,
+  machineWorkingModel,
+  visibleMachines,
+  type Machine,
+} from '../../data/machines';
+import { visibleServices } from '../../data/services';
+import { site, whatsappLink, whatsappServiceMessage } from '../../data/site';
+import { publicFileExists } from '../../utils/assets';
+import { imageSize } from '../../utils/image-size';
+import { breadcrumbSchema } from '../../utils/schema';
+
+// /makine-kiralama/ (liste) ve /makine-kiralama/<slug>/ (detay) tek dosyada üretilir.
+// Görünür makine yoksa (yayında onaylı makine yok) hiçbir sayfa üretilmez.
+export function getStaticPaths() {
+  if (visibleMachines.length === 0) return [];
+  return [
+    { params: { slug: undefined }, props: { machine: null } },
+    ...visibleMachines.map((item) => ({ params: { slug: item.slug }, props: { machine: item } })),
+  ];
+}
+
+const { machine } = Astro.props as { machine: Machine | null };
+const others = machine ? visibleMachines.filter((item) => item.slug !== machine.slug) : [];
+const relatedServices = machine
+  ? visibleServices.filter((service) => machine.relatedServices.includes(service.slug))
+  : [];
+const waLink = machine ? whatsappLink(whatsappServiceMessage(machine.title)) : null;
+const headImage = machine && publicFileExists(machine.image) ? machine.image : null;
+const headSize = headImage ? imageSize(headImage) : null;
+
+// Taslak sayfalar noindex (site yayına çıksa bile onaylanana kadar)
+const anyApproved = visibleMachines.some((item) => item.onaylandi);
+const noindex = machine ? !machine.onaylandi : !anyApproved;
+
+const title = machine
+  ? `${machine.seoName} Malatya | ${site.name}`
+  : `Makine Kiralama Malatya | ${site.name}`;
+const description = machine
+  ? machine.summary
+  : `${site.legalName} operatörlü makine kiralama: kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya'da ihtiyacınızı konuşmak için arayın.`;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <Fragment slot="head">
+    {
+      machine?.onaylandi && Astro.site && (
+        <JsonLd
+          data={breadcrumbSchema(
+            [
+              { name: 'Ana Sayfa', path: '/' },
+              { name: 'Makine kiralama', path: '/makine-kiralama/' },
+              { name: machine.seoName, path: `/makine-kiralama/${machine.slug}/` },
+            ],
+            Astro.site,
+          )}
+        />
+      )
+    }
+  </Fragment>
+  {
+    machine ? (
+      <>
+        <section class="page-head on-dark">
+          {
+            headImage && (
+              <div class="page-head-media" aria-hidden="true">
+                <Picture
+                  src={headImage}
+                  alt=""
+                  width={headSize?.width ?? 1600}
+                  height={headSize?.height ?? 1000}
+                  loading="eager"
+                  sizes="100vw"
+                />
+              </div>
+            )
+          }
+          <TopoArt variant="soft" />
+          <div class="container narrow">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+              <ol>
+                <li><a href="/">Ana Sayfa</a></li>
+                <li><a href="/makine-kiralama/">Makine kiralama</a></li>
+                <li aria-current="page">{machine.seoName}</li>
+              </ol>
+            </nav>
+            <h1>{machine.title}</h1>
+            <p class="lead">{machine.summary}</p>
+            {!machine.onaylandi && <p><span class="draft-badge">TASLAK</span></p>}
+          </div>
+        </section>
+
+        <section class="section section-light">
+          <div class="container detail-grid">
+            <div class="prose">
+              {
+                !machine.onaylandi && (
+                  <p class="draft-notice" role="note">
+                    <span class="draft-badge">TASLAK</span> Bu makinenin firmada bulunduğu onaylanmadı.
+                  </p>
+                )
+              }
+
+              {machine.detail.map((paragraph) => <p>{paragraph}</p>)}
+
+              <h2>Hangi işlerde tercih edilir?</h2>
+              <ul class="check-list">
+                {
+                  machine.uses.map((item) => (
+                    <li>
+                      <Icon name="check" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+
+              <h2>Çalışma şekli</h2>
+              <p>{machineWorkingModel}</p>
+
+              <h2>Teklif için gerekenler</h2>
+              <ul class="check-list">
+                {
+                  [...machine.quoteNeeds, ...machineCommonNeeds].map((item) => (
+                    <li>
+                      <Icon name="check" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+
+              <RelatedLinks
+                heading="İlgili hizmetler"
+                items={relatedServices.map((service) => ({
+                  href: `/hizmetler/${service.slug}/`,
+                  title: service.title,
+                  icon: service.icon,
+                  draft: !service.onaylandi,
+                }))}
+              />
+            </div>
+
+            <aside class="call-card on-dark" aria-label="Teklif için arayın">
+              <Icon name="phone" />
+              <h2>Teklif için arayın</h2>
+              <p>İşi anlatın, ihtiyacınıza göre teklif hazırlayalım.</p>
+              <a class="btn btn-primary btn-lg" href={site.phone.href}>
+                {site.phone.display}
+              </a>
+              {waLink && <WhatsAppButton class="btn btn-wa btn-lg call-card-wa" href={waLink} />}
+            </aside>
+          </div>
+        </section>
+
+        {
+          others.length > 0 && (
+            <section class="section section-paper" aria-labelledby="diger-makine-baslik">
+              <div class="container">
+                <div class="section-head">
+                  <p class="eyebrow">Makine kiralama</p>
+                  <h2 id="diger-makine-baslik">Diğer makineler</h2>
+                </div>
+                <ul class="link-list">
+                  {others.map((item) => (
+                    <li>
+                      <a href={`/makine-kiralama/${item.slug}/`}>
+                        <Icon name={item.icon} />
+                        <span>{item.title}</span>
+                        {!item.onaylandi && <span class="draft-badge">TASLAK</span>}
+                        <Icon class="link-list-arrow" name="arrow" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )
+        }
+      </>
+    ) : (
+      <>
+        <section class="page-head on-dark">
+          <TopoArt variant="soft" />
+          <div class="container narrow">
+            <p class="eyebrow">Operatörlü makineler</p>
+            <h1>Makine Kiralama</h1>
+            <p class="lead">
+              Kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya'da
+              ihtiyacınızı anlatmak için bizi arayabilirsiniz.
+            </p>
+            {visibleMachines.some((item) => !item.onaylandi) && (
+              <p class="draft-notice" role="note">
+                <span class="draft-badge">TASLAK</span> Bu makinelerin firmada bulunduğu onaylanmadı.
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section class="section section-light section--flush-top">
+          <div class="container">
+            <div class="card-grid">
+              {visibleMachines.map((item, i) => (
+                <ServiceCard service={item} index={i + 1} basePath="/makine-kiralama/" />
+              ))}
+            </div>
+            <p class="section-more">
+              <a class="text-link" href="/hizmetler/">
+                Tüm hizmetler<span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
+          </div>
+        </section>
+      </>
+    )
+  }
+</BaseLayout>

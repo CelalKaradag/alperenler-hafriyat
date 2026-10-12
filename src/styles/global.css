@@ -3038,6 +3038,83 @@ textarea.wizard-input {
   }
 }
 
+/* ---------- İçindekiler / fiyat rehberi / ilgili bağlantılar ---------- */
+
+.toc {
+  max-width: 42rem;
+  margin-bottom: 2.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.toc h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toc ol {
+  display: grid;
+  gap: 0.4rem;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.toc a {
+  font-weight: 600;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 2px;
+  padding-bottom: 0.1em;
+  transition: background-size 0.3s ease;
+}
+
+.toc a:hover,
+.toc a:focus-visible {
+  background-size: 100% 2px;
+}
+
+.guide-section {
+  margin-top: 3rem;
+}
+
+.guide-section:first-of-type {
+  margin-top: 0;
+}
+
+.guide-note {
+  max-width: 42rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.quote-page-narrow {
+  max-width: 52rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ilgili hizmet/makine bağlantıları (prose içinde) */
+.related-block {
+  margin-top: 2.5rem;
+}
+
+.related-block h2 {
+  margin-bottom: 1rem;
+  font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem);
+}
+
+.link-list .draft-badge {
+  flex: none;
+}
 /* ---------- Sık sorulan sorular (details/summary, JavaScript gerekmez) ---------- */
 
 :root {

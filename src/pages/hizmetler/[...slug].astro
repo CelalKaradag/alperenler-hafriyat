@@ -6,7 +6,9 @@ import TopoArt from '../../components/TopoArt.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { approvedFaqs } from '../../data/faq';
-import { faqSchema, serviceSchema } from '../../utils/schema';
+import { breadcrumbSchema, faqSchema, serviceSchema } from '../../utils/schema';
+import { visibleMachines } from '../../data/machines';
+import RelatedLinks from '../../components/RelatedLinks.astro';
 import { defaultPriceFactors, visibleServices, type Service } from '../../data/services';
 import { site, whatsappLink, whatsappServiceMessage } from '../../data/site';
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
@@ -39,6 +41,14 @@ const hasRelated = service
   ? getGalleryEntries().some((entry) => entry.item.services?.includes(service.slug))
   : false;
 
+// İlgili makine kiralama sayfaları (iç bağlantı)
+const relatedMachines = service
+  ? visibleMachines.filter((machine) => machine.relatedServices.includes(service.slug))
+  : [];
+// Taslak içerik sayfaları noindex (site yayına çıksa bile onaylanana kadar)
+const anyApproved = visibleServices.some((item) => item.onaylandi);
+const noindex = service ? !service.onaylandi : !anyApproved;
+
 const title = service
   ? `${service.seoName} Malatya | ${site.name}`
   : `Hizmetler | ${site.name}`;
@@ -47,9 +57,23 @@ const description = service
   : `${site.legalName} hizmetleri: hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya'da ihtiyacınızı konuşmak için arayın.`;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} noindex={noindex}>
   <Fragment slot="head">
     {service?.onaylandi && <JsonLd data={serviceSchema(service, Astro.site)} />}
+    {
+      service?.onaylandi && Astro.site && (
+        <JsonLd
+          data={breadcrumbSchema(
+            [
+              { name: 'Ana Sayfa', path: '/' },
+              { name: 'Hizmetler', path: '/hizmetler/' },
+              { name: service.seoName, path: `/hizmetler/${service.slug}/` },
+            ],
+            Astro.site,
+          )}
+        />
+      )
+    }
     {!service && approvedFaqs.length > 0 && <JsonLd data={faqSchema(approvedFaqs)} />}
   </Fragment>
   {
@@ -117,6 +141,15 @@ const description = service
                   ))
                 }
               </ul>
+              <RelatedLinks
+                heading="İlgili makine kiralama"
+                items={relatedMachines.map((machine) => ({
+                  href: `/makine-kiralama/${machine.slug}/`,
+                  title: machine.title,
+                  icon: machine.icon,
+                  draft: !machine.onaylandi,
+                }))}
+              />
             </div>
 
             <aside class="call-card on-dark" aria-label="Teklif için arayın">
@@ -188,7 +221,30 @@ const description = service
           </div>
         </section>
 
-        <FaqSection tone="paper" />
+        {
+          visibleMachines.length > 0 && (
+            <section class="section section-paper" aria-labelledby="makine-baslik">
+              <div class="container">
+                <div class="section-head">
+                  <p class="eyebrow">Makine kiralama</p>
+                  <h2 id="makine-baslik">Operatörlü makine kiralama</h2>
+                </div>
+                <div class="card-grid">
+                  {visibleMachines.map((machine, i) => (
+                    <ServiceCard service={machine} index={i + 1} basePath="/makine-kiralama/" />
+                  ))}
+                </div>
+                <p class="section-more">
+                  <a class="text-link" href="/makine-kiralama/">
+                    Tüm makine kiralama sayfaları<span class="arrow" aria-hidden="true">→</span>
+                  </a>
+                </p>
+              </div>
+            </section>
+          )
+        }
+
+        <FaqSection tone={visibleMachines.length > 0 ? 'light' : 'paper'} />
       </>
     )
   }
