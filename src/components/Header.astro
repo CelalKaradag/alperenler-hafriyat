@@ -1,8 +1,9 @@
 ﻿---
 import { navItems } from '../data/nav';
-import { site } from '../data/site';
+import { site, whatsappUrl } from '../data/site';
 import Icon from './Icon.astro';
 import BrandLogo from './BrandLogo.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
 
 const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isCurrent = (href: string) => {
@@ -44,6 +45,18 @@ const isCurrent = (href: string) => {
           ))
         }
       </ul>
+      {/* Yalnızca mobil/tablet menüsünde (CSS ile): büyük aramalar + adres */}
+      <div class="nav-extra">
+        <a class="btn btn-primary btn-lg" href={site.phone.href}>
+          <Icon class="btn-icon" name="phone" />Hemen Ara
+        </a>
+        {
+          whatsappUrl && (
+            <WhatsAppButton class="btn btn-wa btn-lg" href={whatsappUrl} label="WhatsApp ile yazın" />
+          )
+        }
+        <p class="nav-address">{site.address}</p>
+      </div>
     </nav>
 
     <a class="header-phone" href={site.phone.href}>
@@ -77,12 +90,43 @@ const isCurrent = (href: string) => {
 
     var desktop = window.matchMedia('(min-width: 84em)');
 
+    // Menü açıkken (tam ekran, yalnızca < 84em): sayfa kaydırılmaz (html.menu-open), alt sabit çubuk gizlenir (CSS),
+    // header dışındaki her şey inert olur (odak/ekran okuyucu menünün içinde kalır)
+    function setPageLocked(locked) {
+      root.classList.toggle('menu-open', locked);
+      var kids = document.body ? document.body.children : [];
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i] === header) continue;
+        if (locked) kids[i].setAttribute('inert', '');
+        else kids[i].removeAttribute('inert');
+      }
+    }
+
     function setOpen(open, returnFocus) {
       header.classList.toggle('is-open', open);
       toggle.setAttribute('aria-expanded', String(open));
       label.textContent = open ? 'Kapat' : 'Menü';
+      setPageLocked(open && !desktop.matches);
       if (!open && returnFocus) toggle.focus();
     }
+
+    // Odak tuzağı: Tab menünün (header) içinde döner
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Tab' || !header.classList.contains('is-open')) return;
+      var items = Array.prototype.filter.call(header.querySelectorAll('a[href], button'), function (el) {
+        return !el.classList.contains('skip-link') && el.offsetParent !== null;
+      });
+      if (items.length === 0) return;
+      var first = items[0];
+      var last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
 
     toggle.addEventListener('click', function () {
       setOpen(toggle.getAttribute('aria-expanded') !== 'true', false);

@@ -65,6 +65,28 @@ html {
   font-weight: 600;
 }
 
+/* Mobil okunurluk: gövde/yardımcı metinler ≥ 15 px (0.9375rem); etiket/eyebrow/rozet ≥ 12 px */
+@media (max-width: 47.99em) {
+  body .footer-bottom,
+  body .breadcrumb,
+  body .map-note,
+  body .wizard-note,
+  body .copy-status,
+  body .gallery-counter,
+  body .gallery-item figcaption,
+  body .lightbox-caption,
+  body .lightbox-count,
+  body .guide-meta,
+  body .map-hint {
+    font-size: 0.9375rem;
+  }
+
+  /* etiketler ≥ 12 px */
+  body .draft-badge {
+    font-size: 0.75rem;
+  }
+}
+
 .todo {
   padding: 0.05em 0.35em;
   background: rgba(245, 180, 0, 0.35);

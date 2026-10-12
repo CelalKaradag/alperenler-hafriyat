@@ -34,8 +34,11 @@ export async function expectH1BelowHeader(
         continue;
       }
       const headerBottom = header.y + header.height;
-      if (h1.y < headerBottom) {
-        problems.push(`${path} @${size.width}: h1 üstü ${h1.y.toFixed(1)} < header altı ${headerBottom.toFixed(1)}`);
+      // Kural: h1.top ≥ header.bottom; ayrıca başlık header'a yapışmasın diye en az 8 px boşluk
+      if (h1.y < headerBottom + 8) {
+        problems.push(
+          `${path} @${size.width}: h1 üstü ${h1.y.toFixed(1)} < header altı ${headerBottom.toFixed(1)} + 8 px boşluk`,
+        );
       }
     }
   }

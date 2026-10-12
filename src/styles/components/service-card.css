@@ -19,7 +19,7 @@
   flex: 1;
 }
 
-@media (min-width: 30em) {
+@media (min-width: 36em) {
   .card-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -217,121 +217,19 @@
   transform: translateX(4px);
 }
 
-/* Dar telefonlar (30em altı): kompakt satır kartı. Numara | ikon | başlık | ok.
-   Açıklama gizli (detay sayfasında var); dokunma alanı en az 48 px. */
-@media (max-width: 29.99em) {
+/* < 36em: TEK sütun, tam kartlar (açıklama görünür). Eski kompakt satır kartı kaldırıldı:
+   okunmuyordu. Başlık >= 1.125rem, açıklama >= 0.9375rem. 36-72em arası 2 sütun. */
+@media (max-width: 35.99em) {
   .card-grid {
-    gap: 0.6rem;
-  }
-
-  .service-card p {
-    display: none;
-  }
-
-  .service-card-body {
-    display: grid;
-    grid-template-columns: 1.75rem 1.5rem minmax(0, 1fr) 1.25rem;
-    column-gap: 0.75rem;
-    align-items: center;
-    min-height: 3.5rem;
-    padding: 0.85rem 1rem;
-  }
-
-  .service-card-top {
-    display: contents;
-  }
-
-  .service-card-number {
-    grid-column: 1;
-    grid-row: 1;
-    font-size: 0.95rem;
-  }
-
-  .service-card-icon {
-    grid-column: 2;
-    grid-row: 1;
-    width: 1.5rem;
-    height: 1.5rem;
+    grid-template-columns: 1fr;
   }
 
   .service-card h3 {
-    grid-column: 3;
-    grid-row: 1;
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.25;
+    font-size: max(1.125rem, 1em);
   }
 
-  .service-card .draft-badge {
-    grid-column: 3;
-    grid-row: 2;
-    margin: 0.35rem 0 0;
-  }
-
-  .service-card-more {
-    grid-column: 4;
-    grid-row: 1;
-    margin: 0;
-    font-size: 0; /* "Detay" yazısı gizli, yalnızca ok */
-  }
-
-  .service-card-more .icon {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-}
-
-/* Kompakt satır, görselli kart: solda 56 px kare küçük resim, yanında küçük numara + başlık, sağda ok */
-@media (max-width: 29.99em) {
-  .service-card.service-card--img {
-    display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr) 1.25rem;
-    column-gap: 0.85rem;
-    align-items: center;
-    min-height: 4.5rem;
-    padding: 0.5rem 1rem 0.5rem 0.5rem;
-  }
-
-  .service-card--img .service-card-media {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    width: 3.5rem;
-    height: 3.5rem;
-    aspect-ratio: 1 / 1;
-    border-radius: var(--radius);
-  }
-
-  .service-card--img .service-card-media::after {
-    display: none;
-  }
-
-  .service-card--img .service-card-body,
-  .service-card--img .service-card-top {
-    position: static;
-    display: contents;
-  }
-
-  .service-card--img .service-card-number {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-    font-size: 0.75rem;
-    text-shadow: none;
-  }
-
-  .service-card--img h3 {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .service-card--img .draft-badge {
-    grid-column: 2;
-    grid-row: 3;
-  }
-
-  .service-card--img .service-card-more {
-    grid-column: 3;
-    grid-row: 1 / span 3;
+  .service-card p {
+    font-size: max(0.9375rem, 0.97rem);
   }
 }
 

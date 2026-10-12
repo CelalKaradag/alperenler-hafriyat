@@ -236,6 +236,107 @@ test.describe('mobil 390x844', () => {
     await expect(page.locator('#site-nav')).toBeVisible();
   });
 
+  test('tam ekran menü: viewport\'u kaplar, altındaki sayfa tıklanamaz, alt çubuk gizli, kaydırma kilitli, Escape kapatır', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const toggle = page.locator('.nav-toggle');
+    const header = page.locator('.site-header');
+    await toggle.click();
+    await expect(header).toHaveClass(/is-open/);
+    await expect(toggle).toHaveText('Kapat'); // "Kapat" görünür ve header üstte
+
+    // Panel viewport'u tamamen kaplar
+    const vp = page.viewportSize() as { width: number; height: number };
+    const box = (await header.boundingBox()) as { x: number; y: number; width: number; height: number };
+    expect(Math.abs(box.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(box.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(box.width - vp.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(box.height - vp.height)).toBeLessThanOrEqual(2);
+    // Opak koyu zemin
+    const bg = await header.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bg).not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+
+    // Altındaki hero butonunun olduğu noktada hero öğesi değil menü bulunur
+    const heroBtn = (await page.locator('.hero .btn-primary').first().boundingBox()) as {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+    const hitHero = await page.evaluate(
+      ([x, y]) => {
+        const el = document.elementFromPoint(x, y);
+        return Boolean(el && el.closest('.hero'));
+      },
+      [heroBtn.x + heroBtn.width / 2, heroBtn.y + heroBtn.height / 2],
+    );
+    expect(hitHero, 'hero butonu menünün altında tıklanamaz olmalı').toBe(false);
+
+    // Alt sabit çubuk gizli, gövde kaydırması kilitli
+    await expect(page.locator('.call-bar')).toBeHidden();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
+
+    // Linkler büyük: ≥ 56 px satır, ≈ 22 px yazı; altta büyük "Hemen Ara" + adres
+    const link = page.locator('#site-nav ul a').first();
+    const linkBox = (await link.boundingBox()) as { height: number };
+    expect(linkBox.height).toBeGreaterThanOrEqual(55.5);
+    expect(parseFloat(await link.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(21.5);
+    await expect(page.locator('#site-nav .nav-extra .btn-primary')).toBeVisible();
+    await expect(page.locator('#site-nav .nav-address')).toContainText('Yeşilyurt');
+
+    // Escape kapatır, odak "Menü" düğmesine döner, kilit kalkar
+    await page.keyboard.press('Escape');
+    await expect(header).not.toHaveClass(/is-open/);
+    await expect(toggle).toBeFocused();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
+    await expect(page.locator('.call-bar')).toBeVisible();
+  });
+
+  test('mobil ana sayfa: header en üstte şeffaf (y=0), hero y≈0, logo kartı 56 px; kaydırınca koyu', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const header = page.locator('.site-header');
+    const hb = (await header.boundingBox()) as { y: number };
+    expect(hb.y).toBe(0);
+    const style = await header.evaluate((el) => {
+      const css = getComputedStyle(el);
+      return { bg: css.backgroundColor, shadow: css.boxShadow };
+    });
+    expect(style.bg).toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+    expect(style.shadow).toBe('none');
+    const hero = (await page.locator('.hero').boundingBox()) as { y: number };
+    expect(hero.y).toBeLessThanOrEqual(0.5);
+    const card = (await page.locator('.site-header .logo-card').boundingBox()) as { height: number };
+    expect(Math.abs(card.height - 56)).toBeLessThanOrEqual(1);
+    // Logo + yazı + "Menü" TEK satırda: header tam piksel 72 px (iki satıra düşerse 128 px olurdu)
+    const headerBox = (await header.boundingBox()) as { height: number };
+    expect(headerBox.height, 'mobil header tek satır ve tam piksel').toBeCloseTo(72, 0);
+    const toggleBox = (await page.locator('.nav-toggle').boundingBox()) as { y: number; height: number };
+    expect(toggleBox.y + toggleBox.height).toBeLessThanOrEqual(72);
+
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await expect
+      .poll(() => header.evaluate((el) => getComputedStyle(el).backgroundColor))
+      .not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+  });
+
+  test('hizmetler 390px: kartlar tek sütun, başlık ≥ 18 px, açıklama ≥ 15 px', async ({ page }) => {
+    await page.goto('/hizmetler/');
+    const columns = await page
+      .locator('.card-grid')
+      .first()
+      .evaluate((el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length);
+    expect(columns).toBe(1);
+    const sizes = await page.locator('.service-card').first().evaluate((el) => ({
+      h3: parseFloat(getComputedStyle(el.querySelector('h3') as Element).fontSize),
+      p: parseFloat(getComputedStyle(el.querySelector('p') as Element).fontSize),
+    }));
+    expect(sizes.h3).toBeGreaterThanOrEqual(18);
+    expect(sizes.p).toBeGreaterThanOrEqual(15);
+  });
+
   test('yatay taşma yok', async ({ page }) => {
     for (const path of ['/', '/hakkimizda/', '/iletisim/', '/teklif/', '/galeri/', '/gizlilik/']) {
       await page.goto(path);

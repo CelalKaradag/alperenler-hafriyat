@@ -1,8 +1,11 @@
 /* ---------- Header ---------- */
 
 .site-header {
-  position: sticky;
-  top: 0;
+  /* Tüm genişliklerde fixed (akıştan çıkar): hero'nun üstünde durur, negatif marj hilesi yok */
+  position: fixed;
+  top: var(--preview-h, 0px);
+  left: 0;
+  right: 0;
   z-index: 40;
   box-shadow: 0 1px 0 var(--line-dark);
   transition:
@@ -31,8 +34,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem 1rem;
-  min-height: var(--header-h);
-  padding-block: 0.5rem;
+  min-height: 0;
+  padding-block: var(--header-pad, 8px);
 }
 
 .brand {
@@ -74,11 +77,11 @@
   height: auto; /* width/height öznitelikleri 3:2 oranı korur (CLS yok) */
 }
 
-/* Header logo kartı: mobil/tablet (< 84em) ≈ 60 px (50 + 2 × 5). Masaüstü boyutları aşağıdaki
-   "Masaüstü header logosu" bloğunda (sayfa en üstteyken büyük, kaydırınca küçük). Oran 3:2 korunur. */
+/* Header logo kartı: mobil/tablet (< 84em) 56 px (46 + 2 × 5). Masaüstü boyutları aşağıdaki
+   "MASAÜSTÜ HEADER" bloğunda (sayfa en üstteyken büyük, kaydırınca küçük). Oran 3:2 korunur. */
 .brand-logo--header img {
   width: auto;
-  height: 50px;
+  height: 46px;
 }
 
 /* Çok dar ekranlarda (< 22em) yanındaki yazı gizlenir: header ve hamburger sığsın */
@@ -111,7 +114,7 @@
   gap: 0.25rem 1.75rem;
 }
 
-.site-nav a {
+.site-nav ul a {
   display: inline-block;
   white-space: nowrap;
   padding: 0.5rem 0;
@@ -121,8 +124,8 @@
   border-bottom: 2px solid transparent;
 }
 
-.site-nav a:hover,
-.site-nav a[aria-current='page'] {
+.site-nav ul a:hover,
+.site-nav ul a[aria-current='page'] {
   border-bottom-color: var(--accent);
 }
 
@@ -168,11 +171,63 @@
   padding-top: calc(var(--header-h) + 2rem);
 }
 
-/* < 84em (mobil/tablet): header akışta (sticky) ve hero'nun üstüne geri çekilir; yükseklik = --header-h */
+/* < 84em (mobil/tablet): header de fixed; kart 56 px + 2 × 8 px dolgu = 72 px, kaydırınca boyut değişmez */
 @media (max-width: 83.99em) {
-  .js .over-hero main {
-    margin-top: calc(var(--header-h) * -1);
+  :root {
+    /* tam piksel: kart 56 px + 2 × 8 px dolgu = 72 px (+ çentik payı: viewport-fit=cover ile iPhone'da safe-area) */
+    --header-h: calc(72px + env(safe-area-inset-top, 0px));
+    --header-top-h: calc(72px + env(safe-area-inset-top, 0px));
+    --header-pad: 8px;
+    --header-gap: clamp(1rem, 4vw, 1.5rem); /* başlık ile header arasındaki nefes payı */
   }
+
+  .site-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* Masaüstü nefes payı */
+@media (min-width: 84em) {
+  :root {
+    --header-gap: clamp(1rem, 2vw, 1.75rem);
+  }
+}
+
+/* Hero'su olmayan sayfalar (tüm genişlikler): ilk bölüm = header yüksekliği (--header-top-h) + nefes payı
+   (--header-gap) kadar aşağıda başlar; her iki değer genişliğe göre tek yerden gelir.
+   `main >` ile özgüllük artırılır (page-head.css daha sonra yüklenir ve padding-block verir). */
+main > .page-head,
+main > .not-found {
+  padding-top: calc(var(--header-top-h) + var(--header-gap, 1.25rem));
+}
+
+/* Mobil: logo + yazı + "Menü" düğmesi TEK satıra sığmalı (yoksa düğme alt satıra düşüp header 128 px olur).
+   360–390 px'te yazı genişliğe göre küçülür; < 22em'de yazı zaten gizli. */
+@media (max-width: 47.99em) {
+  .brand {
+    gap: 0.6rem;
+  }
+
+  .brand-top {
+    font-size: clamp(0.95rem, 4vw, 1.3rem);
+  }
+}
+
+/* Önizleme şeridi (tüm genişlikler): sabit, header'ın üstünde; gövde şerit kadar aşağı itilir */
+.has-preview {
+  --preview-h: 2.5rem;
+  padding-top: var(--preview-h);
+}
+
+.has-preview .preview-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: var(--preview-h);
+  padding-block: 0;
+  line-height: var(--preview-h);
 }
 
 /* Hero'nun en üstünde header okunurluğu için yumuşak koyu geçiş (şerit değil): yukarıdan aşağı .55 → 0, ≈ 160 px */
@@ -238,34 +293,6 @@
   .js .over-hero .hero {
     padding-top: calc(var(--header-top-h) + 2rem);
   }
-
-  /* Hero'su olmayan sayfalar: ilk bölüm header yüksekliği kadar aşağıda başlar (başlık header'ın altına girmez) */
-  /* `main >` ile özgüllük artırılır: page-head.css (header.css'ten SONRA yüklenir) `.page-head { padding-block }`
-     kuralı aksi halde bu üst dolguyu ezerdi (örn. /iletisim/: başlık header'ın hemen altında/içinde kalıyordu) */
-  main > .page-head {
-    padding-top: calc(var(--header-top-h) + clamp(1rem, 2vw, 1.75rem));
-  }
-
-  main > .not-found {
-    padding-top: calc(var(--header-top-h) + clamp(1rem, 2vw, 1.75rem));
-  }
-
-  /* Önizleme şeridi: sabit, header'ın üstünde; gövde şerit kadar aşağı itilir */
-  .has-preview {
-    --preview-h: 2.5rem;
-    padding-top: var(--preview-h);
-  }
-
-  .has-preview .preview-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    height: var(--preview-h);
-    padding-block: 0;
-    line-height: var(--preview-h);
-  }
 }
 
 /* 100em ve üstü: header telefonu da görünür; sığması için büyük kart 80 px (logo 70 px) */
@@ -300,37 +327,49 @@
  * Telefon (≈ 130 px + boşluk) yalnızca 100em (1600 px) ve üstünde eklenir (header-phone.css).
  */
 
-/* <84em: hamburger. Menü kapalı başlar, açılınca panel olarak iner. JS yoksa menü her zaman görünür. */
+/*
+ * <84em: hamburger. AÇILINCA TAM EKRAN panel: header (üstte, "Kapat" görünür) 100dvh olur, opak koyu grafit; altındaki
+ * sayfa/hero/alt çubuk görünmez. Linkler büyük (1.375rem, satır ≥ 56 px); altta büyük "Hemen Ara" + WhatsApp + adres.
+ * JS yoksa menü her zaman görünür ve header akışta kalır (fixed değil).
+ */
 @media (max-width: 83.99em) {
   .site-nav {
     flex-basis: 100%;
     order: 3;
   }
 
+  .site-header:not(.js-nav) {
+    position: relative;
+  }
+
   .js-nav .site-nav {
     display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: calc(100vh - var(--header-h));
-    max-height: calc(100dvh - var(--header-h));
+  }
+
+  .js-nav.is-open {
+    top: 0; /* önizleme şeridinin de üstünü kapatır */
+    z-index: 70; /* şerit (60) ve alt çubuk (50) üstünde */
+    height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
-    padding: 0.25rem var(--gutter) 1rem;
-    background: var(--surface);
-    box-shadow:
-      0 1px 0 var(--line-dark),
-      0 18px 30px rgba(0, 0, 0, 0.35);
+    overscroll-behavior: contain;
+    background: var(--bg);
+  }
+
+  .js-nav.is-open .header-inner {
+    min-height: 100%;
+    align-content: flex-start;
+  }
+
+  .js-nav.is-open .header-call {
+    display: none; /* menünün altında büyük "Hemen Ara" var */
   }
 
   .js-nav.is-open .site-nav {
-    display: block;
-  }
-
-  /* Açık menü, alt "Hemen Ara" çubuğunun (z-index 50) üstünde kalır */
-  .js-nav.is-open {
-    z-index: 60;
-    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0 calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    animation: menu-in 0.2s ease both;
   }
 
   .site-nav ul {
@@ -338,17 +377,64 @@
     gap: 0;
   }
 
-  .site-nav a {
+  .site-nav ul a {
     display: block;
-    min-height: 3.5rem;
+    min-height: 3.5rem; /* 56 px */
     padding: 1rem 0;
     border-top: 1px solid var(--line-dark);
     border-bottom: 0;
-    font-size: 1.15rem;
+    font-size: 1.375rem;
+    line-height: 1.5rem;
   }
 
-  .site-nav a[aria-current='page'] {
+  .site-nav ul a[aria-current='page'] {
     color: var(--accent);
+  }
+
+  /* Menünün altı: büyük aramalar + adres */
+  .site-nav .nav-extra {
+    display: grid; /* özgüllük: aşağıdaki masaüstü "display: none" kuralını yener */
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+  }
+
+  .nav-address {
+    margin: 0.5rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--on-dark-muted);
+  }
+
+  /* Menü açıkken sayfa kaydırılmaz; alt sabit çubuk gizlenir */
+  html.menu-open,
+  html.menu-open body {
+    overflow: hidden;
+  }
+
+  html.menu-open .call-bar {
+    display: none;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Masaüstünde satır içi menüde "menü altı" bölümü yok */
+.nav-extra {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-nav.is-open .site-nav {
+    animation: none;
   }
 }
 
