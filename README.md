@@ -180,6 +180,12 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
 4. Yayın öncesi kontrol listesindeki diğer maddeler (gizlilik sayfası yer tutucuları, logo, `og-image.png`, koordinat/İşletme Profili).
 
+## Hizmet görselleri, güven şeridi
+
+- **Hizmet görselleri:** `services.ts` içindeki `image` alanı galeri dosyalarını kullanır (`/images/galeri/*.jpg`, aynı adlı `.webp` varsa `<picture>` ile önce o). Masaüstü kartında 16/10 görsel, alttan karta kaynaşan koyu degrade ve görselin üstünde numara + ikon; hover'da görsel 400 ms'de `scale(1.04)` (hareket azaltmada yok). Mobil kompakt satırda solda 56 px kare küçük resim, yanında küçük numara. Detay sayfasının başlık bölümünün arka planı aynı görseldir (koyu katman + soluk topo deseni).
+- **"Sahadan kareler":** `gallery.ts` içindeki her öğenin `services` alanı (dosya adından eşleme, bkz. `SERVICES_BY_NAME`) ilgili hizmetleri belirler; hizmet detay sayfası en çok 4 ilgili öğeyi gösterir (lightbox çalışır, altında "Tüm galeri →").
+- **Güven şeridi** ([highlights.ts](src/data/highlights.ts)): ana sayfada Biz Kimiz ile Hizmetler arasında, rakamsız ve iddiasız 4 madde. `onaylandi: false` olduğu için yalnızca `showDrafts` iken (dev veya `PUBLIC_SHOW_DRAFTS=true` önizleme) görünür, "TASLAK" rozetiyle. Firma onaylayınca `onaylandi: true` yapın.
+
 ## Galeri
 
 [src/data/gallery.ts](src/data/gallery.ts) içindeki `photo(ad, alt)` ve `video(ad, başlık)` satırlarıyla yönetilir. Dosyalar `public/images/galeri/` altındadır: `<ad>.jpg` (+ `<ad>.webp` varsa `<picture>` ile önce o sunulur), videolar için `<ad>.mp4` + `<ad>-poster.jpg` (mp4 `public/videos/galeri/` altında da aranır).

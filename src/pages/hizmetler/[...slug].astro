@@ -10,6 +10,11 @@ import { faqSchema, serviceSchema } from '../../utils/schema';
 import { defaultPriceFactors, visibleServices, type Service } from '../../data/services';
 import { site, whatsappLink, whatsappServiceMessage } from '../../data/site';
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import GallerySection from '../../components/GallerySection.astro';
+import Picture from '../../components/Picture.astro';
+import { publicFileExists } from '../../utils/assets';
+import { imageSize } from '../../utils/image-size';
+import { getGalleryEntries } from '../../utils/gallery';
 
 // /hizmetler/ (liste) ve /hizmetler/<slug>/ (detay) tek dosyada üretilir.
 // Görünür hizmet yoksa (yayında onaylı hizmet yok) hiçbir sayfa üretilmez.
@@ -26,6 +31,13 @@ const others = service ? visibleServices.filter((item) => item.slug !== service.
 const factors = service?.priceFactors ?? defaultPriceFactors;
 // Hizmete özel hazır mesaj; WhatsApp numarası yoksa null
 const waLink = service ? whatsappLink(whatsappServiceMessage(service.title)) : null;
+// Başlık bölümünün arka plan görseli (hizmet görseli); dosya yoksa düz koyu zemin
+const headImage = service && publicFileExists(service.image) ? service.image : null;
+const headSize = headImage ? imageSize(headImage) : null;
+// İlgili galeri şeridi varsa "Diğer hizmetler" açık, yoksa kum zeminde (komşu bölümlerle aynı ton olmasın)
+const hasRelated = service
+  ? getGalleryEntries().some((entry) => entry.item.services?.includes(service.slug))
+  : false;
 
 const title = service
   ? `${service.seoName} Malatya | ${site.name}`
@@ -44,6 +56,20 @@ const description = service
     service ? (
       <>
         <section class="page-head on-dark">
+          {
+            headImage && (
+              <div class="page-head-media" aria-hidden="true">
+                <Picture
+                  src={headImage}
+                  alt=""
+                  width={headSize?.width ?? 1600}
+                  height={headSize?.height ?? 1000}
+                  loading="eager"
+                  sizes="100vw"
+                />
+              </div>
+            )
+          }
           <TopoArt variant="soft" />
           <div class="container narrow">
             <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -109,9 +135,14 @@ const description = service
           </div>
         </section>
 
+        <GallerySection variant="related" serviceSlug={service.slug} />
+
         {
           others.length > 0 && (
-            <section class="section section-paper" aria-labelledby="diger-baslik">
+            <section
+              class:list={['section', hasRelated ? 'section-light' : 'section-paper']}
+              aria-labelledby="diger-baslik"
+            >
               <div class="container">
                 <div class="section-head">
                   <p class="eyebrow">Hizmetler</p>

@@ -15,6 +15,8 @@
 
 export interface GalleryBase {
   featured?: boolean;
+  /** İlgili hizmetlerin slug'ları (hizmet detay sayfasındaki "Sahadan kareler" şeridi için) */
+  services?: string[];
   width?: number;
   height?: number;
 }
@@ -41,10 +43,56 @@ export type GalleryItem = GalleryImage | GalleryVideo;
 
 const DIR = '/images/galeri';
 
+// Hizmet slug'ları (services.ts)
+const S = {
+  hafriyat: 'hafriyat-ve-temel-kazisi',
+  yikim: 'bina-yikim-ve-kirim',
+  altyapi: 'altyapi-ve-kanalizasyon-kazisi',
+  arazi: 'arazi-duzleme-ve-yol-acma',
+  kaya: 'kaya-kirma-ve-kirici-isleri',
+  makine: 'operatorlu-is-makinesi-kiralama',
+  tasima: 'hafriyat-kamyonu-ve-moloz-tasima',
+  dolgu: 'dolgu-toprak-temini-ve-saha-temizligi',
+} as const;
+
+// Dosya adından hizmet eşlemesi (görsel/video içeriğine göre makul eşleme):
+//   boru/kanal → altyapı; kırıcı/kaya → kaya kırma; arazi/teras/drone/yol → arazi düzleme;
+//   lowbed/kamyon → taşıma; istinat/duvar/gabion → dolgu-saha; şantiye/temel/derin → hafriyat ve yıkım
+const SERVICES_BY_NAME: Record<string, string[]> = {
+  'santiye-temel-kazisi': [S.hafriyat, S.yikim, S.tasima],
+  'kazi-calismasi': [S.hafriyat, S.makine],
+  'derin-kazi-hitachi': [S.hafriyat, S.yikim],
+  'drone-arazi-duzenleme': [S.arazi],
+  'arazide-yol-acma': [S.arazi],
+  'tas-ocagi-ekskavator-kamyon': [S.makine, S.tasima, S.kaya],
+  'beton-boru-dosemesi': [S.altyapi],
+  'gun-batiminda-ekskavator': [S.makine, S.dolgu],
+  'kabinden-kazi': [S.hafriyat, S.makine],
+  'su-hatti-boru-dosemesi': [S.altyapi],
+  'sokakta-kanal-kazisi': [S.altyapi],
+  'kirici-ile-kaya-kirma': [S.kaya],
+  'boru-hatti-calismasi': [S.altyapi],
+  'demiryolu-hattinda-ekskavator': [S.makine, S.altyapi],
+  'ekskavator-tasima-lowbed': [S.tasima, S.makine],
+  'karli-arazide-calisma': [S.arazi, S.makine],
+  'buyuk-cap-boru-yerlestirme': [S.altyapi],
+  'raylarda-ozel-ekskavator': [S.makine],
+  'istinat-duvari-ve-ekskavator': [S.dolgu],
+  'sehir-ici-kanal-kazisi': [S.altyapi],
+  'boru-hatti-kazisi': [S.altyapi],
+  'tas-istinat-duvari': [S.dolgu],
+  'teras-arazi-duzenleme': [S.arazi, S.dolgu],
+  'altyapi-boru-dosemesi': [S.altyapi],
+  'gabion-duvar': [S.dolgu],
+  'bayrakli-arazi-calismasi': [S.arazi, S.makine],
+  'duzlenmis-saha': [S.arazi, S.dolgu],
+};
+
 const photo = (name: string, alt: string, extra: GalleryBase = {}): GalleryImage => ({
   type: 'image',
   src: `${DIR}/${name}.jpg`,
   alt,
+  services: SERVICES_BY_NAME[name],
   ...extra,
 });
 
@@ -53,6 +101,7 @@ const video = (name: string, title: string, extra: GalleryBase = {}): GalleryVid
   src: [`${DIR}/${name}.mp4`, `/videos/galeri/${name}.mp4`],
   title,
   poster: `${DIR}/${name}-poster.jpg`,
+  services: SERVICES_BY_NAME[name],
   ...extra,
 });
 

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import StatsStrip from '../components/StatsStrip.astro';
+import TrustStrip from '../components/TrustStrip.astro';
 import GallerySection from '../components/GallerySection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import PriceWizard from '../components/PriceWizard.astro';
@@ -74,6 +75,8 @@ const hasAboutImage = publicFileExists(aboutImage);
   </section>
 
   <StatsStrip />
+
+  <TrustStrip />
 
   {
     visibleServices.length > 0 && (

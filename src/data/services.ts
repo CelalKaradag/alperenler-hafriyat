@@ -30,7 +30,7 @@ export interface Service {
   keywords: string[];
   icon: IconName;
   onaylandi: boolean;
-  /** İsteğe bağlı görsel: public/ altındaki yol, örn. "/images/hizmet-kazi.jpg". Dosya yoksa gösterilmez. */
+  /** İsteğe bağlı görsel (JPG; aynı adlı .webp varsa <picture> ile önce o). Dosya yoksa gösterilmez. Galeri dosyalarından seçilir. */
   image?: string;
 }
 
@@ -61,6 +61,7 @@ export const services: Service[] = [
     ],
     keywords: ['temel kazısı', 'hafriyat işleri', 'sert zemin kazısı', 'taşlık arazi kazısı'],
     icon: 'excavate',
+    image: '/images/galeri/santiye-temel-kazisi.jpg',
     onaylandi: false,
   },
   {
@@ -81,6 +82,7 @@ export const services: Service[] = [
     ],
     keywords: ['bina yıkım ve hafriyat', 'yıkım kırım', 'eski bina yıkımı', 'moloz kaldırma'],
     icon: 'demolish',
+    image: '/images/galeri/derin-kazi-hitachi.jpg',
     onaylandi: false,
   },
   {
@@ -101,6 +103,7 @@ export const services: Service[] = [
     ],
     keywords: ['kanalizasyon kazısı', 'altyapı kazısı', 'hat kazısı', 'kanal kazısı'],
     icon: 'pipe',
+    image: '/images/galeri/sokakta-kanal-kazisi.jpg',
     onaylandi: false,
   },
   {
@@ -121,6 +124,7 @@ export const services: Service[] = [
     ],
     keywords: ['tesviye', 'arazi düzleme', 'orman yolu açma', 'dağ yolu açma'],
     icon: 'road',
+    image: '/images/galeri/arazide-yol-acma.jpg',
     onaylandi: false,
   },
   {
@@ -140,6 +144,7 @@ export const services: Service[] = [
     ],
     keywords: ['kırıcılı ekskavatör', 'kaya kırma', 'hidrolik kırıcı', 'sert zemin kırma'],
     icon: 'rock',
+    image: '/images/galeri/kirici-ile-kaya-kirma.jpg',
     onaylandi: false,
   },
   {
@@ -172,6 +177,7 @@ export const services: Service[] = [
       'günlük makine kiralama',
     ],
     icon: 'machine',
+    image: '/images/galeri/tas-ocagi-ekskavator-kamyon.jpg',
     onaylandi: false,
   },
   {
@@ -197,6 +203,7 @@ export const services: Service[] = [
     ],
     keywords: ['hafriyat kamyonu', 'moloz taşıma', 'hafriyat taşıma', 'toprak taşıma'],
     icon: 'truck',
+    image: '/images/galeri/ekskavator-tasima-lowbed.jpg',
     onaylandi: false,
   },
   {
@@ -217,6 +224,7 @@ export const services: Service[] = [
     ],
     keywords: ['dolgu toprağı', 'dolgu malzemesi', 'saha temizliği', 'arsa temizliği'],
     icon: 'soil',
+    image: '/images/galeri/istinat-duvari-ve-ekskavator.jpg',
     onaylandi: false,
   },
 ];

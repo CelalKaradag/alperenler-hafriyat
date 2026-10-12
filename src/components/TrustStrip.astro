@@ -1,0 +1,28 @@
+---
+import { visibleHighlights } from '../data/highlights';
+import Icon from './Icon.astro';
+
+const hasDraft = visibleHighlights.some((item) => !item.onaylandi);
+---
+
+{
+  visibleHighlights.length > 0 && (
+    <section class="trust-strip" aria-label="Kısaca">
+      <div class="container reveal">
+        {hasDraft && <p class="trust-draft"><span class="draft-badge">TASLAK</span></p>}
+        <ul class="trust-list">
+          {
+            visibleHighlights.map((item) => (
+              <li class="trust-item">
+                <span class="trust-icon">
+                  <Icon name={item.icon} />
+                </span>
+                <span>{item.text}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  )
+}

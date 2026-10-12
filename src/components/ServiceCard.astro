@@ -1,7 +1,9 @@
 ---
 import type { Service } from '../data/services';
 import { publicFileExists } from '../utils/assets';
+import { imageSize } from '../utils/image-size';
 import Icon from './Icon.astro';
+import Picture from './Picture.astro';
 
 interface Props {
   service: Service;
@@ -11,14 +13,21 @@ interface Props {
 
 const { service, index } = Astro.props;
 const image = publicFileExists(service.image) ? service.image : null;
+const size = image ? imageSize(image) : null;
 const number = String(index).padStart(2, '0');
 ---
 
-<article class="service-card">
+<article class:list={['service-card', image && 'service-card--img']}>
   {
     image && (
       <div class="service-card-media">
-        <img src={image} alt="" loading="lazy" decoding="async" />
+        <Picture
+          src={image}
+          alt=""
+          width={size?.width ?? 1600}
+          height={size?.height ?? 1000}
+          sizes="(min-width: 72em) 25vw, (min-width: 30em) 50vw, 56px"
+        />
       </div>
     )
   }

@@ -4,16 +4,26 @@ import Icon from './Icon.astro';
 import Picture from './Picture.astro';
 
 interface Props {
-  /** home: ana sayfa "Sahadan" (öne çıkan en çok 6 öğe + /galeri/ bağlantısı); page: /galeri/ (hepsi + filtre) */
-  variant?: 'home' | 'page';
+  /**
+   * home: ana sayfa "Sahadan" (öne çıkan en çok 6 öğe + /galeri/ bağlantısı);
+   * page: /galeri/ (hepsi + filtre);
+   * related: hizmet detay sayfası "Sahadan kareler" şeridi (ilgili 3-4 öğe, serviceSlug gerekir)
+   */
+  variant?: 'home' | 'page' | 'related';
+  serviceSlug?: string;
 }
 
-const { variant = 'home' } = Astro.props;
+const { variant = 'home', serviceSlug } = Astro.props;
 
 // Dosyası public/ altında olmayan öğeler hiç render edilmez (kırık görsel/video olmaz).
 const all = getGalleryEntries();
 const featured = all.filter((entry) => entry.item.featured);
-const entries = variant === 'page' ? all : (featured.length > 0 ? featured : all).slice(0, 6);
+const entries =
+  variant === 'page'
+    ? all
+    : variant === 'related'
+      ? all.filter((entry) => serviceSlug && entry.item.services?.includes(serviceSlug)).slice(0, 4)
+      : (featured.length > 0 ? featured : all).slice(0, 6);
 
 const photoCount = entries.filter((entry) => entry.kind === 'image').length;
 const videoCount = entries.length - photoCount;
@@ -29,16 +39,20 @@ let hasImages = false;
 {
   entries.length > 0 && (
     <section
-      class:list={['section', 'section-light', variant === 'page' && 'section--flush-top']}
-      aria-labelledby={variant === 'home' ? 'galeri-baslik' : undefined}
+      class:list={[
+        'section',
+        variant === 'related' ? 'section-paper' : 'section-light',
+        variant === 'page' && 'section--flush-top',
+      ]}
+      aria-labelledby={variant !== 'page' ? 'galeri-baslik' : undefined}
       aria-label={variant === 'page' ? 'Fotoğraf ve videolar' : undefined}
     >
       <div class="container reveal" data-lightbox-root>
         {
-          variant === 'home' && (
+          variant !== 'page' && (
             <div class="section-head">
               <p class="eyebrow">Çalışmalarımız</p>
-              <h2 id="galeri-baslik">Sahadan</h2>
+              <h2 id="galeri-baslik">{variant === 'related' ? 'Sahadan kareler' : 'Sahadan'}</h2>
             </div>
           )
         }
@@ -88,7 +102,7 @@ let hasImages = false;
                       width={entry.width}
                       height={entry.height}
                       loading={i < eagerCount ? 'eager' : 'lazy'}
-                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 78vw"
+                      sizes={`(min-width: 64em) ${variant === 'related' ? '25vw' : '33vw'}, (min-width: 40em) 50vw, 78vw`}
                     />
                   </button>
                 </li>
@@ -156,6 +170,16 @@ let hasImages = false;
             <p class="gallery-more">
               <a class="text-link" href="/galeri/">
                 Tüm fotoğraf ve videolar<span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
+          )
+        }
+
+        {
+          variant === 'related' && (
+            <p class="gallery-more">
+              <a class="text-link" href="/galeri/">
+                Tüm galeri<span class="arrow" aria-hidden="true">→</span>
               </a>
             </p>
           )

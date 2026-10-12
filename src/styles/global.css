@@ -1049,6 +1049,23 @@ section[id] {
   display: inline;
 }
 
+/* Mobil: "Durdur/Oynat" küçük yuvarlak ikon düğmesi, sağ üstte (header altı); kaydır okuyla çakışmaz */
+@media (max-width: 47.99em) {
+  .hero-toggle {
+    top: calc(var(--header-h) + 0.75rem);
+    bottom: auto;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+  }
+
+  .hero-toggle span.hero-toggle-pause,
+  .hero-toggle[aria-pressed='true'] span.hero-toggle-play {
+    display: none;
+  }
+}
+
 /* Aşağı kaydır göstergesi */
 .hero-scroll {
   position: absolute;
@@ -1354,6 +1371,7 @@ section[id] {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 3;
   height: 2px;
   background: var(--accent);
   transform: scaleX(0);
@@ -1373,10 +1391,69 @@ section[id] {
   transform: scaleX(1);
 }
 
-.service-card-media img {
-  width: 100%;
+/* Görselli kart: 16/10 görsel, alttan karta kaynaşan koyu degrade; numara + ikon görselin üstünde */
+.service-card-media {
+  position: relative;
   aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.service-card-media picture,
+.service-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+
+.service-card-media img {
+  transition: transform 400ms ease;
+}
+
+.service-card:hover .service-card-media img,
+.service-card:focus-within .service-card-media img {
+  transform: scale(1.04);
+}
+
+.service-card-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--surface) 0%,
+    rgba(28, 31, 36, 0.62) 38%,
+    rgba(28, 31, 36, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+/* hover'da kart zemini değişmesin: degrade ile dikiş izi oluşmasın */
+.service-card--img:hover,
+.service-card--img:focus-within {
+  background: var(--surface);
+}
+
+.service-card--img .service-card-top {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  z-index: 2;
+  margin: 0;
+}
+
+.service-card--img .service-card-number {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+}
+
+.service-card--img .service-card-icon {
+  color: #fff;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.65));
+}
+
+.service-card--img .service-card-body {
+  padding-top: 1.25rem;
 }
 
 .service-card-body {
@@ -1466,7 +1543,6 @@ section[id] {
     gap: 0.6rem;
   }
 
-  .service-card-media,
   .service-card p {
     display: none;
   }
@@ -1521,6 +1597,64 @@ section[id] {
   .service-card-more .icon {
     width: 1.25rem;
     height: 1.25rem;
+  }
+}
+
+/* Kompakt satır, görselli kart: solda 56 px kare küçük resim, yanında küçük numara + başlık, sağda ok */
+@media (max-width: 29.99em) {
+  .service-card.service-card--img {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) 1.25rem;
+    column-gap: 0.85rem;
+    align-items: center;
+    min-height: 4.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+  }
+
+  .service-card--img .service-card-media {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 3.5rem;
+    height: 3.5rem;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
+  }
+
+  .service-card--img .service-card-media::after {
+    display: none;
+  }
+
+  .service-card--img .service-card-body,
+  .service-card--img .service-card-top {
+    position: static;
+    display: contents;
+  }
+
+  .service-card--img .service-card-number {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    font-size: 0.75rem;
+    text-shadow: none;
+  }
+
+  .service-card--img .service-card-icon {
+    display: none;
+  }
+
+  .service-card--img h3 {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .service-card--img .draft-badge {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .service-card--img .service-card-more {
+    grid-column: 3;
+    grid-row: 1 / span 3;
   }
 }
 
@@ -2032,6 +2166,129 @@ section[id] {
     scroll-snap-align: start;
   }
 }
+/* Hizmet detay: "Sahadan kareler" şeridi (3-4 ilgili öğe, her ekranda oran korumalı kırpma) */
+.gallery-grid--related {
+  display: grid;
+  columns: auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+@media (min-width: 48em) {
+  .gallery-grid--related {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+.gallery-grid--related .gallery-item {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.gallery-grid--related .gallery-open {
+  height: 100%;
+  border-radius: 0;
+}
+
+.gallery-grid--related .gallery-open picture,
+.gallery-grid--related .gallery-open img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* videolar bu şeritte her ekranda poster + oynat ikonu (lightbox'ta oynar) */
+.gallery-grid--related .gallery-video {
+  display: none;
+}
+
+.gallery-grid--related .gallery-item .gallery-open--video {
+  display: block;
+}
+
+.gallery-grid--related .gallery-open::after {
+  display: none;
+}
+
+/* Hizmet detay başlık bölümü: arka planda hizmet görseli + koyu katman (metin okunur kalır) */
+.page-head-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.page-head-media picture,
+.page-head-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-head-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 22, 26, 0.94) 0%,
+    rgba(20, 22, 26, 0.84) 55%,
+    rgba(20, 22, 26, 0.7) 100%
+  );
+}
+
+/* Güven şeridi (Biz Kimiz ile Hizmetler arası, rakamsız) */
+.trust-strip {
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--sand-2);
+  border-block: 1px solid var(--line-light);
+}
+
+.trust-draft {
+  margin: 0 0 1rem;
+}
+
+.trust-list {
+  display: grid;
+  gap: 1.1rem 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 64em) {
+  .trust-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.trust-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--accent);
+}
+
+.trust-icon .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
 /* Lightbox: yerel <dialog> (odak tuzağı, Escape, arka plan etkisiz) */
 .lightbox {
   width: 100vw;
@@ -2257,6 +2514,7 @@ section[id] {
 
 .site-footer {
   position: relative;
+  isolation: isolate; /* .footer-mark (z-index: -1) footer zemininin üstünde, içeriğin altında kalır */
   overflow: hidden;
   color: var(--on-dark-muted);
   border-top: 1px solid var(--line-dark);
@@ -2341,27 +2599,25 @@ section[id] {
   }
 }
 
-/* e) Dev, çok soluk kontur yazı: bölümün altından taşar (dekor, mobilde gizli) */
+/* e) Dev, çok soluk logo işareti: sağ altta, bölümün dışına taşar (dekor) */
 .footer-mark {
-  display: none;
+  position: absolute;
+  right: -6%;
+  bottom: -18%;
+  z-index: -1;
+  width: min(78vw, 34rem);
+  height: auto;
+  color: var(--on-dark);
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
 }
 
 @media (min-width: 48em) {
   .footer-mark {
-    display: block;
-    margin: 0.5rem 0 -0.3em;
-    font-family: var(--font-display);
-    font-stretch: 100%;
-    font-weight: 900;
-    font-size: 13vw;
-    line-height: 0.8;
-    letter-spacing: 0.02em;
-    text-align: center;
-    white-space: nowrap;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.07);
-    pointer-events: none;
-    user-select: none;
+    right: -3%;
+    bottom: -22%;
+    width: min(42vw, 40rem);
   }
 }
 
@@ -3552,6 +3808,8 @@ html {
   .service-card:hover .service-card-more .icon,
   .service-card:hover,
   .service-card:focus-within,
+  .service-card:hover .service-card-media img,
+  .service-card:focus-within .service-card-media img,
   a:hover > .arrow {
     transform: none;
   }
