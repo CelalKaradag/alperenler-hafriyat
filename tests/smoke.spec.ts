@@ -58,16 +58,13 @@ test('tel: ve wa.me bağlantıları doğru numarayı içeriyor', async ({ page }
 });
 
 test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async ({ page, request }) => {
-  // Not: bu sayfalar onaylanıp `onaylandi: true` yapılınca burası güncellenmelidir.
+  // Not: kalan taslaklar (fiyat rehberi, rehber yazıları, mini ekskavatör) onaylanınca burası güncellenmelidir.
   // Onaylanmamış (onaylandi:false) içerik normal build'de üretilmez.
   for (const path of [
     '/hafriyat-fiyatlari/',
     '/rehber/',
     '/rehber/temel-kazisindan-once-bilinmesi-gerekenler/',
-    '/makine-kiralama/kiricili-ekskavator/', // firma teyit etmedi
-    '/makine-kiralama/lowbed-ile-is-makinesi-tasima/', // firma teyit edecek
     '/makine-kiralama/mini-ekskavator-kiralama/', // firmada yok: kaldırıldı
-    '/hizmetler/hafriyat-ve-temel-kazisi/', // yalnızca 2 hizmet onaylı
   ]) {
     const response = await request.get(path);
     expect(response.status(), `${path} üretilmemeli`).toBe(404);
@@ -80,20 +77,35 @@ test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async (
   await expect(page.locator('footer a[href="/bolgeler/"]')).toHaveCount(1);
 });
 
-test('firma onaylı sayfalar normal build\'de var: bölgeler, 3 makine, 2 hizmet', async ({ request }) => {
+const SERVICE_SLUGS = [
+  'hafriyat-ve-temel-kazisi',
+  'bina-yikim-ve-kirim',
+  'altyapi-ve-kanalizasyon-kazisi',
+  'arazi-duzleme-ve-yol-acma',
+  'kaya-kirma-ve-kirici-isleri',
+  'operatorlu-is-makinesi-kiralama',
+  'hafriyat-kamyonu-ve-moloz-tasima',
+  'dolgu-toprak-temini-ve-saha-temizligi',
+];
+const MACHINE_SLUGS = [
+  'kiralik-kepce-jcb',
+  'ekskavator-kiralama',
+  'kiricili-ekskavator',
+  'hafriyat-kamyonu-kiralama',
+  'lowbed-ile-is-makinesi-tasima',
+];
+
+test("firma onaylı sayfalar normal build'de var: bölgeler, 8 hizmet, 5 makine (lowbed dahil)", async ({ request }) => {
   const present = [
     '/bolgeler/',
     ...[
       'yesilyurt', 'battalgazi', 'akcadag', 'arapgir', 'arguvan', 'darende', 'dogansehir',
       'doganyol', 'hekimhan', 'kale', 'kuluncak', 'puturge', 'yazihan',
     ].map((slug) => `/bolgeler/${slug}/`),
-    '/makine-kiralama/',
-    '/makine-kiralama/ekskavator-kiralama/',
-    '/makine-kiralama/kiralik-kepce-jcb/',
-    '/makine-kiralama/hafriyat-kamyonu-kiralama/',
     '/hizmetler/',
-    '/hizmetler/operatorlu-is-makinesi-kiralama/',
-    '/hizmetler/hafriyat-kamyonu-ve-moloz-tasima/',
+    ...SERVICE_SLUGS.map((slug) => `/hizmetler/${slug}/`),
+    '/makine-kiralama/',
+    ...MACHINE_SLUGS.map((slug) => `/makine-kiralama/${slug}/`),
   ];
   for (const path of present) {
     const response = await request.get(path);
@@ -101,6 +113,28 @@ test('firma onaylı sayfalar normal build\'de var: bölgeler, 3 makine, 2 hizmet
   }
 });
 
+test('hizmetler sayfasında 8 kart; makine listesinde 5 kart; onaylı sayfalarda TASLAK rozeti yok', async ({ page }) => {
+  await page.goto('/hizmetler/');
+  // (sayfada ayrıca makine kartları da var: yalnızca /hizmetler/<slug>/ kartları sayılır)
+  await expect(page.locator('main .service-card a[href^="/hizmetler/"]')).toHaveCount(8);
+  await expect(page.locator('.draft-badge')).toHaveCount(0);
+  await page.goto('/makine-kiralama/');
+  await expect(page.locator('main .service-card')).toHaveCount(5);
+  await expect(page.locator('.draft-badge')).toHaveCount(0);
+  // JSON-LD: onaylı hizmet sayfasında Service var
+  await page.goto('/hizmetler/hafriyat-ve-temel-kazisi/');
+  const ld = (
+    await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
+  ).join('\n');
+  expect(ld).toContain('"@type":"Service"');
+});
+
+test("lowbed sayfası normal build'de 200 ve \"2 adet lowbed tır\" bilgisini içerir", async ({ page }) => {
+  const response = await page.goto('/makine-kiralama/lowbed-ile-is-makinesi-tasima/');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('main')).toContainText('Filomuzda 2 adet lowbed tır');
+  await expect(page.locator('.draft-badge')).toHaveCount(0);
+});
 test('WhatsApp ikonları görünür: svg > 10×10 px ve path dolgusu "none" değil', async ({ page }) => {
   let checked = 0;
   for (const path of [
@@ -181,7 +215,7 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sa
   await page.goto('/makine-kiralama/kiralik-kepce-jcb/');
   await expect(page.locator('main')).toContainText('Filomuzda 2 adet JCB');
 
-  // Ana sayfa sayı şeridi: sırayla 5 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Tır
+  // Ana sayfa sayı şeridi: sırayla 5 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır
   await page.goto('/');
   const items = page.locator('.stats .stat');
   await expect(items).toHaveCount(4);
@@ -189,7 +223,7 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sa
     ['5', 'Paletli ekskavatör'],
     ['2', 'JCB'],
     ['7', 'Kamyon'],
-    ['2', 'Tır'],
+    ['2', 'Lowbed tır'],
   ];
   for (let i = 0; i < expected.length; i += 1) {
     await expect(items.nth(i).locator('.stat-value')).toHaveText(expected[i][0]);
@@ -197,7 +231,7 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sa
   }
 });
 
-test('onaylı (normal build) sayfalarda "13 ton" ve "lowbed" geçmez', async ({ page, request }) => {
+test('onaylı (normal build) sayfalarda "13 ton" geçmez', async ({ page, request }) => {
   const pages = await crawl(page);
   expect(pages.length).toBeGreaterThan(10);
   const problems: string[] = [];
@@ -207,7 +241,6 @@ test('onaylı (normal build) sayfalarda "13 ton" ve "lowbed" geçmez', async ({ 
     // görünen metin, alt/aria/title ve meta içerikleri taranır
     const text = html.replace(/\s[\w:-]+="[^"]*\/(?:images|videos|_astro)\/[^"]*"/gi, '');
     if (/13\s*ton/i.test(text)) problems.push(`${path}: "13 ton"`);
-    if (/lowbed/i.test(text)) problems.push(`${path}: "lowbed"`);
   }
   expect(problems, problems.join('\n')).toEqual([]);
 });
@@ -670,12 +703,9 @@ test.describe('masaüstü header tek satır', () => {
         '/gizlilik/',
         '/404.html',
         '/hizmetler/',
-        '/hizmetler/operatorlu-is-makinesi-kiralama/',
-        '/hizmetler/hafriyat-kamyonu-ve-moloz-tasima/',
+        ...SERVICE_SLUGS.map((slug) => `/hizmetler/${slug}/`),
         '/makine-kiralama/',
-        '/makine-kiralama/ekskavator-kiralama/',
-        '/makine-kiralama/kiralik-kepce-jcb/',
-        '/makine-kiralama/hafriyat-kamyonu-kiralama/',
+        ...MACHINE_SLUGS.map((slug) => `/makine-kiralama/${slug}/`),
         '/bolgeler/',
         '/bolgeler/yesilyurt/',
       ],

@@ -11,7 +11,7 @@
  * - Kaynak değişmediyse atlanır (public/images/_r/.cache.json).
  * - Hata olursa build DURMAZ: sharp yoksa/çalışmazsa mevcut _r klasörü ve meta olduğu gibi kalır;
  *   site tek boy orijinal görsellere düşer. Çıkış kodu her zaman 0.
- * - public/images/_r/ Git'e girer (Netlify'da sharp çalışmasa bile hazır olsun).
+ * - public/images/_r/ Git'e girer (dağıtım ortamında sharp çalışmasa bile hazır olsun).
  */
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';

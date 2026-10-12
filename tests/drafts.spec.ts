@@ -145,13 +145,13 @@ test('önizleme şeridi masaüstü header\'ı ile çakışmaz (şerit üstte, he
   }
 });
 
-test('önizleme şeridi ve TASLAK rozetleri görünür', async ({ page }) => {
-  await page.goto('/hizmetler/');
+test('önizleme şeridi ve TASLAK rozetleri görünür (kalan taslaklar: rehber yazıları)', async ({ page }) => {
+  await page.goto('/rehber/');
   await expect(page.locator('.preview-bar')).toContainText('Önizleme sürümü');
   await expect(page.locator('.draft-badge').first()).toBeVisible();
 });
 
-test('JSON-LD\'ye taslaklar girmez (taslak SSS, taslak hizmet/makine)', async ({ page }) => {
+test("JSON-LD'ye taslaklar girmez (rehber, fiyat rehberi); onaylı hizmet/SSS girer", async ({ page }) => {
   const ld = async () =>
     (
       await page
@@ -159,21 +159,25 @@ test('JSON-LD\'ye taslaklar girmez (taslak SSS, taslak hizmet/makine)', async ({
         .evaluateAll((nodes) => nodes.map((node) => node.textContent ?? ''))
     ).join('\n');
 
-  // FAQPage yalnızca onaylı SSS'yi (bölge sorusu) içerir; taslak sorular girmez
-  for (const path of ['/', '/hizmetler/', '/makine-kiralama/', '/hafriyat-fiyatlari/']) {
-    await page.goto(path);
-    const joined = await ld();
-    expect(joined, `${path} JSON-LD`).not.toContain('Fiyat neye göre belirlenir?');
-    expect(joined, `${path} JSON-LD`).not.toContain('Bina yıkımı için izin gerekir mi?');
-  }
-  // Taslak hizmet sayfasında Service yok; onaylı hizmet sayfasında var
+  // Onaylı hizmet sayfasında Service var; onaylı SSS ana sayfada FAQPage'e girer
   await page.goto('/hizmetler/hafriyat-ve-temel-kazisi/');
-  expect(await ld()).not.toContain('"@type":"Service"');
-  // Kırıcılı ekskavatör ve lowbed taslak: sayfa var, rozet var, mini ekskavatör yok
+  expect(await ld()).toContain('"@type":"Service"');
+  await page.goto('/');
+  expect(await ld()).toContain('"FAQPage"');
+
+  // Taslak rehber yazılarında Article, taslak fiyat rehberinde FAQPage yok
+  for (const slug of GUIDE_SLUGS) {
+    await page.goto(`/rehber/${slug}/`);
+    expect(await ld(), `${slug} JSON-LD`).not.toContain('"Article"');
+  }
+  await page.goto('/hafriyat-fiyatlari/');
+  expect(await ld()).not.toContain('"FAQPage"');
+
+  // Onaylı makineler (kırıcılı ekskavatör, lowbed dahil) rozetsizdir; mini ekskavatör yok
   for (const slug of ['kiricili-ekskavator', 'lowbed-ile-is-makinesi-tasima']) {
     const response = await page.goto(`/makine-kiralama/${slug}/`);
     expect(response?.status(), slug).toBe(200);
-    await expect(page.locator('.draft-badge').first()).toBeVisible();
+    await expect(page.locator('.draft-badge')).toHaveCount(0);
   }
   const mini = await page.goto('/makine-kiralama/mini-ekskavator-kiralama/');
   expect(mini?.status()).toBe(404);

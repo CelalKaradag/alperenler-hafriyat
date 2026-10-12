@@ -35,7 +35,7 @@ Tüm firma/iletişim bilgisi tek dosyada: [src/data/site.ts](src/data/site.ts)
 Hizmetler [src/data/services.ts](src/data/services.ts) içindedir. Şu an 8 hizmet **taslak** olarak (`onaylandi: false`) tanımlıdır.
 
 - `onaylandi: true` → menü, ana sayfa, `/hizmetler/` ve `/hizmetler/<slug>/` sayfalarında görünür.
-- `onaylandi: false` → yalnızca `showDrafts` iken görünür (`npm run dev` ya da `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i, bkz. "Netlify önizleme"); kartta "TASLAK" rozeti olur. Normal `npm run build` çıktısında ne kart, ne menü öğesi, ne de sayfa üretilir.
+- `onaylandi: false` → yalnızca `showDrafts` iken görünür (`npm run dev` ya da `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i, bkz. "Önizleme ve taslak bayrağı"); kartta "TASLAK" rozeti olur. Normal `npm run build` çıktısında ne kart, ne menü öğesi, ne de sayfa üretilir.
 - Firma bir hizmeti doğruladığında yalnızca o hizmetin `onaylandi` değerini `true` yapın; metni de gözden geçirin. Hiç onaylı hizmet yoksa `/hizmetler/` sayfası da üretilmez.
 - Taslak metinlerde deneyim, makine sayısı, süre, fiyat, garanti veya "en iyi/lider" ifadesi bilerek yoktur; eklenmemelidir.
 - `keywords` alanı yalnızca veri olarak durur; sayfada görünür liste olarak basılmaz ve meta keywords eklenmez.
@@ -166,7 +166,7 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 [scripts/build-images.mjs](scripts/build-images.mjs) (`prepare:assets` içinde, `predev`/`prebuild` ile otomatik): `public/images/` altındaki tüm `.jpg` kaynaklardan (galeri, hakkımızda, hero posterleri) **480, 960 ve 1600 px** genişlikte webp + jpg türevleri üretir: `public/images/_r/<ad>-<genişlik>.(webp|jpg)`. Kaynaktan büyük türev üretilmez; kaynağın kendi genişliği de bir türev olarak eklenir.
 - Her görselin boyutu ve **baskın rengi** (`sharp stats().dominant`) [src/data/image-meta.json](src/data/image-meta.json)'a yazılır. `Picture.astro` bununla `srcset` + `sizes` (bağlama göre), `width/height` ve yer tutucu zemin rengi (baskın renk) üretir; meta yoksa eski davranışa (tek boy görsel + sabit kum rengi, `image-size.ts`) düşer. Lightbox tam boyda ve hero posterinde de `srcset` kullanılır; hero posteri `fetchpriority="high"` taşır.
 - Kaynak değişmediyse atlanır (`public/images/_r/.cache.json`). Hata olursa (sharp yoksa/çalışmazsa) build durmaz, mevcut türevler ve orijinal görseller kullanılır.
-- **`public/images/_r/` ve `src/data/image-meta.json` Git'e girer**, böylece Netlify'da sharp çalışmasa bile hazır görseller kullanılır. Yeni görsel eklenince `npm run dev`/`build` türevleri üretir; üretilenleri commit etmeyi unutmayın.
+- **`public/images/_r/` ve `src/data/image-meta.json` Git'e girer**, böylece Dağıtım ortamında sharp çalışmasa bile hazır görseller kullanılır. Yeni görsel eklenince `npm run dev`/`build` türevleri üretir; üretilenleri commit etmeyi unutmayın.
 - `<video poster>` ve galeri video posterleri de `_r` türevlerinden gelir (küçük webp).
 
 ## CSS yapısı
@@ -203,7 +203,7 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 ## Yayın: Cloudflare Workers (yalnızca statik dosya)
 
-Önizleme **Cloudflare Workers statik assets** olarak yayınlanır (Worker kodu ve Astro adaptörü YOK; yalnızca `dist/`): **https://alperenler-hafriyat.celal-krdg-13.workers.dev**. (Önce Netlify, sonra Pages denendi; Netlify kredisi bittiği için Cloudflare'e taşındı.)
+Önizleme **Cloudflare Workers statik assets** olarak yayınlanır (Worker kodu ve Astro adaptörü YOK; yalnızca `dist/`): **https://alperenler-hafriyat.celal-krdg-13.workers.dev**.
 
 - **Git bağlantısı yok, yayın elle:** `npm run deploy:preview` ([scripts/deploy-preview.mjs](scripts/deploy-preview.mjs)): önce `PUBLIC_SHOW_DRAFTS=true` ile `npm run build`, başarılıysa `npx wrangler deploy`; hata olursa çıkış koduyla durur. İlk kez `npx wrangler login` gerekir. `wrangler` sabit sürümle devDependency'dir (`4.149.0`).
 - **Yapılandırma:** [wrangler.jsonc](wrangler.jsonc) (`assets.directory: ./dist`, `not_found_handling: 404-page`, `html_handling: auto-trailing-slash`). `.wrangler/` yerel durum klasörüdür (git'e girmez). Wrangler'ın "otomatik kurulum" önerisini (Astro Cloudflare adaptörü) KABUL ETMEYİN; site statiktir. `astro.config.mjs`'te `adapter` olmamalıdır.
@@ -215,27 +215,15 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 
 **Gerçek yayında:** `public/_headers` içindeki `X-Robots-Tag` satırlarını silin, `PUBLIC_SHOW_DRAFTS` olmadan build alın (deploy betiğini taslaksız yapacak şekilde değiştirin veya `npm run build && npx wrangler deploy`), `SITE_URL`'i gerçek alan adına ayarlayın ve `site.publish.indexable: true` yapın. Alan adı: Cloudflare paneli → Workers & Pages → `alperenler-hafriyat` → **Settings → Domains & Routes**.
 
-## Netlify önizleme (ESKİ – şu an kullanılmıyor)
+## Önizleme ve taslak bayrağı (PUBLIC_SHOW_DRAFTS)
 
-> Site artık Cloudflare Workers'ta (statik assets; yukarıya bakın). Aşağıdaki bölüm ve [netlify.toml](netlify.toml) yalnızca ileride gerekirse diye duruyor.
-
-[netlify.toml](netlify.toml) ile siteyi Netlify'a önizleme olarak koyabilirsiniz (`npm run build`, yayın klasörü `dist`, Node `24.13.0`).
-
-**Taslak bayrağı — `PUBLIC_SHOW_DRAFTS`** ([src/data/drafts.ts](src/data/drafts.ts)): `showDrafts = import.meta.env.DEV || PUBLIC_SHOW_DRAFTS === 'true'`.
-- `true` iken `onaylandi: false` hizmetler ve SSS maddeleri build çıktısına girer: menüde "Hizmetler", ana sayfa kartları, `/hizmetler/` ve detay sayfaları, footer listesi, teklif sihirbazının 1. adımı, SSS bölümü ve gizlilik sayfasındaki taslak uyarısı. "TASLAK" rozetleri görünür.
+**`PUBLIC_SHOW_DRAFTS`** ([src/data/drafts.ts](src/data/drafts.ts)): `showDrafts = import.meta.env.DEV || PUBLIC_SHOW_DRAFTS === 'true'`.
+- `true` iken `onaylandi: false` içerik (hizmet, makine, SSS, rehber yazıları, fiyat rehberi, güven şeridi) build çıktısına girer ve "TASLAK" rozetiyle görünür. Normal yayın çıktısında taslak ne sayfa ne bağlantı olarak üretilir.
 - Sayfanın en üstünde ince sarı şerit çıkar: "Önizleme sürümü – içerikler onay bekliyor" (yalnızca bu önizleme build'inde; `npm run dev`'de ve normal yayında yok).
-- **JSON-LD'ye (Service, FAQPage) taslaklar hiçbir zaman girmez**; yalnızca `onaylandi: true` olanlar girer.
-- Yerelde denemek: `$env:PUBLIC_SHOW_DRAFTS = 'true'; npm run build; npm run preview` (PowerShell) veya `.env` dosyasına `PUBLIC_SHOW_DRAFTS=true` yazın ([.env.example](.env.example)).
+- **JSON-LD'ye (Service, FAQPage, Article) taslaklar hiçbir zaman girmez**; sitemap'e de yalnızca `onaylandi: true` olanlar girer.
+- Önizleme yayını `npm run deploy:preview` ile `PUBLIC_SHOW_DRAFTS=true` kullanır (bkz. "Yayın: Cloudflare Workers"). Yerelde denemek: `$env:PUBLIC_SHOW_DRAFTS = 'true'; npm run build; npm run preview` (PowerShell) veya `.env` dosyasına `PUBLIC_SHOW_DRAFTS=true` yazın ([.env.example](.env.example)).
 
-**Önizlemede arama motorlarından gizleme:** `netlify.toml` içindeki `[[headers]]` bloğu tüm yollara `X-Robots-Tag: noindex, nofollow` ekler. Ayrıca sayfalarda `noindex` meta etiketi vardır (`site.publish.indexable: false`).
-
-**404:** Netlify, publish dizinindeki `404.html`'i (Astro `dist/404.html` üretir) eşleşmeyen yollar için otomatik kullanır; ek ayar gerekmez.
-
-### Gerçek yayına geçerken kapatılacaklar (ESKİ Netlify adımları; Cloudflare için yukarıdaki "Gerçek yayında" paragrafı geçerlidir)
-1. `netlify.toml` → `PUBLIC_SHOW_DRAFTS` değerini `"false"` yapın veya satırı silin (ya da Netlify panelinde değişkeni silin). Hâlâ yayına girmesi istenen hizmet/SSS için `onaylandi: true` yapın.
-2. `netlify.toml` → `[[headers]]` (`X-Robots-Tag`) bloğunu kaldırın.
-3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
-4. Yayın öncesi kontrol listesindeki diğer maddeler (gizlilik sayfası yer tutucuları, logo, `og-image.png`, koordinat/İşletme Profili).
+**Gerçek yayına geçerken:** "Yayın: Cloudflare Workers" bölümündeki "Gerçek yayında" adımları ve aşağıdaki "Yayına alma kontrol listesi" geçerlidir (`publish.indexable: true`, `SITE_URL`, `public/_headers`, taslaksız build; gizlilik sayfası `noindex` kalır).
 
 ## Premium görsel katman (Aşama 9A)
 

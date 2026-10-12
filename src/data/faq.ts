@@ -31,37 +31,37 @@ export const faqs: Faq[] = [
     question: 'Fiyat neye göre belirlenir?',
     answer:
       'Fiyat işin koşullarına göre belirlenir. Başlıca etkenler zemin türü, hacim (metreküp), sahaya mesafe ve kullanılacak makine tipidir. Kesin fiyat, işin ayrıntıları öğrenildikten sonra verilir.',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     question: 'Fiyat teklifi almak için ne gerekir?',
     answer:
       'İşin türü, sahanın bulunduğu yer (ilçe ve mahalle) ve varsa yaklaşık ölçüler yeterlidir. Bizi arayabilir veya Teklif Al sayfasından mesajınızı hazırlayabilirsiniz.',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     question: 'Hafriyat toprağı ve moloz nereye götürülür?',
     answer:
-      'Hafriyat toprağı ve inşaat molozunun, ilgili belediyenin izin verdiği döküm alanlarına götürülmesi gerekir. Hangi alanın kullanılacağı sahanın yerine ve belediyenin düzenlemelerine bağlıdır; ayrıntı için arayarak sorabilirsiniz.',
-    onaylandi: false,
+      'Hafriyat toprağı ve moloz, belediyenin izin verdiği döküm alanlarına götürülür. Ayrıntılar belediyeye göre değişebilir; işe başlamadan önce konuşulur.',
+    onaylandi: true,
   },
   {
     question: 'Dar alanlarda çalışılabilir mi?',
     answer:
       'Bu, sahanın ölçülerine ve kullanılacak makineye bağlıdır. Sahayı kısaca anlatıp bizi arayın, birlikte değerlendirelim.',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     question: 'Operatörlü iş makinesi kiralanabilir mi?',
     answer:
       'Operatörlü iş makinesi kiralama saatlik veya günlük olarak görüşülür. Hangi makinenin uygun olduğu işin niteliğine ve sahaya bağlıdır; ihtiyacınızı anlatarak bizi arayın.',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     question: 'Bina yıkımı için izin gerekir mi?',
     answer:
-      'Yıkım işlerinde belediye ve ilgili kurumların süreçleri olabilir. İşe başlamadan önce ilgili belediyeden öğrenilmesi gerekir. Bu yanıt genel bilgidir, hukuki tavsiye değildir.',
-    onaylandi: false,
+      'İzin süreçleri belediyeye göre değişir; işe başlamadan önce konuşulur.',
+    onaylandi: true,
   },
   {
     question: 'Hangi bölgelere hizmet veriyorsunuz?',

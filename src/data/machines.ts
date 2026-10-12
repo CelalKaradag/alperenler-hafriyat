@@ -5,11 +5,11 @@
  * rozeti taşır: `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build’i.
  * Normal yayın çıktısında sayfa, menü/liste bağlantısı ve sitemap girdisi üretilmez; JSON-LD’ye girmez.
  *
- * Firma onayı: kepçe (kazıcı yükleyici), ekskavatör ve hafriyat kamyonu ONAYLI. Kırıcılı ekskavatör
- * ve lowbed ile taşıma henüz teyit edilmedi (`false`). Mini ekskavatör firmada yok: kaldırıldı.
- * FİLO (müşteri onayı, kesin): 5 paletli ekskavatör (22 ton × 3, 30 ton × 1, 35 ton × 1; daha küçük sınıf YOK), 2 JCB,
- * 7 kamyon, 2 tır. Marka/model/yıl bilinmiyor: YAZILMAZ. Tırların lowbed olup olmadığı BİLİNMİYOR: onaylı
- * sayfalarda "lowbed" kelimesi geçmez. Metinlerde fiyat, süre, model/marka iddiası veya "en iyi" ifadesi yoktur; eklenmemelidir.
+ * Firma onayı (hepsi onaylı): kepçe/JCB, ekskavatör, kırıcılı ekskavatör, hafriyat kamyonu, lowbed ile taşıma.
+ * Mini ekskavatör firmada yok: kaldırıldı.
+ * FİLO (müşteri onayı, kesin): 5 paletli ekskavatör (22 ton × 3, 30 ton × 1, 35 ton × 1), 2 JCB, 7 kamyon,
+ * 2 lowbed tır; firmada hidrolik kırıcı var (adet ve hangi makineye takıldığı BİLİNMİYOR: yazılmaz).
+ * Marka/model/yıl, kapasite, güzergâh, fiyat, süre, "en iyi" ifadesi YAZILMAZ.
  */
 import type { IconName } from '../utils/icons';
 import { showDrafts } from './drafts';
@@ -135,7 +135,7 @@ export const machines: Machine[] = [
     relatedServices: [S.kaya, S.yikim, S.hafriyat, S.makine],
     icon: 'rock',
     image: '/images/galeri/kirici-ile-kaya-kirma.jpg',
-    onaylandi: false,
+    onaylandi: true, // firmada hidrolik kırıcı var; adedi ve hangi makineye takıldığı bilinmiyor: YAZILMAZ
   },
   {
     slug: 'hafriyat-kamyonu-kiralama',
@@ -172,6 +172,7 @@ export const machines: Machine[] = [
     detail: [
       'Paletli iş makineleri yollarda kendi başına uzun mesafe gidemeyeceği için bir sahadan diğerine lowbed adı verilen alçak platformlu tırlarla taşınır. Taşıma, makinenin güvenle yüklenmesini, bağlanmasını ve varış sahasında indirilmesini kapsar.',
       'Taşınacak makinenin türü, sahaya giriş ve yükleme-indirme için uygun bir yer bulunması taşıma planını belirler. Bu yüzden iş önce konuşulur.',
+      'Filomuzda 2 adet lowbed tır bulunur.',
     ],
     uses: [
       'Ekskavatör gibi paletli makinelerin başka bir sahaya götürülmesinde',
@@ -186,8 +187,7 @@ export const machines: Machine[] = [
     relatedServices: [S.tasima, S.makine],
     icon: 'truck',
     image: '/images/galeri/ekskavator-tasima-lowbed.jpg',
-    // Firma teyit edecek (tır/lowbed bulunduğu doğrulanmadı)
-    onaylandi: false,
+    onaylandi: true, // firma onayı: 2 tır LOWBED'dir (kapasite/ton/güzergâh/fiyat YAZILMAZ)
   },
 ];
 

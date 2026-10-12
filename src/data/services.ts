@@ -62,7 +62,7 @@ export const services: Service[] = [
     keywords: ['temel kazısı', 'hafriyat işleri', 'sert zemin kazısı', 'taşlık arazi kazısı'],
     icon: 'excavate',
     image: '/images/galeri/santiye-temel-kazisi.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'bina-yikim-ve-kirim',
@@ -72,7 +72,7 @@ export const services: Service[] = [
       'Eski veya kullanılmayan yapıların yıkımı, kırım işleri ve ortaya çıkan molozun sahadan uzaklaştırılması.',
     detail: [
       "Yıkım, yapının yerinde bırakılmasının mümkün olmadığı ya da yeni bir yapıya yer açılması gerektiği durumlarda gündeme gelir. Malatya’da yıkım işi çoğu zaman hafriyat ve moloz taşıma ile birlikte planlanır.",
-      'Yapının türü, çevresindeki yapılar ve sahaya giriş durumu işin nasıl yürütüleceğini belirler. İş öncesinde yeri görerek konuşmak, planın doğru yapılmasına yardımcı olur.',
+      'Yapının türü, çevresindeki yapılar ve sahaya giriş durumu işin nasıl yürütüleceğini belirler. İş öncesinde yeri görerek konuşmak, planın doğru yapılmasına yardımcı olur. İzin süreçleri belediyeye göre değişir; işe başlamadan önce konuşulur.',
     ],
     whenNeeded: [
       'Eski veya kullanılmayan bir yapının kaldırılması gerektiğinde',
@@ -83,7 +83,7 @@ export const services: Service[] = [
     keywords: ['bina yıkım ve hafriyat', 'yıkım kırım', 'eski bina yıkımı', 'moloz kaldırma'],
     icon: 'demolish',
     image: '/images/galeri/derin-kazi-hitachi.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'altyapi-ve-kanalizasyon-kazisi',
@@ -104,7 +104,7 @@ export const services: Service[] = [
     keywords: ['kanalizasyon kazısı', 'altyapı kazısı', 'hat kazısı', 'kanal kazısı'],
     icon: 'pipe',
     image: '/images/galeri/sokakta-kanal-kazisi.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'arazi-duzleme-ve-yol-acma',
@@ -125,15 +125,15 @@ export const services: Service[] = [
     keywords: ['tesviye', 'arazi düzleme', 'orman yolu açma', 'dağ yolu açma'],
     icon: 'road',
     image: '/images/galeri/arazide-yol-acma.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'kaya-kirma-ve-kirici-isleri',
     title: 'Kaya Kırma ve Kırıcı İşleri',
     seoName: 'Kaya Kırma ve Kırıcı İşleri',
-    summary: 'Sert zemin ve kayalık alanlarda, kırıcı takılmış ekskavatörle kaya kırma işleri.',
+    summary: 'Sert zemin ve kayalık alanlarda hidrolik kırıcı ile kaya kırma işleri.',
     detail: [
-      'Kazı sırasında kaya veya çok sert zemine rastlandığında standart kova ile ilerlemek mümkün olmayabilir. Bu durumda ekskavatöre takılan hidrolik kırıcı ile zemin kırılarak kazı sürdürülür.',
+      'Kazı sırasında kaya veya çok sert zemine rastlandığında standart kova ile ilerlemek mümkün olmayabilir. Bu durumda hidrolik kırıcı ile zemin kırılarak kazı sürdürülür.',
       "Taşlık ve kayalık arsalarda Malatya’da da bu ihtiyaçla karşılaşılabilir. Çevredeki yapılara mesafe ve çalışma düzeni, iş başlamadan önce konuşulmalıdır.",
     ],
     whenNeeded: [
@@ -142,10 +142,10 @@ export const services: Service[] = [
       'Beton veya iri parçaların kırılması gerektiğinde',
       'Standart kova ile ilerlenemeyen zeminlerde',
     ],
-    keywords: ['kırıcılı ekskavatör', 'kaya kırma', 'hidrolik kırıcı', 'sert zemin kırma'],
+    keywords: ['kaya kırma', 'hidrolik kırıcı', 'sert zemin kırma', 'kırıcı işleri'],
     icon: 'rock',
     image: '/images/galeri/kirici-ile-kaya-kirma.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'operatorlu-is-makinesi-kiralama',
@@ -224,7 +224,7 @@ export const services: Service[] = [
     keywords: ['dolgu toprağı', 'dolgu malzemesi', 'saha temizliği', 'arsa temizliği'],
     icon: 'soil',
     image: '/images/galeri/istinat-duvari-ve-ekskavator.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
 ];
 
