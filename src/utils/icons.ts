@@ -19,6 +19,7 @@ export const iconPaths = {
   arrow: 'M5 12h14M13 6l6 6-6 6',
   arrowUp: 'M12 19V5M6 11l6-6 6 6',
   close: 'M6 6l12 12M18 6L6 18',
+  play: 'M8 5.5v13l11-6.5-11-6.5z',
   message: 'M4 5h16v11H9l-5 4V5z',
   quote: 'M7 3h7l4 4v14H7V3zM14 3v4h4M10 12h5M10 16h5',
   calendar:

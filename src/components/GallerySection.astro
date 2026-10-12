@@ -23,8 +23,7 @@ const videoCount = entries.length - photoCount;
 const eagerCount = variant === 'page' ? 3 : 0;
 
 // Filtre çubuğu JavaScript yoksa gizli kalır (hepsi görünür); gallery-filter.js açar.
-// Lightbox yalnızca görselleri gezer; sıra numarası görseller arasında verilir.
-let imageIndex = -1;
+let hasImages = false;
 ---
 
 {
@@ -63,16 +62,18 @@ let imageIndex = -1;
           )
         }
 
-        <ul class="gallery-grid">
+        {/* Mobilde (48em altı): ana sayfada yatay kaydırmalı şerit, /galeri/'de 2 sütunlu kare ızgara */}
+        <ul class:list={['gallery-grid', `gallery-grid--${variant}`]} data-gallery-grid={variant}>
           {entries.map((entry, i) => {
             if (entry.kind === 'image') {
-              imageIndex += 1;
+              hasImages = true;
               return (
                 <li class="gallery-item" data-kind="image">
                   <button
                     type="button"
                     class="gallery-open"
-                    data-lightbox-open={imageIndex}
+                    data-lightbox-open
+                    data-kind="image"
                     data-src={entry.src}
                     data-webp={entry.webp ?? ''}
                     data-alt={entry.alt}
@@ -87,15 +88,17 @@ let imageIndex = -1;
                       width={entry.width}
                       height={entry.height}
                       loading={i < eagerCount ? 'eager' : 'lazy'}
-                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 100vw"
+                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 78vw"
                     />
                   </button>
                 </li>
               );
             }
+            hasImages = true;
             return (
               <li class="gallery-item" data-kind="video">
-                <figure>
+                {/* Masaüstü: kendi yerinde oynatılan video (preload="none", poster, muted, controls) */}
+                <figure class="gallery-video">
                   <video
                     controls
                     muted
@@ -109,14 +112,48 @@ let imageIndex = -1;
                     <source src={entry.src} type="video/mp4" />
                   </video>
                 </figure>
+                {/* Mobil: poster + oynat ikonu; dokununca lightbox içinde oynar */}
+                <button
+                  type="button"
+                  class="gallery-open gallery-open--video"
+                  data-lightbox-open
+                  data-kind="video"
+                  data-video={entry.src}
+                  data-poster={entry.poster ?? ''}
+                  data-alt={entry.title}
+                  data-width={entry.width}
+                  data-height={entry.height}
+                  aria-haspopup="dialog"
+                  aria-label={`Videoyu oynat: ${entry.title}`}
+                >
+                  {entry.poster && (
+                    <img
+                      src={entry.poster}
+                      alt=""
+                      width={entry.width}
+                      height={entry.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  <span class="gallery-play" aria-hidden="true">
+                    <Icon name="play" />
+                  </span>
+                </button>
               </li>
             );
           })}
         </ul>
 
         {
+          variant === 'home' && entries.length > 1 && (
+            <p class="gallery-counter" data-carousel-count aria-hidden="true" hidden />
+          )
+        }
+
+        {
           variant === 'home' && all.length > entries.length && (
-            <p class="section-more">
+            <p class="gallery-more">
               <a class="text-link" href="/galeri/">
                 Tüm fotoğraf ve videolar<span class="arrow" aria-hidden="true">→</span>
               </a>
@@ -125,22 +162,23 @@ let imageIndex = -1;
         }
 
         {
-          imageIndex >= 0 && (
-            <dialog class="lightbox" data-lightbox aria-label="Görsel büyütme">
+          hasImages && (
+            <dialog class="lightbox" data-lightbox aria-label="Görsel ve video büyütme">
               <button type="button" class="lightbox-btn lightbox-close" data-lightbox-close aria-label="Kapat">
                 <Icon name="close" />
               </button>
-              <button type="button" class="lightbox-btn lightbox-prev" data-lightbox-prev aria-label="Önceki görsel">
+              <button type="button" class="lightbox-btn lightbox-prev" data-lightbox-prev aria-label="Önceki">
                 <Icon name="arrow" />
               </button>
-              <button type="button" class="lightbox-btn lightbox-next" data-lightbox-next aria-label="Sonraki görsel">
+              <button type="button" class="lightbox-btn lightbox-next" data-lightbox-next aria-label="Sonraki">
                 <Icon name="arrow" />
               </button>
               <div class="lightbox-stage">
-                <picture>
+                <picture data-lightbox-picture>
                   <source data-lightbox-source type="image/webp" />
                   <img data-lightbox-img alt="" />
                 </picture>
+                <video class="lightbox-video" data-lightbox-video controls muted playsinline hidden />
               </div>
               <div class="lightbox-bar">
                 <p class="lightbox-caption" data-lightbox-caption />

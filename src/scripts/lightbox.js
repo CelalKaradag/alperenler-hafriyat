@@ -13,15 +13,19 @@ export function initLightbox() {
   const openers = Array.from(root.querySelectorAll('[data-lightbox-open]'));
   if (openers.length === 0) return null;
 
-  // Galeri filtresi bazı öğeleri gizleyebilir: yalnızca görünür görseller arasında gezilir
+  // Gezilecek öğeler: filtreyle gizlenmemiş ve ekranda gerçekten görünen düğmeler.
+  // (Masaüstünde video kendi yerinde oynar; mobilde video düğmesi lightbox'ta oynatır,
+  // bu yüzden "gallery-open--video" düğmeleri yalnızca mobilde görünür sayılır.)
   const visibleOpeners = () =>
     openers.filter((button) => {
       const item = button.closest('.gallery-item');
-      return !item || !item.hidden;
+      return (!item || !item.hidden) && button.offsetParent !== null;
     });
 
   const source = dialog.querySelector('[data-lightbox-source]');
   const image = dialog.querySelector('[data-lightbox-img]');
+  const picture = dialog.querySelector('[data-lightbox-picture]');
+  const video = dialog.querySelector('[data-lightbox-video]');
   const caption = dialog.querySelector('[data-lightbox-caption]');
   const count = dialog.querySelector('[data-lightbox-count]');
   const prev = dialog.querySelector('[data-lightbox-prev]');
@@ -35,19 +39,41 @@ export function initLightbox() {
     document.documentElement.style.overflow = lock ? 'hidden' : '';
   };
 
+  function stopVideo() {
+    video.pause();
+    video.removeAttribute('src'); // indirmeyi keser
+    video.load();
+  }
+
   function show(i) {
     const list = visibleOpeners();
     index = (i + list.length) % list.length;
     const data = list[index].dataset;
-    if (data.webp) {
-      source.srcset = data.webp;
+    stopVideo();
+    if (data.kind === 'video') {
+      // Video: lightbox içinde oynatılır (kullanıcı dokunuşuyla başladığı için sessiz otomatik oynatma izinli)
+      picture.hidden = true;
+      video.hidden = false;
+      video.poster = data.poster || '';
+      video.src = data.video;
+      video.width = Number(data.width) || video.width;
+      video.height = Number(data.height) || video.height;
+      video.setAttribute('aria-label', data.alt || 'Video');
+      const played = video.play();
+      if (played && typeof played.catch === 'function') played.catch(() => {});
     } else {
-      source.removeAttribute('srcset');
+      video.hidden = true;
+      picture.hidden = false;
+      if (data.webp) {
+        source.srcset = data.webp;
+      } else {
+        source.removeAttribute('srcset');
+      }
+      image.src = data.src;
+      image.alt = data.alt || '';
+      image.width = Number(data.width) || image.width;
+      image.height = Number(data.height) || image.height;
     }
-    image.src = data.src;
-    image.alt = data.alt || '';
-    image.width = Number(data.width) || image.width;
-    image.height = Number(data.height) || image.height;
     caption.textContent = data.alt || '';
     count.textContent = `${index + 1} / ${list.length}`;
     const single = list.length < 2;
@@ -70,10 +96,12 @@ export function initLightbox() {
 
   // Tab dialog içinde döner (odak tuzağı)
   function onKeyDown(event) {
-    if (event.key === 'ArrowRight') {
+    // Video kontrollerindeki ok tuşları (ileri/geri sarma) bozulmasın
+    const onVideo = event.target === video;
+    if (event.key === 'ArrowRight' && !onVideo) {
       event.preventDefault();
       show(index + 1);
-    } else if (event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft' && !onVideo) {
       event.preventDefault();
       show(index - 1);
     } else if (event.key === 'Tab') {
@@ -97,6 +125,7 @@ export function initLightbox() {
   }
 
   function onClose() {
+    stopVideo();
     lockScroll(false);
     if (opener && opener.isConnected) opener.focus();
     opener = null;
@@ -111,6 +140,7 @@ export function initLightbox() {
   dialog.addEventListener('close', onClose);
 
   return () => {
+    stopVideo();
     if (dialog.open) dialog.close();
     lockScroll(false);
   };

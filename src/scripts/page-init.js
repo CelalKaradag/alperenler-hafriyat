@@ -10,6 +10,7 @@ import { initMapCards } from './map-card.js';
 import { initFloatingActions } from './floating-actions.js';
 import { initLightbox } from './lightbox.js';
 import { initGalleryFilters } from './gallery-filter.js';
+import { initGalleryCarousel } from './gallery-carousel.js';
 
 let cleanups = [];
 let lastBody = null;
@@ -33,6 +34,7 @@ function run() {
     initMapCards(),
     initFloatingActions(),
     initLightbox(),
+    initGalleryCarousel(),
   ].filter(Boolean);
   initQuoteWizards();
   initGalleryFilters();
