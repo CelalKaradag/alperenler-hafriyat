@@ -11,11 +11,20 @@ import { initFloatingActions } from './floating-actions.js';
 
 let cleanups = [];
 let lastBody = null;
+let firstRun = true;
 
 function run() {
   // Aynı sayfa için iki kez başlatma (ilk yükleme + astro:page-load)
   if (!document.body || document.body === lastBody) return;
   lastBody = document.body;
+
+  // Sayfa geçişinden sonra odak 'İçeriğe geç' bağlantısına gitmesin: ana içeriğe alınır
+  // (main tabindex=-1, görünür halka yok). İlk yüklemede odak değiştirilmez.
+  if (!firstRun) {
+    const main = document.getElementById('icerik');
+    if (main) main.focus({ preventScroll: true });
+  }
+  firstRun = false;
   cleanups = [initReveal(), initHeroVideo(), initMapCards(), initFloatingActions()].filter(Boolean);
   initQuoteWizards();
 }
