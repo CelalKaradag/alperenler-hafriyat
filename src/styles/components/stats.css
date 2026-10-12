@@ -1,4 +1,4 @@
-/* ---------- Rakam şeridi: sarı tam genişlik bant ---------- */
+/* ---------- Rakam şeridi: sarı tam genişlik bant, iki grup ---------- */
 
 /* Zemin site sarısı, metin ve ikonlar grafit (#14161a on #f5b400 ≈ 9:1, AA/AAA). Beyaz metin KULLANILMAZ. */
 .stats {
@@ -21,7 +21,36 @@
   pointer-events: none;
 }
 
-/* Mobil ve tablet: kompakt 2 × 2; masaüstü: yan yana (öğe sayısına göre) */
+/* Gruplar (üst: iş/müşteri/ilçe, alt: filo) arasında boşluk + "Filomuz" etiketi ve ince ayraç çizgisi */
+.stats-inner {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3rem);
+}
+
+.stats-group-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bg);
+}
+
+.stats-group-label::before,
+.stats-group-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--bg);
+  opacity: 0.15;
+}
+
+/* Mobil ve tablet: her grup kompakt 2 sütun */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -29,14 +58,19 @@
   text-align: center;
 }
 
-/* Mobil/tablet: öğe sayısı tekse son öğe iki sütunu kaplayıp ortalanır (2 + 2 + 1) */
+/* Tek kalan son öğe iki sütunu kaplayıp ortalanır (2 + 2 + 1) */
 .stat:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
-/* Masaüstü: öğeler tek satırda dengeli (5 öğe sığar); auto-fit boş sütunları çökertir */
+/* Masaüstü: üst grup 3 sütun; alt grup öğe sayısı kadar sütun (auto-fit boş sütunları çökertir) */
 @media (min-width: 64em) {
-  .stats-grid {
+  .stats-grid--is {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem 3rem;
+  }
+
+  .stats-grid--filo {
     grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
     gap: 2rem 2rem;
   }
@@ -47,7 +81,7 @@
 }
 
 @media (min-width: 80em) {
-  .stats-grid {
+  .stats-grid--filo {
     column-gap: 3rem;
   }
 }
@@ -84,8 +118,14 @@
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 850;
   line-height: 1;
+  white-space: nowrap; /* "1.653" hiçbir genişlikte bölünmez */
   font-variant-numeric: tabular-nums;
   color: var(--bg);
+}
+
+/* Üst grupta sayılar biraz daha büyük */
+.stats-grid--is .stat-value {
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
 }
 
 .stat-label {

@@ -1,6 +1,11 @@
 ---
-import { stats } from '../data/stats';
+import { formatStatValue, stats } from '../data/stats';
 import Icon from './Icon.astro';
+
+const groups = [
+  { id: 'is', label: null, items: stats.filter((stat) => stat.group === 'is') },
+  { id: 'filo', label: 'Filomuz', items: stats.filter((stat) => stat.group === 'filo') },
+].filter((group) => group.items.length > 0);
 ---
 
 {
@@ -8,22 +13,34 @@ import Icon from './Icon.astro';
     <section class="stats" aria-label="Rakamlarla firma" data-stats>
       {/* Çok soluk dekoratif nokta dokusu (grafit, opacity ≈ .08); metni bozmaz, ekran okuyucuya görünmez */}
       <div class="stats-texture" aria-hidden="true" />
-      <ul class="container stats-grid">
-        {stats.map((stat) => (
-          <li class="stat">
-            {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
-            {/* HTML'de GERÇEK sayı yazılı (JS yoksa / ekran okuyucu / arama motoru); JS görünüme girince 0'dan sayar */}
-            <span
-              class="stat-value"
-              data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}
-              data-suffix={stat.suffix}
-            >
-              {stat.value}{stat.suffix}
-            </span>
-            <span class="stat-label">{stat.label}</span>
-          </li>
+      <div class="container stats-inner">
+        {groups.map((group, index) => (
+          <>
+            {index > 0 && group.label && (
+              <p class="stats-group-label">
+                <span>{group.label}</span>
+              </p>
+            )}
+            <ul class={`stats-grid stats-grid--${group.id}`} aria-label={group.label ?? undefined}>
+              {group.items.map((stat) => (
+                <li class="stat">
+                  {stat.icon && <Icon class="stat-icon" name={stat.icon} />}
+                  {/* HTML'de GERÇEK (Türkçe biçimli) sayı yazılı: JS yoksa / ekran okuyucu / arama motoru bunu görür;
+                      JS görünüme girince 0'dan sayar (ara değerler aynı biçimde) */}
+                  <span
+                    class="stat-value"
+                    data-count={/^\d+$/.test(stat.value) ? stat.value : undefined}
+                    data-suffix={stat.suffix}
+                  >
+                    {formatStatValue(stat.value)}{stat.suffix}
+                  </span>
+                  <span class="stat-label">{stat.label}</span>
+                </li>
+              ))}
+            </ul>
+          </>
         ))}
-      </ul>
+      </div>
     </section>
   )
 }

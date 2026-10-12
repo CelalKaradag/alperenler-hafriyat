@@ -220,73 +220,106 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   const regionCount = await page.locator('main .link-list li').count();
   expect(regionCount).toBeGreaterThan(0);
 
-  // Ana sayfa sayı şeridi: sırayla 7 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Lowbed tır, N · İlçede hizmet
+  // Ana sayfa sayı şeridi, iki grup. Üst: 1.653 Tamamlanan iş, 1.500 Mutlu müşteri, N İlçede hizmet;
+  // alt (Filomuz): 7 Paletli ekskavatör, 2 JCB, 7 Kamyon, 2 Lowbed tır. Sayılar Türkçe biçimli (1.653).
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded(); // sayaç görünüme girince 0'dan sayar; bitince son sayı
   const items = page.locator('.stats .stat');
-  await expect(items).toHaveCount(5);
+  await expect(items).toHaveCount(7);
   const expected = [
+    ['1.653', 'Tamamlanan iş'],
+    ['1.500', 'Mutlu müşteri'],
+    [String(regionCount), 'İlçede hizmet'],
     ['7', 'Paletli ekskavatör'],
     ['2', 'JCB'],
     ['7', 'Kamyon'],
     ['2', 'Lowbed tır'],
-    [String(regionCount), 'İlçede hizmet'],
   ];
   for (let i = 0; i < expected.length; i += 1) {
     await expect(items.nth(i).locator('.stat-value')).toHaveText(expected[i][0]);
     await expect(items.nth(i).locator('.stat-label')).toHaveText(expected[i][1]);
   }
+  // "+" son eki yok (müşteri tam sayı verdi)
+  await expect(page.locator('[data-stats] .stat-value', { hasText: '+' })).toHaveCount(0);
 });
 
-test('sayı şeridi: sarı bant, grafit metin, 5 ikon; masaüstü 5 sütun tek satır, tablet/mobil 2 sütun + ortalı son öğe; taşma yok', async ({ page }) => {
-  for (const [width, columns] of [
-    [390, 2],
-    [768, 2],
-    [1024, 5],
-    [1366, 5],
+test('sayı şeridi: sarı bant, grafit metin, 7 ikon, iki grup ("Filomuz"); masaüstü 3 + 4 sütun, tablet/mobil 2 sütun + ortalı tek kalan; taşma yok', async ({
+  page,
+}) => {
+  for (const [width, isColumns, filoColumns] of [
+    [390, 2, 2],
+    [768, 2, 2],
+    [1024, 3, 4],
+    [1366, 3, 4],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     const strip = page.locator('[data-stats]');
     await strip.scrollIntoViewIfNeeded();
-    await expect(strip.locator('.stat')).toHaveCount(5);
-    await expect(strip.locator('.stat-icon')).toHaveCount(5);
+    await expect(strip.locator('.stat')).toHaveCount(7);
+    await expect(strip.locator('.stat-icon')).toHaveCount(7);
+    // İki grup görünür; alt grubun üstünde "Filomuz" etiketi
+    await expect(strip.locator('.stats-grid--is')).toBeVisible();
+    await expect(strip.locator('.stats-grid--filo')).toBeVisible();
+    await expect(strip.locator('.stats-group-label')).toHaveText('Filomuz');
+    await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(3);
+    await expect(strip.locator('.stats-grid--filo .stat')).toHaveCount(4);
+
     const css = await strip.evaluate((el) => {
       const value = el.querySelector('.stat-value') as Element;
       const label = el.querySelector('.stat-label') as Element;
-      const grid = el.querySelector('.stats-grid') as Element;
+      // auto-fit boş sütunları 0 px'e çöker: yalnızca genişliği > 0 olan sütunlar sayılır
+      const tracks = (selector: string) =>
+        getComputedStyle(el.querySelector(selector) as Element)
+          .gridTemplateColumns.trim()
+          .split(/\s+/)
+          .filter((track) => parseFloat(track) > 0).length;
+      const valueBox = value.getBoundingClientRect();
       return {
         bg: getComputedStyle(el).backgroundColor,
         valueColor: getComputedStyle(value).color,
         labelColor: getComputedStyle(label).color,
-        // auto-fit boş sütunları 0 px'e çöker: yalnızca genişliği > 0 olan sütunlar sayılır
-        columns: getComputedStyle(grid)
-          .gridTemplateColumns.trim()
-          .split(/\s+/)
-          .filter((track) => parseFloat(track) > 0).length,
+        isColumns: tracks('.stats-grid--is'),
+        filoColumns: tracks('.stats-grid--filo'),
         overflow: document.documentElement.scrollWidth - window.innerWidth,
         width: el.getBoundingClientRect().width,
+        // "1.653" tek satır: yükseklik yazı boyutunun ~1.3 katını aşmaz
+        firstValueLines: valueBox.height / parseFloat(getComputedStyle(value).fontSize),
       };
     });
     expect(css.bg, 'zemin site sarısı').toBe('rgb(245, 180, 0)');
     expect(css.valueColor, 'sayı grafit').toBe('rgb(20, 22, 26)');
     expect(css.labelColor, 'etiket grafit').toBe('rgb(20, 22, 26)');
-    expect(css.columns, `${width}px sütun sayısı`).toBe(columns);
+    expect(css.isColumns, `${width}px üst grup sütun`).toBe(isColumns);
+    expect(css.filoColumns, `${width}px alt grup (filo) sütun`).toBe(filoColumns);
     expect(css.overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
     expect(Math.round(css.width), 'tam genişlik bant').toBe(width);
-    const tops = await strip.locator('.stat').evaluateAll((nodes) => nodes.map((n) => Math.round(n.getBoundingClientRect().top)));
-    if (columns === 5) {
-      expect(new Set(tops).size, `${width}px: 5 öğe tek satırda: ${tops.join(', ')}`).toBe(1);
+    expect(css.firstValueLines, `${width}px: 1.653 tek satır`).toBeLessThan(1.4);
+
+    const topsOf = (selector: string) =>
+      strip
+        .locator(selector)
+        .evaluateAll((nodes) => nodes.map((n) => Math.round(n.getBoundingClientRect().top)));
+    const isTops = await topsOf('.stats-grid--is .stat');
+    const filoTops = await topsOf('.stats-grid--filo .stat');
+    if (width >= 1024) {
+      expect(new Set(isTops).size, `${width}px üst grup tek satır: ${isTops.join(', ')}`).toBe(1);
+      expect(new Set(filoTops).size, `${width}px alt grup tek satır: ${filoTops.join(', ')}`).toBe(1);
     } else {
-      // 2 sütun: 2 + 2 + 1; tek kalan son öğe sayfa ortasında
-      expect(new Set(tops).size, `${width}px: 3 satır: ${tops.join(', ')}`).toBe(3);
-      const last = (await strip.locator('.stat').last().boundingBox()) as { x: number; width: number };
-      expect(Math.abs(last.x + last.width / 2 - width / 2), 'son öğe ortalı').toBeLessThanOrEqual(2);
+      // 2 sütun: üst grup 2 + 1 (tek kalan ortalı), alt grup 2 + 2
+      expect(new Set(isTops).size, `${width}px üst grup 2 satır`).toBe(2);
+      expect(new Set(filoTops).size, `${width}px alt grup 2 satır`).toBe(2);
+      const last = (await strip.locator('.stats-grid--is .stat').last().boundingBox()) as { x: number; width: number };
+      expect(Math.abs(last.x + last.width / 2 - width / 2), 'tek kalan öğe ortalı').toBeLessThanOrEqual(2);
     }
+    // Gruplar alt alta: alt grup üst grubun altında
+    expect(Math.min(...filoTops)).toBeGreaterThan(Math.max(...isTops));
   }
 });
 
-test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür (7/2/7/2/13)', async ({ page }) => {
+test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görünür (1.653 / 1.500 / ilçe / 7 / 2 / 7 / 2)', async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded();
@@ -294,9 +327,28 @@ test('sayı şeridi: hareket azaltmada animasyon yok, son sayı hemen görünür
   const values = await page.locator('[data-stats] .stat-value').evaluateAll((nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  expect(values).toHaveLength(5);
-  expect(values.slice(0, 4)).toEqual(['7', '2', '7', '2']);
-  expect(Number(values[4])).toBeGreaterThan(0); // ilçe sayısı
+  expect(values).toHaveLength(7);
+  expect(values[0]).toBe('1.653');
+  expect(values[1]).toBe('1.500');
+  expect(Number(values[2])).toBeGreaterThan(0); // ilçe sayısı
+  expect(values.slice(3)).toEqual(['7', '2', '7', '2']);
+});
+
+test('sayı şeridi: sayaç ara değerleri de Türkçe biçimli (1.234 gibi) ve sonunda 1.653', async ({ page }) => {
+  await page.goto('/');
+  const first = page.locator('[data-stats] .stat-value').first();
+  const seen = new Set<string>();
+  await first.scrollIntoViewIfNeeded();
+  // Sayım ~1.2 sn sürer: 40 ms aralıkla örnekle
+  for (let i = 0; i < 40; i += 1) {
+    seen.add(((await first.textContent()) ?? '').trim());
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  }
+  await expect(first).toHaveText('1.653');
+  for (const text of seen) {
+    // her değer ya 0-999 arası düz sayı ya da "N.NNN" biçimli olmalı; "1653" gibi biçimsiz değer olmamalı
+    expect(text, `ara değer: ${text}`).toMatch(/^(\d{1,3}|\d{1,3}(\.\d{3})+)$/);
+  }
 });
 test('onaylı (normal build) sayfalarda "13 ton" geçmez', async ({ page, request }) => {
   const pages = await crawl(page);

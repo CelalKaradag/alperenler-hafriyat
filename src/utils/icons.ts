@@ -40,6 +40,12 @@ export const iconPaths = {
   /** lowbed tır: uzun alçak dorse (arkası basamaklı), önde çekici kabin, dorse üstünde küçük paletli makine silueti, çok tekerlek */
   fleetLowbed:
     'M1.5 17h2v-2h12M16 15V9h3.5l3 3.5V15H15.5M7.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM10.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM13.3 18a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0zM20.3 18.3a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0zM4.5 15v-1.5a.8.8 0 0 1 .8-.8h5.4a.8.8 0 0 1 .8.8V15M6 12.7v-1.9h2.8l.9 1.9M8.3 10.8l3.2-3 2 2.5M13.5 10.3l.8 1.4h-1.7',
+  /** tamamlanan iş: onay işaretli pano */
+  statJobs:
+    'M9 3h6v3H9zM9 4.5H7A1.5 1.5 0 0 0 5.5 6v14A1.5 1.5 0 0 0 7 21.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2M8.8 13.5l2.4 2.4 4.2-4.8',
+  /** mutlu müşteri: el sıkışma (iki kol manşeti + kenetlenen eller) */
+  statHandshake:
+    'M1.5 8.5l3.5-.5 1 7.5-3.5.5zM22.5 8.5L19 8l-1 7.5 3.5.5zM5 8.2l5-2 2.5 1.5 2.5-1.5 4 2M5.8 15.4l5 4c.7.6 1.8.4 2.3-.4l.4-.8M18 15.4l-4.6 3.6M12.5 7.7l-2.6 2.3a1.3 1.3 0 0 0 1.8 1.9l2-1.5 2.9 3a1.2 1.2 0 0 0 1.7-1.6',
 } as const;
 
 export type IconName = keyof typeof iconPaths;

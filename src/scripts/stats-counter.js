@@ -6,6 +6,8 @@
  * Her sayfa yüklenişinde page-init.js çağırır; dönen fonksiyon gözlemcileri ve çerçeveyi bırakır.
  */
 const DURATION = 1200;
+// Türkçe biçim: 1653 → "1.653" (HTML'deki statik metinle aynı; ara değerler de aynı biçimde görünür)
+const format = new Intl.NumberFormat('tr-TR');
 
 export function initStatsCounter() {
   const root = document.querySelector('[data-stats]');
@@ -22,11 +24,11 @@ export function initStatsCounter() {
   function animate(el) {
     const target = Number(el.dataset.count);
     const suffix = el.dataset.suffix || '';
-    const final = el.dataset.final || String(target) + suffix; // HTML'deki gerçek metin (prime adımında saklanır)
+    const final = el.dataset.final || format.format(target) + suffix; // HTML'deki gerçek metin (prime adımında saklanır)
     const start = performance.now();
     const step = (now) => {
       const progress = Math.min(1, (now - start) / DURATION);
-      el.textContent = String(Math.round(target * easeOut(progress))) + suffix; // son ek (örn. "+") sayılırken de korunur
+      el.textContent = format.format(Math.round(target * easeOut(progress))) + suffix; // son ek (örn. "+") sayılırken de korunur
       if (progress < 1) {
         frames.add(window.requestAnimationFrame(step));
       } else {
