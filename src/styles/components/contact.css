@@ -37,6 +37,7 @@
 
 .not-found {
   min-height: 50vh;
+  min-height: 50svh; /* iOS adres çubuğu açılıp kapanınca zıplamasın */
   display: flex;
   align-items: center;
 }

@@ -358,7 +358,7 @@ img.fade-img {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem; /* dokunma hedefi ≥ 44 px */
   padding: 0.3rem 0.95rem;
   border: 1.5px solid var(--text);
   border-radius: 999px;

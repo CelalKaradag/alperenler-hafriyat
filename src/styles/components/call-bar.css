@@ -26,6 +26,11 @@
   color: #25d366;
 }
 
+/* Form alanına odaklanınca (ekran klavyesi açık) sabit çubuk alanı örtmesin */
+body:has(input:focus, textarea:focus, select:focus) .call-bar {
+  display: none;
+}
+
 @media (min-width: 48em) {
   .call-bar {
     display: none;

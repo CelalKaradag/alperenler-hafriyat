@@ -133,6 +133,20 @@
   color: var(--on-dark);
 }
 
+/* Dokunmatik ekranlarda bağlantı hedefi ≥ 44 px (iOS/Android) */
+@media (pointer: coarse) {
+  .footer-list a,
+  .footer-bottom a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .footer-list {
+    gap: 0;
+  }
+}
+
 .footer-list address {
   margin-bottom: 0.4rem;
 }

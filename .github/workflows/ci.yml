@@ -25,9 +25,21 @@ jobs:
       # prebuild: font kırpma, topo SVG'leri ve duyarlı görseller (prepare:assets) burada da çalışır
       - run: npm run build
 
-      - run: npx playwright install --with-deps chromium
+      # chromium: masaüstü + Pixel 7; webkit: iPhone 13 (iOS Safari motoru)
+      - run: npx playwright install --with-deps chromium webkit
 
       - run: npm test
+
+      # Görsel kontrol arşivi: her sayfa × 6 genişlik tam sayfa ekran görüntüsü (karşılaştırma yok).
+      # Test geçse de geçmese de yüklenir; tek artifact (zip) olarak indirilir.
+      - name: Ekran görüntülerini yükle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 14
+          if-no-files-found: ignore
 
       # Test başarısız olursa rapor ve izler indirilebilir olsun
       - name: Test raporunu yükle

@@ -211,7 +211,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem; /* dokunma hedefi ≥ 44 px */
   padding: 0.35rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 999px;
@@ -271,8 +271,8 @@
     top: calc(var(--header-h) + 0.75rem);
     bottom: auto;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     padding: 0;
   }
 

@@ -30,6 +30,7 @@
   display: flex;
   align-items: flex-end;
   min-height: clamp(18rem, 48vh, 30rem);
+  min-height: clamp(18rem, 48svh, 30rem); /* iOS adres çubuğu zıplamasın */
 }
 
 .page-head--tall > .container {

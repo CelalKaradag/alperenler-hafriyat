@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
 
 export const PHONE_HREF = 'tel:+905392527058';
 export const WA_BASE = 'https://wa.me/905392527058';
@@ -8,6 +8,65 @@ export async function stubGoogle(page: Page): Promise<void> {
   await page.route(/^https:\/\/(www\.)?google\.com\/maps/, (route) =>
     route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>harita</title>' }),
   );
+}
+
+/** Tüm sayfalar: ana sayfadan taranan iç bağlantılar + bağlantısı olmayan sayfalar (404) */
+export async function sitePages(page: Page): Promise<string[]> {
+  const pages = await crawl(page, 150);
+  for (const extra of ['/gizlilik/', '/404.html']) if (!pages.includes(extra)) pages.push(extra);
+  return pages;
+}
+
+/** Sayfa listesini bir kez toplar (beforeAll için: kendi bağlamını açar/kapatır) */
+export async function collectPages(browser: Browser, baseURL: string): Promise<string[]> {
+  const context = await browser.newContext({ baseURL });
+  const page = await context.newPage();
+  await stubGoogle(page);
+  const pages = await sitePages(page);
+  await context.close();
+  return pages;
+}
+
+/** Sayfayı baştan sona kaydırarak lazy görselleri yükletir, sonra en üste döner */
+export async function scrollThrough(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const step = Math.max(300, window.innerHeight - 100);
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    }
+    window.scrollTo(0, 0);
+  });
+  // Görünür görseller yüklensin (en çok 8 sn)
+  await page
+    .waitForFunction(
+      () =>
+        Array.from(document.images)
+          .filter((img) => img.getClientRects().length > 0)
+          .every((img) => img.complete),
+      undefined,
+      { timeout: 8000 },
+    )
+    .catch(() => undefined);
+}
+
+/** Konsol uyarı/hata iletileri ve 4xx/5xx ağ yanıtları (Google harita sahte olmalı) */
+export function watchConsoleAndNetwork(page: Page): string[] {
+  const problems: string[] = [];
+  page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') {
+      problems.push(`console.${message.type()}: ${message.text()}`);
+    }
+  });
+  page.on('response', (response) => {
+    const url = response.url();
+    // 404.html sayfasının kendisi bilerek 404 dönebilir
+    if (response.status() >= 400 && !url.endsWith('/404.html')) {
+      problems.push(`HTTP ${response.status()}: ${url}`);
+    }
+  });
+  return problems;
 }
 
 /** Sayfa hatalarını ve konsol "error" iletilerini toplar */

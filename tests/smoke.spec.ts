@@ -201,9 +201,75 @@ test('teklif sihirbazı: 3 adım doldurulur, WhatsApp bağlantısında mesaj olu
   expect(message).toContain('Acil');
 });
 
-test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kaydırınca ikona daralır, hover\'da açılır', async ({
+test('hero videosu iOS/Android uyumlu: muted + playsinline; oynatma reddedilirse (düşük güç modu) poster kalır', async ({
   page,
 }) => {
+  // play() her zaman reddedilir: iOS düşük güç modu benzetimi
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = () => Promise.reject(new DOMException('düşük güç', 'NotAllowedError'));
+  });
+  await page.goto('/');
+  const media = page.locator('[data-hero-media]');
+  test.skip((await media.count()) === 0, 'Hero videosu yok (video dosyaları eklenmemiş)');
+
+  const video = media.locator('video').first();
+  await expect(video).toHaveCount(1);
+  expect(
+    await video.evaluate((node) => {
+      const el = node as HTMLVideoElement;
+      return el.muted && el.playsInline;
+    }),
+  ).toBe(true);
+  await expect(video).toHaveAttribute('playsinline', '');
+  await expect(video).toHaveAttribute('muted', '');
+  // Oynatılamadı: video görünür olmaz (poster altta kalır), düğme "Oynat" durumuna geçer
+  await expect(media.locator('video.is-visible')).toHaveCount(0);
+  await expect(page.locator('[data-hero-toggle]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.hero-poster img')).toBeVisible();
+});
+
+test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'yalnızca mobil cihaz projeleri');
+  for (const path of ['/', '/teklif/', '/iletisim/', '/galeri/', '/hakkimizda/']) {
+    await page.goto(path);
+    const small: string[] = [];
+    for (const handle of await page
+      .locator('.btn, button, .nav-toggle, .call-bar a, .site-footer a')
+      .elementHandles()) {
+      const box = await handle.boundingBox();
+      if (!box || !(await handle.isVisible())) continue;
+      if (box.width < 43.5 || box.height < 43.5) {
+        small.push(
+          `${await handle.evaluate((node) => {
+            const el = node as Element;
+            return el.tagName.toLowerCase() + '.' + (el.getAttribute('class') ?? '');
+          })} ${Math.round(box.width)}×${Math.round(box.height)}`,
+        );
+      }
+    }
+    expect(small, `${path} küçük dokunma hedefleri`).toEqual([]);
+  }
+});
+
+test('mobil: sihirbaz alanına odaklanınca alt çubuk gizlenir (klavye alanı örtmez)', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'yalnızca mobil cihaz projeleri');
+  await page.goto('/teklif/');
+  await expect(page.locator('.call-bar')).toBeVisible();
+  const choices = page.locator('.choice');
+  if ((await choices.count()) > 0) await choices.first().click();
+  else await page.locator('#wizard-job-text').fill('Temel kazısı');
+  await page.locator('[data-step]').nth(0).locator('[data-action="next"]').click();
+  await page.locator('#wizard-place').focus();
+  await expect(page.locator('.call-bar')).toBeHidden();
+  await page.locator('#wizard-place').blur();
+  await expect(page.locator('.call-bar')).toBeVisible();
+});
+
+test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kaydırınca ikona daralır, hover\'da açılır', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'masaüstü projesi');
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto('/');
   const wa = page.locator('.wa-float');
@@ -230,6 +296,10 @@ test('mobilde yüzen düğmeler yok, alt çubukta WhatsApp bağlantısı var', a
 });
 
 test.describe('masaüstü header tek satır', () => {
+  test.beforeEach(({ isMobile }) => {
+    test.skip(isMobile, 'masaüstü projesi');
+  });
+
   for (const size of [
     { width: 1366, height: 768 },
     { width: 1440, height: 900 },
