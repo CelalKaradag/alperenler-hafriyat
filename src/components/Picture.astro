@@ -1,0 +1,23 @@
+---
+import { webpSibling } from '../utils/assets';
+
+interface Props {
+  /** public/ altındaki JPG/PNG yolu; aynı adlı .webp varsa <picture> ile önce o sunulur */
+  src: string;
+  alt: string;
+  /** Gerçek piksel boyutu (CLS olmasın diye zorunlu) */
+  width: number;
+  height: number;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  sizes?: string;
+}
+
+const { src, alt, width, height, class: className, loading = 'lazy', sizes } = Astro.props;
+const webp = webpSibling(src);
+---
+
+<picture>
+  {webp && <source srcset={webp} type="image/webp" sizes={sizes} />}
+  <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding="async" sizes={sizes} />
+</picture>

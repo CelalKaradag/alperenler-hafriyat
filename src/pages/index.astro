@@ -8,6 +8,7 @@ import HowWeWork from '../components/HowWeWork.astro';
 import PriceWizard from '../components/PriceWizard.astro';
 import TopoArt from '../components/TopoArt.astro';
 import LogoMark from '../components/LogoMark.astro';
+import Picture from '../components/Picture.astro';
 import FaqSection from '../components/FaqSection.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { approvedFaqs, visibleFaqs } from '../data/faq';
@@ -54,7 +55,13 @@ const hasAboutImage = publicFileExists(aboutImage);
       {
         hasAboutImage ? (
           <div class="about-media">
-            <img src={aboutImage} alt="" loading="lazy" decoding="async" />
+            <Picture
+              src={aboutImage}
+              alt="Kayalık arazide çalışan Hitachi ekskavatör"
+              width={1000}
+              height={1333}
+              sizes="(min-width: 56em) 40vw, 100vw"
+            />
           </div>
         ) : (
           <div class="about-panel" aria-hidden="true">

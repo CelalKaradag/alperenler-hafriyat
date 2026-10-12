@@ -1,44 +1,120 @@
 ---
-import { gallery } from '../data/gallery';
-import { publicFileExists } from '../utils/assets';
+import { gallery, type GalleryImage, type GalleryVideo } from '../data/gallery';
+import { firstExisting, publicFileExists, webpSibling } from '../utils/assets';
+import Icon from './Icon.astro';
+import Picture from './Picture.astro';
 
 // Dosyası public/ altında olmayan öğeler hiç render edilmez (kırık görsel/video olmaz).
-const items = gallery.filter((item) => publicFileExists(item.src));
+type ImageEntry = { kind: 'image'; item: GalleryImage; webp: string | null };
+type VideoEntry = { kind: 'video'; item: GalleryVideo; src: string; poster: string | undefined };
+
+const entries: Array<ImageEntry | VideoEntry> = [];
+for (const item of gallery) {
+  if (item.type === 'image') {
+    if (publicFileExists(item.src)) entries.push({ kind: 'image', item, webp: webpSibling(item.src) });
+  } else {
+    const src = firstExisting(item.src);
+    if (src) {
+      entries.push({
+        kind: 'video',
+        item,
+        src,
+        poster: publicFileExists(item.poster) ? item.poster : undefined,
+      });
+    }
+  }
+}
+
+// Lightbox yalnızca görselleri gezer; sıra numarası görseller arasında verilir.
+let imageIndex = -1;
 ---
 
 {
-  items.length > 0 && (
+  entries.length > 0 && (
     <section class="section section-light" aria-labelledby="galeri-baslik">
-      <div class="container reveal">
+      <div class="container reveal" data-lightbox-root>
         <div class="section-head">
-          <p class="eyebrow">Galeri</p>
-          <h2 id="galeri-baslik">Saha Görselleri</h2>
+          <p class="eyebrow">Çalışmalarımız</p>
+          <h2 id="galeri-baslik">Sahadan</h2>
         </div>
+
         <ul class="gallery-grid">
-          {items.map((item) => (
-            <li class="gallery-item">
-              {item.type === 'image' ? (
-                <figure>
-                  <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
-                  {item.caption && <figcaption>{item.caption}</figcaption>}
-                </figure>
-              ) : (
+          {entries.map((entry) => {
+            if (entry.kind === 'image') {
+              imageIndex += 1;
+              const { item, webp } = entry;
+              return (
+                <li class="gallery-item">
+                  <button
+                    type="button"
+                    class="gallery-open"
+                    data-lightbox-open={imageIndex}
+                    data-src={item.src}
+                    data-webp={webp ?? ''}
+                    data-alt={item.alt}
+                    data-width={item.width}
+                    data-height={item.height}
+                    aria-haspopup="dialog"
+                    aria-label={`Büyüt: ${item.alt}`}
+                  >
+                    <Picture
+                      src={item.src}
+                      alt={item.alt}
+                      width={item.width}
+                      height={item.height}
+                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 100vw"
+                    />
+                  </button>
+                </li>
+              );
+            }
+            const { item, src, poster } = entry;
+            return (
+              <li class="gallery-item">
                 <figure>
                   <video
                     controls
+                    muted
                     preload="none"
                     playsinline
-                    poster={publicFileExists(item.poster) ? item.poster : undefined}
+                    width={item.width}
+                    height={item.height}
+                    poster={poster}
                     aria-label={item.title}
                   >
-                    <source src={item.src} />
+                    <source src={src} type="video/mp4" />
                   </video>
-                  {item.caption && <figcaption>{item.caption}</figcaption>}
                 </figure>
-              )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
+
+        {
+          imageIndex >= 0 && (
+            <dialog class="lightbox" data-lightbox aria-label="Görsel büyütme">
+              <button type="button" class="lightbox-btn lightbox-close" data-lightbox-close aria-label="Kapat">
+                <Icon name="close" />
+              </button>
+              <button type="button" class="lightbox-btn lightbox-prev" data-lightbox-prev aria-label="Önceki görsel">
+                <Icon name="arrow" />
+              </button>
+              <button type="button" class="lightbox-btn lightbox-next" data-lightbox-next aria-label="Sonraki görsel">
+                <Icon name="arrow" />
+              </button>
+              <div class="lightbox-stage">
+                <picture>
+                  <source data-lightbox-source type="image/webp" />
+                  <img data-lightbox-img alt="" />
+                </picture>
+              </div>
+              <div class="lightbox-bar">
+                <p class="lightbox-caption" data-lightbox-caption></p>
+                <p class="lightbox-count" data-lightbox-count aria-live="polite"></p>
+              </div>
+            </dialog>
+          )
+        }
       </div>
     </section>
   )

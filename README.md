@@ -51,6 +51,11 @@ Dosya yoksa ilgili alan hiç render edilmez; kırık görsel ikonu veya boş kut
 | `public/videos/hero-1080.webm`, `hero-1080.mp4` | Açılış videosu, masaüstü (≥ 768 px) | Video hiç basılmaz |
 | `public/videos/hero-720.webm`, `hero-720.mp4` | Açılış videosu, mobil | Eldeki diğer boyut kullanılır; hiçbiri yoksa video yok |
 | `public/images/hero-poster.jpg` | Videonun **ilk karesi, birebir aynı** (videonun altında hep görünür; hareket azaltma / Save-Data / yükleme anında tek görünen şey) | `hero.jpg` varsa o, yoksa koyu degrade + sade desen |
+| `public/images/hero-poster-720.jpg` | **Dikey** poster (720×1280 videosunun ilk karesi); mobilde (48em altı) arka plan ve önyükleme için kullanılır | `hero-poster.jpg` (yatay) kullanılır |
+| `public/videos/hero-720.(webm\|mp4)` | Mobil için **dikey 720×1280** video (`object-fit: cover` ile hero'yu doldurur) | Eldeki diğer boyut |
+| `public/images/hakkimizda.jpg` + `.webp` | Biz Kimiz (ana sayfa) ve Hakkımızda sayfası fotoğrafı, dikey 1000×1333; `<picture>` ile webp önce, jpg yedek. Alt: "Kayalık arazide çalışan Hitachi ekskavatör" | Ana sayfada dekoratif panel; Hakkımızda'da yalnızca metin |
+| `public/images/galeri/*.jpg` + `.webp` | "Sahadan" galerisi görselleri (`santiye-temel-kazisi` 1600×1200, `derin-kazi-hitachi` ve `arazide-yol-acma` 1000×1333); bkz. [gallery.ts](src/data/gallery.ts) | Dosyası olmayan öğe atlanır |
+| `public/videos/galeri/*.mp4` + `public/images/galeri/*-poster.jpg` | Galeri videoları (`kazi-calismasi` dikey 540×960, `drone-arazi-duzenleme` yatay 960×540); `preload="none"`, poster, muted, controls. `/images/galeri/` altına konan mp4 de bulunur | Öğe atlanır |
 | `public/images/hero.jpg` | Video yokken kullanılacak açılış fotoğrafı (yatay, en az ~1920 px; üstüne koyu katman biner) | Koyu degrade + sade desen |
 | `public/images/hakkimizda.jpg` | "Biz Kimiz" bölümünde sol görsel (4:3 önerilir) | Bölüm tek sütun metin |
 | `services.ts` → `image` | Hizmet kartı görseli, örn. `"/images/hizmet-kazi.jpg"` (16:10 önerilir) | Kart görselsiz |

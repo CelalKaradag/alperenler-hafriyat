@@ -18,6 +18,7 @@ export const iconPaths = {
   pin: 'M12 21s6.5-5.7 6.5-11A6.5 6.5 0 0 0 5.5 10C5.5 15.3 12 21 12 21zM12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z',
   arrow: 'M5 12h14M13 6l6 6-6 6',
   arrowUp: 'M12 19V5M6 11l6-6 6 6',
+  close: 'M6 6l12 12M18 6L6 18',
   message: 'M4 5h16v11H9l-5 4V5z',
   quote: 'M7 3h7l4 4v14H7V3zM14 3v4h4M10 12h5M10 16h5',
   calendar:

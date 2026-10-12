@@ -8,6 +8,7 @@ import { initHeroVideo } from './hero-video.js';
 import { initQuoteWizards } from './quote-wizard.js';
 import { initMapCards } from './map-card.js';
 import { initFloatingActions } from './floating-actions.js';
+import { initLightbox } from './lightbox.js';
 
 let cleanups = [];
 let lastBody = null;
@@ -25,7 +26,13 @@ function run() {
     if (main) main.focus({ preventScroll: true });
   }
   firstRun = false;
-  cleanups = [initReveal(), initHeroVideo(), initMapCards(), initFloatingActions()].filter(Boolean);
+  cleanups = [
+    initReveal(),
+    initHeroVideo(),
+    initMapCards(),
+    initFloatingActions(),
+    initLightbox(),
+  ].filter(Boolean);
   initQuoteWizards();
 }
 

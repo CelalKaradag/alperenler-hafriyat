@@ -1,6 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Picture from '../components/Picture.astro';
 import { site } from '../data/site';
+import { publicFileExists } from '../utils/assets';
+
+const photo = '/images/hakkimizda.jpg';
+const hasPhoto = publicFileExists(photo);
 ---
 
 <BaseLayout
@@ -15,7 +20,8 @@ import { site } from '../data/site';
   </section>
 
   <section class="section section-light">
-    <div class="container narrow prose">
+    <div class:list={['container', 'about-page', hasPhoto && 'about-page--photo']}>
+      <div class="prose">
       <h2>Kimiz?</h2>
       <p>
         {site.legalName}, Malatya'nın Yeşilyurt ilçesinde, Koyunoğlu Mahallesi'ndeki adresinden
@@ -45,6 +51,21 @@ import { site } from '../data/site';
       <div class="btn-row">
         <a class="btn btn-dark" href="/iletisim/">İletişim Bilgileri</a>
       </div>
+      </div>
+
+      {
+        hasPhoto && (
+          <div class="about-media">
+            <Picture
+              src={photo}
+              alt="Kayalık arazide çalışan Hitachi ekskavatör"
+              width={1000}
+              height={1333}
+              sizes="(min-width: 56em) 35vw, 100vw"
+            />
+          </div>
+        )
+      }
     </div>
   </section>
 </BaseLayout>

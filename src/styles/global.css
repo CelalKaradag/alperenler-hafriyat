@@ -820,6 +820,13 @@ section[id] {
   background-image: var(--hero-image, none);
 }
 
+/* Mobil (48em altı): dikey poster; yoksa yatay poster. Dikey video object-fit: cover ile doldurur. */
+@media (max-width: 47.99em) {
+  .hero--media {
+    background-image: var(--hero-image-mobile, var(--hero-image, none));
+  }
+}
+
 /* Video katmanı: kendi kompozit katmanında; üstünde blur/filtre yok */
 .hero-media {
   position: absolute;
@@ -1160,10 +1167,29 @@ section[id] {
   border-radius: var(--radius);
 }
 
+.about-media picture,
 .about-media img {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  height: auto; /* width/height öznitelikleri oranı korur (CLS yok) */
+}
+
+/* Hakkımızda sayfası: metin + dikey fotoğraf */
+.about-page {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.about-page > * {
+  min-width: 0;
+}
+
+@media (min-width: 56em) {
+  .about-page--photo {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 4.5rem;
+  }
 }
 
 /* Fotoğraf yokken: dekoratif koyu panel (topo deseni + büyük logo işareti + etiket).
@@ -1743,40 +1769,210 @@ section[id] {
   }
 }
 
-/* ---------- Galeri ---------- */
+/* ---------- Galeri (oran korumalı masonry) + lightbox ---------- */
 
+/* CSS sütunları: dikey ve yatay görseller karışık olsa da boşluk bırakmadan, oranlar korunarak dizilir */
 .gallery-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  columns: 1;
+  column-gap: 1.25rem;
+}
+
+@media (min-width: 40em) {
+  .gallery-grid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 64em) {
+  .gallery-grid {
+    columns: 3;
+  }
 }
 
 .gallery-item {
-  min-width: 0;
+  margin: 0 0 1.25rem;
+  break-inside: avoid;
 }
 
 .gallery-item figure {
   margin: 0;
   overflow: hidden;
-  background: var(--card);
-  border: 1px solid var(--line-light);
+  background: var(--bg);
   border-radius: var(--radius);
 }
 
+.gallery-item picture,
 .gallery-item img,
 .gallery-item video {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  height: auto; /* width/height öznitelikleri oranı korur (CLS yok) */
   background: var(--bg);
+}
+
+.gallery-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: zoom-in;
+}
+
+.gallery-open img {
+  transition: transform 0.5s ease;
+}
+
+.gallery-open:hover img,
+.gallery-open:focus-visible img {
+  transform: scale(1.03);
+}
+
+.gallery-open::after {
+  content: '';
+  position: absolute;
+  inset: auto 0.6rem 0.6rem auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: rgba(20, 22, 26, 0.75)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3f1ed' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7'/%3E%3C/svg%3E")
+    center / 1.1rem no-repeat;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.gallery-open:hover::after,
+.gallery-open:focus-visible::after {
+  opacity: 1;
 }
 
 .gallery-item figcaption {
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
-  color: var(--text-muted);
+  color: var(--on-dark-muted);
+  background: var(--bg);
 }
 
+/* Lightbox: yerel <dialog> (odak tuzağı, Escape, arka plan etkisiz) */
+.lightbox {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(10, 12, 14, 0.94);
+  color: var(--on-dark);
+  --focus: var(--accent);
+}
+
+.lightbox::backdrop {
+  background: rgba(10, 12, 14, 0.94);
+}
+
+.lightbox[open] {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.lightbox-stage {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 3.5rem 1rem 0.5rem;
+}
+
+.lightbox-stage picture,
+.lightbox-stage img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 9rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.lightbox-caption {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  color: var(--on-dark-muted);
+}
+
+.lightbox-count {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--on-dark-muted);
+  white-space: nowrap;
+}
+
+.lightbox-btn {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(20, 22, 26, 0.8);
+  color: var(--on-dark);
+  cursor: pointer;
+}
+
+.lightbox-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lightbox-btn .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.lightbox-close {
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev {
+  left: 0.75rem;
+}
+
+.lightbox-next {
+  right: 0.75rem;
+}
+
+.lightbox-prev .icon {
+  transform: rotate(180deg);
+}
+
+.lightbox-prev[hidden],
+.lightbox-next[hidden] {
+  display: none;
+}
 /* ---------- Rakam şeridi (animasyonsuz) ---------- */
 
 /* Açık zeminli şerit: iki koyu bölüm art arda gelmesin diye koyu değil */

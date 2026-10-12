@@ -21,21 +21,43 @@ const variants = [
 ].filter((variant) => publicFileExists(variant.src));
 const hasVideo = variants.length > 0;
 
+// Posterler: yatay (masaüstü, 1080 videosu için) ve dikey (mobil, 720 videosu için).
+// Mobilde (48em altı) dikey poster kullanılır; yoksa yatay poster.
 const posterSrc = '/images/hero-poster.jpg';
+const posterMobileSrc = '/images/hero-poster-720.jpg';
 const photoSrc = '/images/hero.jpg';
 const poster = publicFileExists(posterSrc) ? posterSrc : null;
-const backdrop = poster ?? (publicFileExists(photoSrc) ? photoSrc : null);
+const posterMobile = publicFileExists(posterMobileSrc) ? posterMobileSrc : null;
+const backdrop = poster ?? posterMobile ?? (publicFileExists(photoSrc) ? photoSrc : null);
 const hasMedia = hasVideo || backdrop !== null;
+
+// Arka plan değişkenleri: CSS mobilde --hero-image-mobile, yoksa --hero-image kullanır.
+const heroStyle = [
+  backdrop ? `--hero-image: url(${backdrop})` : null,
+  posterMobile ? `--hero-image-mobile: url(${posterMobile})` : null,
+]
+  .filter(Boolean)
+  .join('; ');
 
 // <video> için tür tanımlı olmayan, standart dışı öznitelikler
 const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true };
 ---
 
-{poster && <link rel="preload" as="image" href={poster} />}
+{/* Önyükleme ekrana göre doğru posteri seçer (media). Tek poster varsa media verilmez. */}
+{
+  poster && posterMobile ? (
+    <>
+      <link rel="preload" as="image" href={posterMobile} media="(max-width: 47.99em)" />
+      <link rel="preload" as="image" href={poster} media="(min-width: 48em)" />
+    </>
+  ) : (
+    (poster ?? posterMobile) && <link rel="preload" as="image" href={poster ?? posterMobile} />
+  )
+}
 
 <section
   class:list={['hero', 'on-dark', hasMedia ? 'hero--media' : 'hero--plain']}
-  style={backdrop ? `--hero-image: url(${backdrop})` : undefined}
+  style={heroStyle || undefined}
 >
   {
     hasVideo && (
