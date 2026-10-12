@@ -152,33 +152,32 @@ export const services: Service[] = [
     title: 'Operatörlü İş Makinesi Kiralama',
     seoName: 'Operatörlü İş Makinesi Kiralama',
     summary:
-      "Operatörlü ekskavatör, mini ekskavatör ve kazıcı yükleyici kiralama; saatlik veya günlük çalışma Malatya’da görüşülür.",
+      "Operatörlü ekskavatör ve kazıcı yükleyici kiralama; saatlik veya günlük çalışma Malatya’da görüşülür.",
     detail: [
-      'Bazı işler için makine satın almak yerine ihtiyaç süresince operatörlü makine kiralamak daha uygun olabilir. Ekskavatör kazı ve yükleme için, mini ekskavatör dar alanlar için, kazıcı yükleyici ise kazı ve yüklemenin birlikte yapıldığı sahalar için tercih edilir.',
+      'Bazı işler için makine satın almak yerine ihtiyaç süresince operatörlü makine kiralamak daha uygun olabilir. Ekskavatör derin ve geniş kazı ile yükleme için, kazıcı yükleyici ise kazı ve yüklemenin birlikte yapıldığı sahalar için tercih edilir.',
       "Kiralama saatlik veya günlük olarak konuşulur. Malatya’daki sahanın büyüklüğüne, zemine ve işin niteliğine göre hangi makinenin uygun olduğu birlikte belirlenir.",
     ],
     whenNeeded: [
       'Kısa süreli ya da tek seferlik bir kazı veya yükleme işi olduğunda',
-      'Dar bir alanda küçük makine gerektiğinde',
+      'Hangi makinenin işe uygun olduğunun birlikte netleştirilmesi gerektiğinde',
       'Sahada kazı ve yükleme işinin birlikte yapılması gerektiğinde',
       'Makine ihtiyacı yalnızca belirli saatler ya da günler için olduğunda',
     ],
     priceFactors: [
-      'Makine tipi (ekskavatör, mini ekskavatör, kazıcı yükleyici)',
+      'Makine tipi (ekskavatör, kazıcı yükleyici)',
       'Çalışma süresi (saatlik veya günlük)',
       'Zemin türü ve işin niteliği',
       'Sahaya mesafe ve ulaşım',
     ],
     keywords: [
       'ekskavatör kiralama',
-      'mini ekskavatör kiralama',
       'kazıcı yükleyici kiralama',
       'saatlik makine kiralama',
       'günlük makine kiralama',
     ],
     icon: 'machine',
     image: '/images/galeri/tas-ocagi-ekskavator-kamyon.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'hafriyat-kamyonu-ve-moloz-tasima',
@@ -204,7 +203,7 @@ export const services: Service[] = [
     keywords: ['hafriyat kamyonu', 'moloz taşıma', 'hafriyat taşıma', 'toprak taşıma'],
     icon: 'truck',
     image: '/images/galeri/ekskavator-tasima-lowbed.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'dolgu-toprak-temini-ve-saha-temizligi',

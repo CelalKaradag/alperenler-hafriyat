@@ -5,9 +5,10 @@
  * rozeti taşır: `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build’i.
  * Normal yayın çıktısında sayfa, menü/liste bağlantısı ve sitemap girdisi üretilmez; JSON-LD’ye girmez.
  *
- * DİKKAT: Bu makinelerin firmada bulunduğu henüz ONAYLANMADI. Firma hangi makinelerin gerçekten
- * bulunduğunu doğrulamadan `onaylandi: true` yapılmamalıdır. Metinlerde rakam, fiyat, süre,
- * model/marka iddiası veya "en iyi" ifadesi yoktur; eklenmemelidir.
+ * Firma onayı: kepçe (kazıcı yükleyici), ekskavatör ve hafriyat kamyonu ONAYLI. Kırıcılı ekskavatör
+ * ve lowbed ile taşıma henüz teyit edilmedi (`false`). Mini ekskavatör firmada yok: kaldırıldı.
+ * Ekskavatör adedi henüz netleşmedi: ADET YAZILMAZ (yalnızca "13 – 35 ton sınıfları"). Metinlerde
+ * fiyat, süre, model/marka iddiası veya "en iyi" ifadesi yoktur; eklenmemelidir.
  */
 import type { IconName } from '../utils/icons';
 import { showDrafts } from './drafts';
@@ -77,7 +78,7 @@ export const machines: Machine[] = [
     relatedServices: [S.hafriyat, S.altyapi, S.dolgu, S.makine],
     icon: 'machine',
     image: '/images/galeri/altyapi-boru-dosemesi.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'ekskavator-kiralama',
@@ -88,6 +89,7 @@ export const machines: Machine[] = [
     detail: [
       'Paletli ekskavatör; uzun kolu ve kovası sayesinde derin ve geniş kazılarda, ağır zeminlerde ve yüksek hacimli işlerde kullanılan temel kazı makinesidir. Kol ucuna kırıcı gibi farklı ataşmanlar takılabildiği için aynı makine farklı işlerde de çalışabilir.',
       "Malatya’da temel kazısı, altyapı hattı, yıkım sonrası hafriyat ve arazi düzleme gibi işlerde ekskavatör sıkça gerekir. Kazı derinliği, zemin ve çıkacak malzemenin miktarı makinenin ve sayısının belirlenmesinde etkilidir.",
+      'Farklı iş büyüklükleri için 13 tondan 35 tona kadar farklı sınıflarda ekskavatör kullanılır; hangi sınıfın uygun olduğu sahaya ve işin kapsamına göre birlikte belirlenir.',
     ],
     uses: [
       'Derin ve geniş temel kazılarında',
@@ -99,29 +101,7 @@ export const machines: Machine[] = [
     relatedServices: [S.hafriyat, S.yikim, S.altyapi, S.arazi, S.makine],
     icon: 'machine',
     image: '/images/galeri/santiye-temel-kazisi.jpg',
-    onaylandi: false,
-  },
-  {
-    slug: 'mini-ekskavator-kiralama',
-    title: 'Mini Ekskavatör Kiralama',
-    seoName: 'Mini Ekskavatör Kiralama',
-    summary:
-      "Dar alanlarda ve hassas çalışmalarda küçük ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
-    detail: [
-      'Mini ekskavatör, normal ekskavatörün küçültülmüş hâlidir; dar sokaklarda, bina aralarında, bahçelerde ve kapıdan geçmesi gereken sahalarda çalışabilir. Daha küçük olduğu için yüzeye ve çevredeki yapılara daha az yük bindirir.',
-      "Malatya’da şehir içi dar sokaklarda hat kazısı, bahçe düzenlemesi ve ince işlerde mini ekskavatör tercih edilir. Hangi makinenin uygun olacağı sahanın giriş genişliğine, zemine ve işin hacmine bağlıdır.",
-    ],
-    uses: [
-      'Dar sokak ve bina arası hat kazılarında',
-      'Bahçe ve avlu gibi kapalı alanlarda kazı ve dolgu işlerinde',
-      'Hassas, küçük hacimli kazılarda',
-      'Büyük makinenin giremediği sahalarda',
-    ],
-    quoteNeeds: ['Sahaya giriş genişliği (kapı, sokak) ve ulaşım durumu'],
-    relatedServices: [S.altyapi, S.dolgu, S.makine, S.hafriyat],
-    icon: 'machine',
-    image: '/images/galeri/sokakta-kanal-kazisi.jpg',
-    onaylandi: false,
+    onaylandi: true,
   },
   {
     slug: 'kiricili-ekskavator',
@@ -168,6 +148,32 @@ export const machines: Machine[] = [
     relatedServices: [S.tasima, S.hafriyat, S.dolgu],
     icon: 'truck',
     image: '/images/galeri/tas-ocagi-ekskavator-kamyon.jpg',
+    onaylandi: true,
+  },
+  {
+    slug: 'lowbed-ile-is-makinesi-tasima',
+    title: 'Lowbed ile İş Makinesi Taşıma',
+    seoName: 'Lowbed ile İş Makinesi Taşıma',
+    summary:
+      "İş makinelerinin tırla (lowbed) bir sahadan diğerine taşınması; Malatya’da iş ve sahaya göre görüşülür.",
+    detail: [
+      'Paletli iş makineleri yollarda kendi başına uzun mesafe gidemeyeceği için bir sahadan diğerine lowbed adı verilen alçak platformlu tırlarla taşınır. Taşıma, makinenin güvenle yüklenmesini, bağlanmasını ve varış sahasında indirilmesini kapsar.',
+      'Taşınacak makinenin türü, sahaya giriş ve yükleme-indirme için uygun bir yer bulunması taşıma planını belirler. Bu yüzden iş önce konuşulur.',
+    ],
+    uses: [
+      'Ekskavatör gibi paletli makinelerin başka bir sahaya götürülmesinde',
+      'Kazı bittikten sonra makinenin sahadan alınmasında',
+      'Makinenin yeni bir iş için ilçeler arasında taşınmasında',
+    ],
+    quoteNeeds: [
+      'Taşınacak makinenin türü',
+      'Yükleme ve varış noktaları (ilçe, mahalle)',
+      'Yükleme/indirme için uygun bir alan olup olmadığı',
+    ],
+    relatedServices: [S.tasima, S.makine],
+    icon: 'truck',
+    image: '/images/galeri/ekskavator-tasima-lowbed.jpg',
+    // Firma teyit edecek (tır/lowbed bulunduğu doğrulanmadı)
     onaylandi: false,
   },
 ];

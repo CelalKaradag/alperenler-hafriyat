@@ -51,7 +51,7 @@ export const priceGuide = {
       intro:
         'Bazı işlerde makine, işin süresine göre saatlik veya günlük olarak çalışır. Bu çalışma şeklinde fiyatı etkileyenler:',
       factors: [
-        'Makine tipi (ekskavatör, mini ekskavatör, kazıcı yükleyici, kırıcılı ekskavatör)',
+        'Makine tipi (ekskavatör, kazıcı yükleyici, kırıcılı ekskavatör)',
         'Çalışma süresi ve çalışma şekli (saatlik veya günlük)',
         'İşin niteliği ve zemin',
         'Makinenin sahaya nakli ve sahaya mesafe',

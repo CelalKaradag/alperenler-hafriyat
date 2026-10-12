@@ -255,7 +255,7 @@ export const guides: Guide[] = [
     title: 'Ekskavatör mü kepçe mi? İşinize uygun makineyi seçmek',
     seoTitle: 'Ekskavatör mü Kepçe mi? Doğru Makine Seçimi',
     description:
-      'Ekskavatör, kepçe (yükleyici-kazıcı) ve mini ekskavatör arasındaki farklar ve işinize uygun makineyi seçerken sorulacak sorular.',
+      'Ekskavatör ve kepçe (yükleyici-kazıcı) arasındaki farklar ve işinize uygun makineyi seçerken sorulacak sorular.',
     cover: '/images/galeri/derin-kazi-hitachi.jpg',
     coverAlt: 'Derin temel kazısında çalışan Hitachi ekskavatör',
     relatedServices: ['operatorlu-is-makinesi-kiralama', 'hafriyat-ve-temel-kazisi', 'kaya-kirma-ve-kirici-isleri'],
@@ -267,7 +267,7 @@ export const guides: Guide[] = [
         title: 'Aynı makineyi mi kastediyoruz?',
         paragraphs: [
           'Günlük konuşmada "kepçe" kelimesi farklı makineler için kullanılabiliyor. Çoğu zaman önde yükleme kovası, arkada kazı kolu olan makine kastedilir; kimi zaman da ekskavatöre kepçe denir. Telefonda ya da teklif isterken yanlış anlaşılmamak için makineyi tarif etmek faydalıdır.',
-          'Bu yazıda ekskavatör, önde yükleyici arkada kazıcı kolu olan makine ve mini ekskavatör arasındaki genel farkları anlatıyoruz. Gerçek ihtiyaç işin ve sahanın durumuna göre değişir.',
+          'Bu yazıda ekskavatör ile önde yükleyici arkada kazıcı kolu olan makine arasındaki genel farkları anlatıyoruz. Gerçek ihtiyaç işin ve sahanın durumuna göre değişir.',
         ],
       },
       {
@@ -287,10 +287,10 @@ export const guides: Guide[] = [
         ],
       },
       {
-        id: 'mini-ekskavator',
-        title: 'Mini ekskavatör',
+        id: 'agirlik-sinifi',
+        title: 'Makine sınıfı ve saha',
         paragraphs: [
-          'Mini ekskavatör, dar ve sınırlı alanlarda çalışmak için daha küçük boyutlu bir makinedir. Bahçe, dar sokak, bina yanı gibi büyük makinenin giremediği yerlerde işe yarayabilir. Küçük boyutu nedeniyle kazı derinliği ve kapasitesi büyük makineye göre sınırlıdır.',
+          'Ekskavatörler ağırlık sınıflarına göre ayrılır. Daha hafif sınıflar sınırlı alanlarda ve hassas çalışmalarda, daha ağır sınıflar ise derin, geniş ve yüksek hacimli kazılarda tercih edilir. Sahanın giriş genişliği ve zemin, hangi sınıfın uygun olduğunu belirleyen başlıca etkenlerdir.',
         ],
       },
       {

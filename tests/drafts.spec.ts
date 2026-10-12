@@ -29,7 +29,7 @@ test.beforeEach(async ({ page }) => {
   await stubGoogle(page);
 });
 
-test('13 bölge sayfası: başlık, taslak notu, ilçeye özel WhatsApp ve ön-dolu sihirbaz bağlantısı', async ({
+test('13 bölge sayfası (firma onaylı): başlık, taslak notu yok, ilçeye özel WhatsApp ve ön-dolu sihirbaz bağlantısı', async ({
   page,
 }) => {
   const intros = new Set<string>();
@@ -38,7 +38,8 @@ test('13 bölge sayfası: başlık, taslak notu, ilçeye özel WhatsApp ve ön-d
     expect(response?.status(), `${slug} durum kodu`).toBe(200);
     await expect(page).toHaveTitle(`${name} Hafriyat | Alperenler Hafriyat`);
     await expect(page.locator('h1')).toHaveText(`${name} Hafriyat`);
-    await expect(page.locator('.draft-notice')).toContainText('Bu bölgeye hizmet verildiği onaylanmadı.');
+    // Firma Malatya'nın tüm ilçelerine hizmet verdiğini onayladı: taslak notu/rozeti yok
+    await expect(page.locator('.draft-notice')).toHaveCount(0);
     intros.add((await page.locator('.page-head .lead').innerText()).trim());
 
     const wa = await page.locator('.call-card a[href*="wa.me"]').getAttribute('href');
@@ -112,14 +113,30 @@ test('önizleme şeridi ve TASLAK rozetleri görünür', async ({ page }) => {
   await expect(page.locator('.draft-badge').first()).toBeVisible();
 });
 
-test('JSON-LD\'ye taslaklar girmez (Service, FAQPage)', async ({ page }) => {
+test('JSON-LD\'ye taslaklar girmez (taslak SSS, taslak hizmet/makine)', async ({ page }) => {
+  const ld = async () =>
+    (
+      await page
+        .locator('script[type="application/ld+json"]')
+        .evaluateAll((nodes) => nodes.map((node) => node.textContent ?? ''))
+    ).join('\n');
+
+  // FAQPage yalnızca onaylı SSS'yi (bölge sorusu) içerir; taslak sorular girmez
   for (const path of ['/', '/hizmetler/', '/makine-kiralama/', '/hafriyat-fiyatlari/']) {
     await page.goto(path);
-    const blocks = await page
-      .locator('script[type="application/ld+json"]')
-      .evaluateAll((nodes) => nodes.map((node) => node.textContent ?? ''));
-    const joined = blocks.join('\n');
-    expect(joined, `${path} JSON-LD`).not.toContain('"FAQPage"');
-    expect(joined, `${path} JSON-LD`).not.toContain('"@type":"Service"');
+    const joined = await ld();
+    expect(joined, `${path} JSON-LD`).not.toContain('Fiyat neye göre belirlenir?');
+    expect(joined, `${path} JSON-LD`).not.toContain('Bina yıkımı için izin gerekir mi?');
   }
+  // Taslak hizmet sayfasında Service yok; onaylı hizmet sayfasında var
+  await page.goto('/hizmetler/hafriyat-ve-temel-kazisi/');
+  expect(await ld()).not.toContain('"@type":"Service"');
+  // Kırıcılı ekskavatör ve lowbed taslak: sayfa var, rozet var, mini ekskavatör yok
+  for (const slug of ['kiricili-ekskavator', 'lowbed-ile-is-makinesi-tasima']) {
+    const response = await page.goto(`/makine-kiralama/${slug}/`);
+    expect(response?.status(), slug).toBe(200);
+    await expect(page.locator('.draft-badge').first()).toBeVisible();
+  }
+  const mini = await page.goto('/makine-kiralama/mini-ekskavator-kiralama/');
+  expect(mini?.status()).toBe(404);
 });

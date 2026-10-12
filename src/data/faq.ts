@@ -13,11 +13,11 @@
 import { showDrafts } from './drafts';
 import { approvedRegionNames } from './regions';
 
-const regionAnswer = 'Bulunduğunuz yeri yazın veya bizi arayın; konumunuza uygun olup olmadığını birlikte netleştirelim.';
-/** Onaylı bölge varsa cevaba liste eklenir (taslak bölgeler asla yazılmaz) */
+const regionAnswer = 'Bulunduğunuz yeri yazın veya arayın.';
+/** Cevaba onaylı ilçelerin listesi otomatik eklenir (taslak bölgeler asla yazılmaz) */
 const regionAnswerWithList =
   approvedRegionNames.length > 0
-    ? `Hizmet verdiğimiz bölgeler: ${approvedRegionNames.join(', ')}. ${regionAnswer}`
+    ? `Malatya’nın tüm ilçelerinde hizmet veriyoruz: ${approvedRegionNames.join(', ')}. ${regionAnswer}`
     : regionAnswer;
 
 export interface Faq {
@@ -66,7 +66,7 @@ export const faqs: Faq[] = [
   {
     question: 'Hangi bölgelere hizmet veriyorsunuz?',
     answer: regionAnswerWithList,
-    onaylandi: false,
+    onaylandi: true, // firma onayı: Malatya'nın tüm ilçelerine hizmet veriliyor
   },
 ];
 

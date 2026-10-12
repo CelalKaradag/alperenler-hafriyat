@@ -1,10 +1,9 @@
 /**
  * Hizmet bölgeleri (/bolgeler/ ve /bolgeler/<slug>/): Malatya’nın 13 ilçesi.
  *
- * Hepsi `onaylandi: false`; yalnızca `showDrafts` (src/data/drafts.ts) true iken görünür (dev veya
- * `PUBLIC_SHOW_DRAFTS=true` önizleme), "TASLAK" rozetiyle ve noindex; sitemap’e ve JSON-LD’ye girmez.
- * **Firma hangi ilçelere gittiğini onayladığında yalnızca o ilçelerin `onaylandi` değerini `true`
- * yapın.** Hizmet verildiği doğrulanmadan yayına alınmamalıdır.
+ * Firma onayı: Malatya’nın TÜM ilçelerine hizmet veriliyor; 13 ilçenin hepsi `onaylandi: true`.
+ * Bir ilçeyi kapsam dışı bırakmak gerekirse aşağıdaki `onaylandi` tek tek ayrılabilir
+ * (`false` → yalnızca `showDrafts` iken, "TASLAK" rozetiyle, noindex; sitemap’e girmez).
  *
  * Coğrafi, nüfus veya mesafe bilgisi YAZILMAZ (doğrulanmadı); metinler yalnızca ilçe adını kullanır.
  * Giriş cümlesi şablon kopyası gibi durmasın diye 4 farklı kalıptan ilçeye göre seçilir.
@@ -22,7 +21,8 @@ export interface Region {
   intro: string;
 }
 
-type RegionSeed = Pick<Region, 'slug' | 'name' | 'locative'>;
+/** `onaylandi` yazılmazsa true (tüm ilçeler onaylı); bir ilçeyi ayırmak için o satıra `onaylandi: false` ekleyin */
+type RegionSeed = Pick<Region, 'slug' | 'name' | 'locative'> & { onaylandi?: boolean };
 
 const seeds: RegionSeed[] = [
   { slug: 'yesilyurt', name: 'Yeşilyurt', locative: 'Yeşilyurt’ta' },
@@ -53,7 +53,7 @@ const introPatterns: Array<(region: RegionSeed) => string> = [
 
 export const regions: Region[] = seeds.map((seed, index) => ({
   ...seed,
-  onaylandi: false,
+  onaylandi: seed.onaylandi ?? true, // firma onayı: Malatya'nın tüm ilçelerine hizmet veriliyor
   intro: introPatterns[index % introPatterns.length](seed),
 }));
 

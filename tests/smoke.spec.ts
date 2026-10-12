@@ -51,14 +51,15 @@ test('tel: ve wa.me bağlantıları doğru numarayı içeriyor', async ({ page }
 
 test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async ({ page, request }) => {
   // Not: bu sayfalar onaylanıp `onaylandi: true` yapılınca burası güncellenmelidir.
-  // Bölge ve rehber sayfaları da onaylanana kadar (onaylandi:false) normal build'de üretilmez.
+  // Onaylanmamış (onaylandi:false) içerik normal build'de üretilmez.
   for (const path of [
-    '/makine-kiralama/',
     '/hafriyat-fiyatlari/',
-    '/bolgeler/',
-    '/bolgeler/yesilyurt/',
     '/rehber/',
     '/rehber/temel-kazisindan-once-bilinmesi-gerekenler/',
+    '/makine-kiralama/kiricili-ekskavator/', // firma teyit etmedi
+    '/makine-kiralama/lowbed-ile-is-makinesi-tasima/', // firma teyit edecek
+    '/makine-kiralama/mini-ekskavator-kiralama/', // firmada yok: kaldırıldı
+    '/hizmetler/hafriyat-ve-temel-kazisi/', // yalnızca 2 hizmet onaylı
   ]) {
     const response = await request.get(path);
     expect(response.status(), `${path} üretilmemeli`).toBe(404);
@@ -66,8 +67,45 @@ test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async (
   await page.goto('/');
   await expect(page.locator('.preview-bar')).toHaveCount(0);
   await expect(page.locator('.draft-badge')).toHaveCount(0);
-  // Footer'da taslak bölge/rehber bağlantısı da görünmemeli
-  await expect(page.locator('footer a[href="/bolgeler/"], footer a[href="/rehber/"]')).toHaveCount(0);
+  // Footer'da taslak rehber bağlantısı görünmemeli; onaylı bölgeler/makineler görünür
+  await expect(page.locator('footer a[href="/rehber/"]')).toHaveCount(0);
+  await expect(page.locator('footer a[href="/bolgeler/"]')).toHaveCount(1);
+});
+
+test('firma onaylı sayfalar normal build\'de var: bölgeler, 3 makine, 2 hizmet', async ({ request }) => {
+  const present = [
+    '/bolgeler/',
+    ...[
+      'yesilyurt', 'battalgazi', 'akcadag', 'arapgir', 'arguvan', 'darende', 'dogansehir',
+      'doganyol', 'hekimhan', 'kale', 'kuluncak', 'puturge', 'yazihan',
+    ].map((slug) => `/bolgeler/${slug}/`),
+    '/makine-kiralama/',
+    '/makine-kiralama/ekskavator-kiralama/',
+    '/makine-kiralama/kiralik-kepce-jcb/',
+    '/makine-kiralama/hafriyat-kamyonu-kiralama/',
+    '/hizmetler/',
+    '/hizmetler/operatorlu-is-makinesi-kiralama/',
+    '/hizmetler/hafriyat-kamyonu-ve-moloz-tasima/',
+  ];
+  for (const path of present) {
+    const response = await request.get(path);
+    expect(response.status(), `${path} var olmalı`).toBe(200);
+  }
+});
+
+test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerde geçmez', async ({ page, request }) => {
+  await page.goto('/');
+  const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });
+  await faq.locator('summary').click();
+  await expect(faq).toContainText('Malatya’nın tüm ilçelerinde hizmet veriyoruz:');
+  await expect(faq).toContainText('Yeşilyurt');
+  await expect(faq).toContainText('Yazıhan');
+  await expect(faq).toContainText('Bulunduğunuz yeri yazın veya arayın.');
+
+  for (const path of ['/', '/hizmetler/', '/makine-kiralama/', '/hizmetler/operatorlu-is-makinesi-kiralama/']) {
+    const html = await (await request.get(path)).text();
+    expect(html.toLowerCase(), `${path}: mini ekskavatör`).not.toContain('mini ekskavatör');
+  }
 });
 
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
