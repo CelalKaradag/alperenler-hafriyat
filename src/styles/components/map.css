@@ -180,6 +180,15 @@
   display: none;
 }
 
+/* Masaüstü/tablet: kalkan yalnızca yüzen kartın KAPLAMADIĞI harita alanını örter (kart genişliği + boşluk
+   kadar soldan başlar); kartın altına uzanıp onunla çakışmaz. Mobilde kart haritanın altında. */
+@media (min-width: 48em) {
+  .map-shield {
+    inset: 0 0 0 var(--map-shift, 0px);
+    width: auto;
+  }
+}
+
 .map-card[data-state='loaded'] .map-shield:not([hidden]) {
   display: block;
 }
@@ -192,7 +201,7 @@
 /* "Haritayı kullanmak için tıklayın/dokunun" etiketi: iğnenin altında, serbest alanın ortasında */
 .map-hint {
   position: absolute;
-  left: calc(50% + var(--map-shift, 0px) / 2);
+  left: 50%; /* kalkan zaten yalnızca serbest alanı kaplar (üstte) */
   top: calc(50% + 1.6rem);
   padding: 0.35rem 0.9rem;
   background: rgba(20, 22, 26, 0.82);
@@ -365,10 +374,9 @@
 
 /* Dokunmatik ekranlarda telefon ve WhatsApp bağlantıları ≥ 44 px yüksek (düzen kaymasın diye marjla dengelenir) */
 @media (pointer: coarse) {
+  /* satır içi öğe: dikey dolgu yerleşimi kaydırmaz, yalnızca dokunma alanını büyütür (≥ 44 px) */
   .map-info-phone a {
-    display: inline-block;
-    padding-block: 0.3rem;
-    margin-block: -0.3rem;
+    padding-block: 0.5rem;
   }
 
   .map-info-wa {

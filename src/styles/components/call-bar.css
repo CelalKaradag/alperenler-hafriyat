@@ -26,10 +26,9 @@
   color: #25d366;
 }
 
-/* Form alanına odaklanınca (ekran klavyesi açık) sabit çubuk alanı örtmesin */
-body:has(input:focus, textarea:focus, select:focus) .call-bar {
-  display: none;
-}
+/* Not: çubuk alan odağında GİZLENMEZ. Odakla çubuk bir görünüp bir kaybolunca (örn. radyo/pill'e dokununca
+   ya da metin alanından düğmeye geçerken) çubuk dokunuşun ortasında düğmenin üstüne gelip tıklamayı yutuyordu.
+   Bunun yerine sihirbaz alanları scroll-margin ile çubuğun üstünde kalır (wizard.css). */
 
 @media (min-width: 48em) {
   .call-bar {

@@ -335,7 +335,7 @@ test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile })
   }
 });
 
-test('mobil: sihirbaz alanına odaklanınca alt çubuk gizlenir (klavye alanı örtmez)', async ({ page, isMobile }) => {
+test('mobil: odaklanan sihirbaz alanı sabit alt çubuğun altında kalmaz', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'yalnızca mobil cihaz projeleri');
   await page.goto('/teklif/');
   await expect(page.locator('.call-bar')).toBeVisible();
@@ -343,9 +343,12 @@ test('mobil: sihirbaz alanına odaklanınca alt çubuk gizlenir (klavye alanı �
   if ((await choices.count()) > 0) await choices.first().click();
   else await page.locator('#wizard-job-text').fill('Temel kazısı');
   await page.locator('[data-step]').nth(0).locator('[data-action="next"]').click();
-  await page.locator('#wizard-place').focus();
-  await expect(page.locator('.call-bar')).toBeHidden();
-  await page.locator('#wizard-place').blur();
+  await page.locator('#wizard-place').focus(); // odak, alanı scroll-margin ile görünüme kaydırır
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const field = (await page.locator('#wizard-place').boundingBox()) as { y: number; height: number };
+  const bar = (await page.locator('.call-bar').boundingBox()) as { y: number };
+  expect(field.y + field.height, 'alan alt çubuğun altında kalmamalı').toBeLessThanOrEqual(bar.y + 1);
+  // Çubuk odakla kaybolup tekrar çıkmaz (dokunuşun ortasında düğmeyi örtüp tıklamayı yutmasın)
   await expect(page.locator('.call-bar')).toBeVisible();
 });
 
@@ -361,7 +364,9 @@ test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kay
   await expect(wa).toHaveAttribute('href', new RegExp(`^${WA_BASE.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`));
 
   // Hero görünürken gizli; aşağı inince belirir, 600 px sonrası yalnızca ikon
-  await page.evaluate(() => window.scrollTo(0, 1600));
+  // "Yukarı çık" sayfanın yarısından sonra (scrollY > (scrollHeight − innerHeight) / 2) görünür:
+  // sabit 1600 px uzun ana sayfada yarıyı geçmez, bu yüzden toplam yüksekliğin %60'ına kaydırılır.
+  await page.evaluate(() => window.scrollTo(0, (document.scrollingElement as Element).scrollHeight * 0.6));
   await expect(wa).toBeVisible();
   await expect(wa).toHaveClass(/is-compact/);
   await expect.poll(async () => Math.round(((await wa.boundingBox()) as { width: number }).width)).toBeLessThanOrEqual(60);

@@ -136,6 +136,14 @@ textarea.wizard-input {
   min-width: 7rem;
 }
 
+/* Odaklanan alan/düğme, mobil sabit alt çubuğun (≈ 4.5 rem) altında kalmasın: tarayıcı odak kaydırmasında pay bırakır */
+.wizard-app input,
+.wizard-app textarea,
+.wizard-app select,
+.wizard-app .btn {
+  scroll-margin-bottom: 6rem;
+}
+
 /* Seçim kartları (radio) */
 .choice-grid {
   display: grid;

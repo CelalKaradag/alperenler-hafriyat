@@ -129,3 +129,12 @@
   color: var(--text);
   border-color: var(--text);
 }
+
+/* .draft-notice KOYU zeminlidir (--bg): içindeki rozet sarı kalır (yukarıdaki açık zemin kuralı onu koyu
+   yazıya çevirip koyu üstünde koyu yapıyordu → axe color-contrast) */
+.draft-notice .draft-badge,
+.prose .draft-notice .draft-badge,
+.related-block .draft-notice .draft-badge {
+  color: var(--accent);
+  border-color: var(--accent);
+}

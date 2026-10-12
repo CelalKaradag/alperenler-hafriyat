@@ -99,6 +99,14 @@ function scan(full: boolean): string[] {
       const w = Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left);
       const h = Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top);
       if (w > 2 && h > 2) {
+        // Kesişiyorlar ama küçük olanın merkezinde gerçekten o öğe (veya içindeki) en üstteyse sorun yok:
+        // üstte duruyor ve tıklanabilir (örn. kart haritanın üstünde).
+        const area = (r: DOMRect) => r.width * r.height;
+        const small = area(a.rect) <= area(b.rect) ? a : b;
+        const cx = small.rect.left + small.rect.width / 2;
+        const cy = small.rect.top + small.rect.height / 2;
+        const top = document.elementFromPoint(cx, cy);
+        if (top && small.el.contains(top)) continue;
         const pair = [label(a.el), label(b.el)].sort().join(' ↔ '); // aynı çift tek kez raporlanır
         issues.push(`üst üste binen: ${pair}`); // boyut yazılmaz: kaydırma adımları arasında aynı çift tek kayıt
       }
