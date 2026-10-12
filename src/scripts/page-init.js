@@ -9,6 +9,7 @@ import { initQuoteWizards } from './quote-wizard.js';
 import { initMapCards } from './map-card.js';
 import { initFloatingActions } from './floating-actions.js';
 import { initLightbox } from './lightbox.js';
+import { initGalleryFilters } from './gallery-filter.js';
 
 let cleanups = [];
 let lastBody = null;
@@ -34,6 +35,7 @@ function run() {
     initLightbox(),
   ].filter(Boolean);
   initQuoteWizards();
+  initGalleryFilters();
 }
 
 function teardown() {

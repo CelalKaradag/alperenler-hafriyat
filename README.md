@@ -182,6 +182,15 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
 4. Yayın öncesi kontrol listesindeki diğer maddeler (gizlilik sayfası yer tutucuları, logo, `og-image.png`, koordinat/İşletme Profili).
 
+## Galeri
+
+[src/data/gallery.ts](src/data/gallery.ts) içindeki `photo(ad, alt)` ve `video(ad, başlık)` satırlarıyla yönetilir. Dosyalar `public/images/galeri/` altındadır: `<ad>.jpg` (+ `<ad>.webp` varsa `<picture>` ile önce o sunulur), videolar için `<ad>.mp4` + `<ad>-poster.jpg` (mp4 `public/videos/galeri/` altında da aranır).
+
+- Piksel boyutları (CLS olmasın diye `width`/`height`) paket eklenmeden dosyadan okunur ([image-size.ts](src/utils/image-size.ts): JPEG başlığı + EXIF yönü); video boyutu poster görselinden alınır. İsterseniz `width`/`height` elle de yazılabilir.
+- Ana sayfa "Sahadan" yalnızca `featured: true` olan en çok 6 öğeyi gösterir ve "Tüm fotoğraf ve videolar" bağlantısıyla `/galeri/` sayfasına gider. `/galeri/` hepsini, Tümü / Fotoğraflar / Videolar filtresiyle (JavaScript yoksa filtre gizli, hepsi görünür) gösterir; ilk 3 öğe hemen, kalanı lazy yüklenir; videolar `preload="none"`. Lightbox yalnızca görünür (filtrelenmemiş) görseller arasında gezinir.
+- Dosyası bulunmayan öğe atlanır; hiç öğe yoksa bölüm ve menüdeki "Galeri" görünmez (dev'de menü için yeni medyadan sonra sunucuyu yeniden başlatın).
+- Konum, tarih, müşteri adı veya "projemiz" gibi iddia yazılmaz.
+
 ## Henüz doğrulanmamış / eksik içerik
 
 - Hizmet listesi ve hizmet bölgeleri

@@ -1794,6 +1794,53 @@ section[id] {
   break-inside: avoid;
 }
 
+.gallery-item[hidden] {
+  display: none;
+}
+
+/* /galeri/ filtre sekmeleri (JavaScript yoksa gizli, hepsi görünür) */
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.gallery-filters[hidden] {
+  display: none;
+}
+
+.gallery-filters button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 1.1rem;
+  border: 1.5px solid var(--line-light);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gallery-filters button:hover {
+  border-color: var(--text);
+}
+
+.gallery-filters button[aria-pressed='true'] {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--on-dark);
+}
+
+.gallery-filter-count {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
 .gallery-item figure {
   margin: 0;
   overflow: hidden;

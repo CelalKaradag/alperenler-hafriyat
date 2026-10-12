@@ -13,6 +13,13 @@ export function initLightbox() {
   const openers = Array.from(root.querySelectorAll('[data-lightbox-open]'));
   if (openers.length === 0) return null;
 
+  // Galeri filtresi bazı öğeleri gizleyebilir: yalnızca görünür görseller arasında gezilir
+  const visibleOpeners = () =>
+    openers.filter((button) => {
+      const item = button.closest('.gallery-item');
+      return !item || !item.hidden;
+    });
+
   const source = dialog.querySelector('[data-lightbox-source]');
   const image = dialog.querySelector('[data-lightbox-img]');
   const caption = dialog.querySelector('[data-lightbox-caption]');
@@ -29,8 +36,9 @@ export function initLightbox() {
   };
 
   function show(i) {
-    index = (i + openers.length) % openers.length;
-    const data = openers[index].dataset;
+    const list = visibleOpeners();
+    index = (i + list.length) % list.length;
+    const data = list[index].dataset;
     if (data.webp) {
       source.srcset = data.webp;
     } else {
@@ -41,8 +49,8 @@ export function initLightbox() {
     image.width = Number(data.width) || image.width;
     image.height = Number(data.height) || image.height;
     caption.textContent = data.alt || '';
-    count.textContent = `${index + 1} / ${openers.length}`;
-    const single = openers.length < 2;
+    count.textContent = `${index + 1} / ${list.length}`;
+    const single = list.length < 2;
     prev.hidden = single;
     next.hidden = single;
   }
@@ -57,7 +65,7 @@ export function initLightbox() {
 
   function onOpenerClick(event) {
     const trigger = event.currentTarget;
-    open(openers.indexOf(trigger), trigger);
+    open(visibleOpeners().indexOf(trigger), trigger);
   }
 
   // Tab dialog içinde döner (odak tuzağı)

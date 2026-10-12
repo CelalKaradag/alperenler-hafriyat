@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GallerySection from '../components/GallerySection.astro';
+import TopoArt from '../components/TopoArt.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title={`Galeri | ${site.name}`}
+  description={`${site.legalName} çalışmalarından fotoğraf ve videolar: kazı, boru hattı, yol açma ve istinat duvarı çalışmaları.`}
+>
+  <section class="page-head on-dark">
+    <TopoArt variant="soft" />
+    <div class="container narrow">
+      <p class="eyebrow">Çalışmalarımız</p>
+      <h1>Galeri</h1>
+      <p class="lead">Sahadan fotoğraf ve videolar.</p>
+    </div>
+  </section>
+
+  <GallerySection variant="page" />
+</BaseLayout>

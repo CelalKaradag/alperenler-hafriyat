@@ -1,94 +1,128 @@
 ---
-import { gallery, type GalleryImage, type GalleryVideo } from '../data/gallery';
-import { firstExisting, publicFileExists, webpSibling } from '../utils/assets';
+import { getGalleryEntries } from '../utils/gallery';
 import Icon from './Icon.astro';
 import Picture from './Picture.astro';
 
-// Dosyası public/ altında olmayan öğeler hiç render edilmez (kırık görsel/video olmaz).
-type ImageEntry = { kind: 'image'; item: GalleryImage; webp: string | null };
-type VideoEntry = { kind: 'video'; item: GalleryVideo; src: string; poster: string | undefined };
-
-const entries: Array<ImageEntry | VideoEntry> = [];
-for (const item of gallery) {
-  if (item.type === 'image') {
-    if (publicFileExists(item.src)) entries.push({ kind: 'image', item, webp: webpSibling(item.src) });
-  } else {
-    const src = firstExisting(item.src);
-    if (src) {
-      entries.push({
-        kind: 'video',
-        item,
-        src,
-        poster: publicFileExists(item.poster) ? item.poster : undefined,
-      });
-    }
-  }
+interface Props {
+  /** home: ana sayfa "Sahadan" (öne çıkan en çok 6 öğe + /galeri/ bağlantısı); page: /galeri/ (hepsi + filtre) */
+  variant?: 'home' | 'page';
 }
 
+const { variant = 'home' } = Astro.props;
+
+// Dosyası public/ altında olmayan öğeler hiç render edilmez (kırık görsel/video olmaz).
+const all = getGalleryEntries();
+const featured = all.filter((entry) => entry.item.featured);
+const entries = variant === 'page' ? all : (featured.length > 0 ? featured : all).slice(0, 6);
+
+const photoCount = entries.filter((entry) => entry.kind === 'image').length;
+const videoCount = entries.length - photoCount;
+
+// Sayfa üstündeki ilk satır (masaüstünde 3 öğe) hemen yüklenir, kalan her şey lazy.
+// Ana sayfada galeri sayfanın aşağısındadır: hepsi lazy.
+const eagerCount = variant === 'page' ? 3 : 0;
+
+// Filtre çubuğu JavaScript yoksa gizli kalır (hepsi görünür); gallery-filter.js açar.
 // Lightbox yalnızca görselleri gezer; sıra numarası görseller arasında verilir.
 let imageIndex = -1;
 ---
 
 {
   entries.length > 0 && (
-    <section class="section section-light" aria-labelledby="galeri-baslik">
+    <section
+      class:list={['section', 'section-light', variant === 'page' && 'section--flush-top']}
+      aria-labelledby={variant === 'home' ? 'galeri-baslik' : undefined}
+      aria-label={variant === 'page' ? 'Fotoğraf ve videolar' : undefined}
+    >
       <div class="container reveal" data-lightbox-root>
-        <div class="section-head">
-          <p class="eyebrow">Çalışmalarımız</p>
-          <h2 id="galeri-baslik">Sahadan</h2>
-        </div>
+        {
+          variant === 'home' && (
+            <div class="section-head">
+              <p class="eyebrow">Çalışmalarımız</p>
+              <h2 id="galeri-baslik">Sahadan</h2>
+            </div>
+          )
+        }
+
+        {
+          variant === 'page' && photoCount > 0 && videoCount > 0 && (
+            <>
+              <div class="gallery-filters" role="group" aria-label="Galeri filtresi" data-gallery-filters hidden>
+                <button type="button" data-filter="all" aria-pressed="true">
+                  Tümü <span class="gallery-filter-count">{entries.length}</span>
+                </button>
+                <button type="button" data-filter="image" aria-pressed="false">
+                  Fotoğraflar <span class="gallery-filter-count">{photoCount}</span>
+                </button>
+                <button type="button" data-filter="video" aria-pressed="false">
+                  Videolar <span class="gallery-filter-count">{videoCount}</span>
+                </button>
+              </div>
+              <p class="visually-hidden" role="status" aria-live="polite" data-gallery-status />
+            </>
+          )
+        }
 
         <ul class="gallery-grid">
-          {entries.map((entry) => {
+          {entries.map((entry, i) => {
             if (entry.kind === 'image') {
               imageIndex += 1;
-              const { item, webp } = entry;
               return (
-                <li class="gallery-item">
+                <li class="gallery-item" data-kind="image">
                   <button
                     type="button"
                     class="gallery-open"
                     data-lightbox-open={imageIndex}
-                    data-src={item.src}
-                    data-webp={webp ?? ''}
-                    data-alt={item.alt}
-                    data-width={item.width}
-                    data-height={item.height}
+                    data-src={entry.src}
+                    data-webp={entry.webp ?? ''}
+                    data-alt={entry.alt}
+                    data-width={entry.width}
+                    data-height={entry.height}
                     aria-haspopup="dialog"
-                    aria-label={`Büyüt: ${item.alt}`}
+                    aria-label={`Büyüt: ${entry.alt}`}
                   >
                     <Picture
-                      src={item.src}
-                      alt={item.alt}
-                      width={item.width}
-                      height={item.height}
+                      src={entry.src}
+                      alt={entry.alt}
+                      width={entry.width}
+                      height={entry.height}
+                      loading={i < eagerCount ? 'eager' : 'lazy'}
                       sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 100vw"
                     />
                   </button>
                 </li>
               );
             }
-            const { item, src, poster } = entry;
             return (
-              <li class="gallery-item">
+              <li class="gallery-item" data-kind="video">
                 <figure>
                   <video
                     controls
                     muted
                     preload="none"
                     playsinline
-                    width={item.width}
-                    height={item.height}
-                    poster={poster}
-                    aria-label={item.title}
+                    width={entry.width}
+                    height={entry.height}
+                    poster={entry.poster}
+                    aria-label={entry.title}
                   >
-                    <source src={src} type="video/mp4" />
+                    <source src={entry.src} type="video/mp4" />
                   </video>
                 </figure>
               </li>
             );
           })}
         </ul>
+
+        {
+          variant === 'home' && all.length > entries.length && (
+            <p class="section-more">
+              <a class="text-link" href="/galeri/">
+                Tüm fotoğraf ve videolar<span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
+          )
+        }
 
         {
           imageIndex >= 0 && (
@@ -109,8 +143,8 @@ let imageIndex = -1;
                 </picture>
               </div>
               <div class="lightbox-bar">
-                <p class="lightbox-caption" data-lightbox-caption></p>
-                <p class="lightbox-count" data-lightbox-count aria-live="polite"></p>
+                <p class="lightbox-caption" data-lightbox-caption />
+                <p class="lightbox-count" data-lightbox-count aria-live="polite" />
               </div>
             </dialog>
           )
