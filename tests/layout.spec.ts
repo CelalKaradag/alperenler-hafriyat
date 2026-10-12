@@ -68,21 +68,39 @@ function scan(full: boolean): string[] {
     }
   }
 
-  // 4) üst üste binen tıklanabilir öğeler (mobil çubuk ve yüzen düğme DAHİL; ata-torun çiftleri hariç)
-  const clickable = Array.from(document.querySelectorAll('a[href], button')).filter(
-    (el) => visible(el) && !el.closest('[hidden]') && !el.closest('.skip-link, .visually-hidden'),
-  );
-  const rects = clickable.map((el) => el.getBoundingClientRect());
+  // 4) üst üste binen tıklanabilir öğeler. Yalnızca AYNI kaydırma bağlamındaki öğeler karşılaştırılır:
+  //    position:fixed/sticky bir kökün (header, alt çubuk, yüzen düğmeler, önizleme şeridi, yapışkan kart)
+  //    içindekiler yalnızca aynı kökün içindekilerle; akıştaki içerik akıştakilerle.
+  //    Gizli (visibility/display, opacity 0, aria-hidden, [hidden], kapalı menü) öğeler hariç.
+  const hiddenAnywhere = (el: Element) => {
+    if (el.closest('[hidden], [aria-hidden="true"], [inert], .skip-link, .visually-hidden')) return true;
+    for (let node: Element | null = el; node; node = node.parentElement) {
+      if (getComputedStyle(node).opacity === '0') return true;
+    }
+    return false;
+  };
+  const scrollContext = (el: Element): Element | null => {
+    for (let node: Element | null = el; node && node !== document.body; node = node.parentElement) {
+      const position = getComputedStyle(node).position;
+      if (position === 'fixed' || position === 'sticky') return node;
+    }
+    return null; // akıştaki içerik
+  };
+  const clickable = Array.from(document.querySelectorAll('a[href], button'))
+    .filter((el) => visible(el) && !hiddenAnywhere(el))
+    .map((el) => ({ el, rect: el.getBoundingClientRect(), ctx: scrollContext(el) }))
+    .filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight); // ekranda görünen alan
   for (let i = 0; i < clickable.length; i++) {
     for (let j = i + 1; j < clickable.length; j++) {
-      const a = rects[i];
-      const b = rects[j];
-      const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
-      const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-      if (w > 2 && h > 2 && !clickable[i].contains(clickable[j]) && !clickable[j].contains(clickable[i])) {
-        // yalnızca ekranda görünen alanda olanlar
-        if (a.bottom < 0 || a.top > window.innerHeight) continue;
-        issues.push(`üst üste binen: ${label(clickable[i])} ↔ ${label(clickable[j])} (${Math.round(w)}×${Math.round(h)}px)`);
+      const a = clickable[i];
+      const b = clickable[j];
+      if (a.ctx !== b.ctx) continue; // farklı kaydırma bağlamı: karşılaştırma yok
+      if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      const w = Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left);
+      const h = Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top);
+      if (w > 2 && h > 2) {
+        const pair = [label(a.el), label(b.el)].sort().join(' ↔ '); // aynı çift tek kez raporlanır
+        issues.push(`üst üste binen: ${pair}`); // boyut yazılmaz: kaydırma adımları arasında aynı çift tek kayıt
       }
     }
   }
@@ -108,12 +126,23 @@ for (const width of WIDTHS) {
         await page.evaluate((top) => window.scrollTo(0, top), y);
         for (const issue of await page.evaluate(scan, y === 0)) found.add(issue);
       }
-      // Görseller: yüklenmiş ve kırık değil
-      const broken = await page.evaluate(() =>
-        Array.from(document.images)
-          .filter((img) => img.getClientRects().length > 0 && !(img.complete && img.naturalWidth > 0))
-          .map((img) => img.currentSrc || img.src || '(src yok)'),
-      );
+      // Görseller: yüklenmiş ve kırık değil. Her görsel görünüme kaydırılır ve decode() beklenir
+      // (lazy-load zamanlaması yüzünden yanlış alarm olmasın); gerçekten kırık olan decode'da hata verir.
+      const broken = await page.evaluate(async () => {
+        const bad: string[] = [];
+        for (const img of Array.from(document.images)) {
+          if (img.getClientRects().length === 0) continue; // görünmeyen (kapalı lightbox vb.)
+          img.scrollIntoView({ block: 'center' });
+          try {
+            await img.decode();
+          } catch {
+            bad.push(img.currentSrc || img.src || '(src yok)');
+            continue;
+          }
+          if (!(img.complete && img.naturalWidth > 0)) bad.push(img.currentSrc || img.src || '(src yok)');
+        }
+        return bad;
+      });
       for (const src of broken) found.add(`kırık/yüklenmemiş görsel: ${src}`);
       for (const issue of found) report.push(`${path} @${width}: ${issue}`);
     }

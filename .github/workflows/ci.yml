@@ -7,6 +7,11 @@ on:
   push:
   pull_request:
 
+# Aynı dal/PR için yeni push, eskisinin çalışmasını iptal eder
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-24.04

@@ -363,6 +363,25 @@
   font-weight: 600;
 }
 
+/* Dokunmatik ekranlarda telefon ve WhatsApp bağlantıları ≥ 44 px yüksek (düzen kaymasın diye marjla dengelenir) */
+@media (pointer: coarse) {
+  .map-info-phone a {
+    display: inline-block;
+    padding-block: 0.3rem;
+    margin-block: -0.3rem;
+  }
+
+  .map-info-wa {
+    margin-bottom: 0.4rem;
+  }
+
+  .map-info-wa a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+
 .map-info-actions {
   display: flex;
   flex-direction: column;

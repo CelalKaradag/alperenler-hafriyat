@@ -223,6 +223,12 @@ test('galeri: lightbox açılır, Escape kapatır, sayfa geçişinden sonra yine
   // Başka sayfaya (ClientRouter) geç ve geri dön
   await page.locator('header .brand').click();
   await expect(page).toHaveURL(/\/$/);
+  // Mobilde (hamburger menü) menü kapalıyken bağlantıya tıklanamaz: önce menü düğmesi
+  const toggle = page.locator('.nav-toggle');
+  if (await toggle.isVisible()) {
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  }
   await page.locator('#site-nav a[href="/galeri/"]').click();
   await expect(page).toHaveURL(/\/galeri\/$/);
 
@@ -305,6 +311,17 @@ test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile })
       .elementHandles()) {
       const box = await handle.boundingBox();
       if (!box || !(await handle.isVisible())) continue;
+      // Metin içi (p, li, dd içindeki satır içi) bağlantılar WCAG 2.5.8 istisnasıdır; menü/footer/düğme/çubuk hariç tutulmaz
+      const inlineInText = await handle.evaluate((node) => {
+        const el = node as Element;
+        return (
+          el.tagName === 'A' &&
+          Boolean(el.closest('p, li, dd, address')) &&
+          !el.closest('footer, nav, header, .call-bar') &&
+          !el.matches('.btn, button')
+        );
+      });
+      if (inlineInText) continue;
       if (box.width < 43.5 || box.height < 43.5) {
         small.push(
           `${await handle.evaluate((node) => {

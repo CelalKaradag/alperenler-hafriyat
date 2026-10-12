@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 3 * * 1'
 
+# Aynı dalda aynı anda tek Full QA; elle başlatılan tam test yeni çalıştırmayla KESİLMEZ (sıraya girer)
+concurrency:
+  group: full-qa-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   full-qa:
     runs-on: ubuntu-24.04

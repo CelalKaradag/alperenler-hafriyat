@@ -119,3 +119,13 @@
 .link-list .draft-badge {
   flex: none;
 }
+
+/* Açık zeminli kartlarda (link listeleri, ilgili bağlantılar, yazı/prose, rehber kartları) rozet:
+   koyu yazı + koyu kenarlık (kontrast AA). Koyu kartlardaki (service-card, call-card, page-head) sarı rozet değişmez. */
+.link-list .draft-badge,
+.related-block .draft-badge,
+.prose .draft-badge,
+.guide-card .draft-badge {
+  color: var(--text);
+  border-color: var(--text);
+}

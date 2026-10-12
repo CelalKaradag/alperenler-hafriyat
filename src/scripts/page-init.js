@@ -119,6 +119,9 @@ function run() {
         document.addEventListener('click', onEarlyClick, true);
         cleanups.push(() => document.removeEventListener('click', onEarlyClick, true));
       }
+    } else {
+      // Hero video, harita, yüzen düğmeler, sihirbaz: sayfa yüklenince HEMEN başlar (boşta bekleme yok)
+      begin();
     }
   }
 }
