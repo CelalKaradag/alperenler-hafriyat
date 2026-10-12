@@ -72,6 +72,53 @@
   font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem);
 }
 
+/* Makine sayfası: filo tablosu (müşteri onaylı adetler) */
+.fleet-table {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 0 1.5rem;
+  border-collapse: collapse;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-radius: var(--radius);
+}
+
+.fleet-table th,
+.fleet-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line-light);
+}
+
+.fleet-table thead th {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fleet-table tbody th,
+.fleet-table tfoot th {
+  font-weight: 600;
+}
+
+.fleet-table td {
+  width: 5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.fleet-table thead th:last-child {
+  text-align: right;
+}
+
+.fleet-table tfoot th,
+.fleet-table tfoot td {
+  border-bottom: 0;
+  border-top: 2px solid var(--accent);
+}
+
 /* rehber yazı: yazar/okuma süresi satırı ve liste kartları */
 .guide-meta {
   display: flex;

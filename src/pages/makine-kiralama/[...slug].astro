@@ -113,6 +113,36 @@ const description = machine
 
               {machine.detail.map((paragraph) => <p>{paragraph}</p>)}
 
+              {
+                machine.fleet && (
+                  <>
+                    <h2>{machine.fleet.title}</h2>
+                    <table class="fleet-table" data-fleet>
+                      <thead>
+                        <tr>
+                          <th scope="col">Makine</th>
+                          <th scope="col">Adet</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {machine.fleet.rows.map((row) => (
+                          <tr>
+                            <th scope="row">{row.label}</th>
+                            <td>{row.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th scope="row">Toplam</th>
+                          <td>{machine.fleet.rows.reduce((sum, row) => sum + row.count, 0)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </>
+                )
+              }
+
               <h2>Hangi işlerde tercih edilir?</h2>
               <ul class="check-list">
                 {

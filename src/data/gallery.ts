@@ -135,7 +135,7 @@ export const gallery: GalleryItem[] = [
   photo('kirici-ile-kaya-kirma', 'Kırıcı takılı ekskavatörlerle kaya kırma', { featured: true }),
   video('boru-hatti-calismasi', 'Boru hattı çalışması'),
   photo('demiryolu-hattinda-ekskavator', 'Demiryolu hattında çalışan ekskavatörler'),
-  photo('ekskavator-tasima-lowbed', 'Ekskavatörün lowbed ile taşınması'),
+  photo('ekskavator-tasima-lowbed', 'Ekskavatörün tırla taşınması'),
   video('karli-arazide-calisma', 'Karlı arazide çalışma'),
   photo('buyuk-cap-boru-yerlestirme', 'Büyük çaplı beton borunun kazıya yerleştirilmesi'),
   photo('raylarda-ozel-ekskavator', 'Ray üzerinde çalışan ekskavatör'),

@@ -162,6 +162,56 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
   expect(box.width / box.height).toBeCloseTo(1.5, 1);
 });
 
+test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 5), JCB 2 adet, sayı şeridi 5-2-7-2', async ({ page }) => {
+  await page.goto('/makine-kiralama/ekskavator-kiralama/');
+  const fleet = page.locator('[data-fleet]');
+  await expect(fleet).toBeVisible();
+  const rows = fleet.locator('tbody tr');
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText('22 ton');
+  await expect(rows.nth(0).locator('td')).toHaveText('3');
+  await expect(rows.nth(1)).toContainText('30 ton');
+  await expect(rows.nth(1).locator('td')).toHaveText('1');
+  await expect(rows.nth(2)).toContainText('35 ton');
+  await expect(rows.nth(2).locator('td')).toHaveText('1');
+  await expect(fleet.locator('tfoot')).toContainText('Toplam');
+  await expect(fleet.locator('tfoot td')).toHaveText('5');
+  await expect(page.locator('main')).toContainText('22 ile 35 ton arası');
+
+  await page.goto('/makine-kiralama/kiralik-kepce-jcb/');
+  await expect(page.locator('main')).toContainText('Filomuzda 2 adet JCB');
+
+  // Ana sayfa sayı şeridi: sırayla 5 · Paletli ekskavatör, 2 · JCB, 7 · Kamyon, 2 · Tır
+  await page.goto('/');
+  const items = page.locator('.stats .stat');
+  await expect(items).toHaveCount(4);
+  const expected = [
+    ['5', 'Paletli ekskavatör'],
+    ['2', 'JCB'],
+    ['7', 'Kamyon'],
+    ['2', 'Tır'],
+  ];
+  for (let i = 0; i < expected.length; i += 1) {
+    await expect(items.nth(i).locator('.stat-value')).toHaveText(expected[i][0]);
+    await expect(items.nth(i).locator('.stat-label')).toHaveText(expected[i][1]);
+  }
+});
+
+test('onaylı (normal build) sayfalarda "13 ton" ve "lowbed" geçmez', async ({ page, request }) => {
+  const pages = await crawl(page);
+  expect(pages.length).toBeGreaterThan(10);
+  const problems: string[] = [];
+  for (const path of pages) {
+    const html = await (await request.get(path)).text();
+    // Dosya yolları hariç (src/srcset/data-webp/poster... değeri /images/, /videos/ veya /_astro/ içerenler):
+    // görünen metin, alt/aria/title ve meta içerikleri taranır
+    const text = html.replace(/\s[\w:-]+="[^"]*\/(?:images|videos|_astro)\/[^"]*"/gi, '');
+    if (/13\s*ton/i.test(text)) problems.push(`${path}: "13 ton"`);
+    if (/lowbed/i.test(text)) problems.push(`${path}: "lowbed"`);
+  }
+  expect(problems, problems.join('\n')).toEqual([]);
+});
+
 test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerde geçmez', async ({ page, request }) => {
   await page.goto('/');
   const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });

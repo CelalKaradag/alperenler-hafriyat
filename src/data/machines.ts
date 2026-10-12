@@ -7,8 +7,9 @@
  *
  * Firma onayı: kepçe (kazıcı yükleyici), ekskavatör ve hafriyat kamyonu ONAYLI. Kırıcılı ekskavatör
  * ve lowbed ile taşıma henüz teyit edilmedi (`false`). Mini ekskavatör firmada yok: kaldırıldı.
- * Ekskavatör adedi henüz netleşmedi: ADET YAZILMAZ (yalnızca "13 – 35 ton sınıfları"). Metinlerde
- * fiyat, süre, model/marka iddiası veya "en iyi" ifadesi yoktur; eklenmemelidir.
+ * FİLO (müşteri onayı, kesin): 5 paletli ekskavatör (22 ton × 3, 30 ton × 1, 35 ton × 1; daha küçük sınıf YOK), 2 JCB,
+ * 7 kamyon, 2 tır. Marka/model/yıl bilinmiyor: YAZILMAZ. Tırların lowbed olup olmadığı BİLİNMİYOR: onaylı
+ * sayfalarda "lowbed" kelimesi geçmez. Metinlerde fiyat, süre, model/marka iddiası veya "en iyi" ifadesi yoktur; eklenmemelidir.
  */
 import type { IconName } from '../utils/icons';
 import { showDrafts } from './drafts';
@@ -30,6 +31,8 @@ export interface Machine {
   icon: IconName;
   /** Galeri görseli (JPG; aynı adlı .webp varsa <picture> ile önce o) */
   image: string;
+  /** Filo tablosu (müşteri onaylı adetler); yalnızca doğrulanmış makineler için */
+  fleet?: { title: string; rows: Array<{ label: string; count: number }> };
   onaylandi: boolean;
 }
 
@@ -67,6 +70,7 @@ export const machines: Machine[] = [
     detail: [
       'Kazıcı yükleyici, halk arasında kepçe olarak da bilinir; önünde yükleme kovası, arkasında kazı kolu bulunan bir iş makinesidir. Aynı makine hem kazı yapabilir hem de malzemeyi yükleyip yerinden oynatabildiği için küçük ve orta ölçekli işlerde sık tercih edilir.',
       "Malatya’da arsa hazırlığı, hat kazısı ve dolgu gibi işlerde makinenin sahaya girebilmesi, zeminin türü ve işin hacmi hangi makinenin uygun olacağını belirler; bu yüzden iş önce konuşulur.",
+      'Filomuzda 2 adet JCB bulunur.',
     ],
     uses: [
       'Küçük ve orta ölçekli temel veya hendek kazılarında',
@@ -85,12 +89,20 @@ export const machines: Machine[] = [
     title: 'Ekskavatör Kiralama',
     seoName: 'Ekskavatör Kiralama',
     summary:
-      "Derin ve geniş kazılar için paletli ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
+      "Derin ve geniş kazılar için 22 ile 35 ton arası paletli ekskavatörler; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Paletli ekskavatör; uzun kolu ve kovası sayesinde derin ve geniş kazılarda, ağır zeminlerde ve yüksek hacimli işlerde kullanılan temel kazı makinesidir. Kol ucuna kırıcı gibi farklı ataşmanlar takılabildiği için aynı makine farklı işlerde de çalışabilir.',
       "Malatya’da temel kazısı, altyapı hattı, yıkım sonrası hafriyat ve arazi düzleme gibi işlerde ekskavatör sıkça gerekir. Kazı derinliği, zemin ve çıkacak malzemenin miktarı makinenin ve sayısının belirlenmesinde etkilidir.",
-      'Farklı iş büyüklükleri için 13 tondan 35 tona kadar farklı sınıflarda ekskavatör kullanılır; hangi sınıfın uygun olduğu sahaya ve işin kapsamına göre birlikte belirlenir.',
+      'Filomuzda 22 ile 35 ton arası paletli ekskavatörler bulunur; hangi ton sınıfının uygun olduğu sahaya ve işin kapsamına göre birlikte belirlenir.',
     ],
+    fleet: {
+      title: 'Ekskavatör filomuz',
+      rows: [
+        { label: '22 ton paletli ekskavatör', count: 3 },
+        { label: '30 ton paletli ekskavatör', count: 1 },
+        { label: '35 ton paletli ekskavatör', count: 1 },
+      ],
+    },
     uses: [
       'Derin ve geniş temel kazılarında',
       'Altyapı ve kanal hattı kazılarında',
@@ -134,6 +146,7 @@ export const machines: Machine[] = [
     detail: [
       'Hafriyat kamyonu, kazıdan çıkan toprağın, enkazın veya dolgu malzemesinin sahadan taşınması için kullanılan damperli kamyondur. Kazı makinesiyle birlikte çalıştığında malzeme sahada birikmeden uzaklaştırılır.',
       "Malatya’da taşıma işinin planı; sahadan boşaltma noktasına mesafeye, sahaya kamyon girişinin kolaylığına ve malzemenin türüne göre yapılır. Hafriyat toprağı ve molozun ilgili belediyenin izin verdiği alanlara götürülmesi gerekir.",
+      'Filomuzda 7 adet hafriyat kamyonu bulunur.',
     ],
     uses: [
       'Kazıdan çıkan toprağın sahadan taşınmasında',
