@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { stubGoogle, watchErrors } from './helpers';
+import { expectH1BelowHeader, stubGoogle, watchErrors } from './helpers';
 
 // PUBLIC_SHOW_DRAFTS=true build'i (önizleme) üzerinde: taslak sayfalar VAR, ama JSON-LD'de YOK.
 
@@ -105,6 +105,44 @@ test('taslak sayfalar üretilir, tek H1 ve noindex içerir', async ({ page }) =>
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
   }
   expect(errors, `konsol/sayfa hataları:\n${errors.join('\n')}`).toEqual([]);
+});
+
+test('taslak sayfalarda (rehber, fiyat rehberi, taslak hizmet/makine) başlık header\'ın altında kalmaz', async ({
+  page,
+}) => {
+  await expectH1BelowHeader(
+    page,
+    [
+      '/hafriyat-fiyatlari/',
+      '/rehber/',
+      ...GUIDE_SLUGS.map((slug) => `/rehber/${slug}/`),
+      '/hizmetler/hafriyat-ve-temel-kazisi/',
+      '/makine-kiralama/kiricili-ekskavator/',
+      '/makine-kiralama/lowbed-ile-is-makinesi-tasima/',
+    ],
+    [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+      { width: 390, height: 844 },
+    ],
+  );
+});
+
+test('önizleme şeridi masaüstü header\'ı ile çakışmaz (şerit üstte, header hemen altında)', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  for (const path of ['/', '/hakkimizda/']) {
+    await page.goto(path);
+    const bar = (await page.locator('.preview-bar').boundingBox()) as { y: number; height: number };
+    const header = (await page.locator('.site-header').boundingBox()) as { y: number };
+    expect(bar.y).toBe(0);
+    expect(header.y, `${path}: header şeridin altında`).toBeGreaterThanOrEqual(bar.y + bar.height - 0.5);
+    // kaydırınca da şerit üstte sabit kalır, header ile çakışmaz
+    await page.evaluate(() => window.scrollTo(0, 600));
+    const bar2 = (await page.locator('.preview-bar').boundingBox()) as { y: number; height: number };
+    const header2 = (await page.locator('.site-header').boundingBox()) as { y: number };
+    expect(bar2.y).toBe(0);
+    expect(header2.y).toBeGreaterThanOrEqual(bar2.y + bar2.height - 0.5);
+  }
 });
 
 test('önizleme şeridi ve TASLAK rozetleri görünür', async ({ page }) => {

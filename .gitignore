@@ -32,3 +32,4 @@ dist-test-drafts/
 playwright-report/
 test-results/
 screenshots/
+.lighthouseci/

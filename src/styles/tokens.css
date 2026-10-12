@@ -33,7 +33,7 @@
   --radius: 3px;
   --container: 80rem;
   --gutter: clamp(1.25rem, 0.75rem + 2.6vw, 3rem);
-  --header-h: 4.5rem;
+  --header-h: 4.75rem; /* mobil logo kartı 60 px + 2 × 8 px dolgu = 76 px */
   --bar-height: 5rem; /* çubuk (4,5 rem + üst çizgi) + biraz pay; safe-area ayrıca eklenir */
   --focus: var(--text);
 }

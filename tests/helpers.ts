@@ -13,6 +13,35 @@ export async function stubGoogle(page: Page): Promise<void> {
   );
 }
 
+/**
+ * Hero'su olmayan sayfalarda ilk başlığın (h1) üstü, sayfa en üstteyken header'ın ALTINDAN aşağıda olmalı
+ * (başlık header'ın altında/içinde kalmaz). Verilen genişliklerde (ör. 1366, 1920, 390) tüm yollar için denetler.
+ */
+export async function expectH1BelowHeader(
+  page: Page,
+  paths: string[],
+  widths: Array<{ width: number; height: number }>,
+): Promise<void> {
+  const problems: string[] = [];
+  for (const size of widths) {
+    await page.setViewportSize(size);
+    for (const path of paths) {
+      await page.goto(path);
+      const header = await page.locator('.site-header').boundingBox();
+      const h1 = await page.locator('main h1').first().boundingBox();
+      if (!header || !h1) {
+        problems.push(`${path} @${size.width}: header veya h1 ölçülemedi`);
+        continue;
+      }
+      const headerBottom = header.y + header.height;
+      if (h1.y < headerBottom) {
+        problems.push(`${path} @${size.width}: h1 üstü ${h1.y.toFixed(1)} < header altı ${headerBottom.toFixed(1)}`);
+      }
+    }
+  }
+  if (problems.length > 0) throw new Error(`Başlık header'ın altında kalıyor:\n${problems.join('\n')}`);
+}
+
 /** Tüm sayfalar: ana sayfadan taranan iç bağlantılar + bağlantısı olmayan sayfalar (404) */
 export async function sitePages(page: Page): Promise<string[]> {
   const pages = await crawl(page, 150);

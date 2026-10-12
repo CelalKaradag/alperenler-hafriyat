@@ -61,7 +61,7 @@ const heroFont = publicFileExists('/fonts/archivo-latin.woff2') ? '/fonts/archiv
     <!-- Sayfa geçişleri (Astro View Transitions). Hareket azaltma açıkken animasyon yok (global.css). -->
     <ClientRouter />
   </head>
-  <body class:list={[overHero && 'over-hero']}>
+  <body class:list={[overHero && 'over-hero', isPreviewBuild && 'has-preview']}>
     {
       isPreviewBuild && (
         <div class="preview-bar" role="note">

@@ -74,16 +74,11 @@
   height: auto; /* width/height öznitelikleri 3:2 oranı korur (CLS yok) */
 }
 
-/* Header: kart yüksekliği mobilde ≈ 52 px (42 + 2 × 5), masaüstünde ≈ 64 px (54 + 2 × 5) */
+/* Header logo kartı: mobil/tablet (< 84em) ≈ 60 px (50 + 2 × 5). Masaüstü boyutları aşağıdaki
+   "Masaüstü header logosu" bloğunda (sayfa en üstteyken büyük, kaydırınca küçük). Oran 3:2 korunur. */
 .brand-logo--header img {
   width: auto;
-  height: 42px;
-}
-
-@media (min-width: 48em) {
-  .brand-logo--header img {
-    height: 54px;
-  }
+  height: 50px;
 }
 
 /* Çok dar ekranlarda (< 22em) yanındaki yazı gizlenir: header ve hamburger sığsın */
@@ -157,22 +152,137 @@
 }
 
 /* Hero üstünde şeffaf başlangıç: yalnızca JavaScript varken (yoksa header koyu kalır) */
-/* Ana sayfada gövde zemini koyu: header yüksekliği ile geri çekme arasında en küçük boşluk bile açık renkli görünmesin */
+/* Ana sayfada gövde zemini koyu: en küçük boşluk bile açık renkli görünmesin */
 .over-hero {
   background: var(--bg);
-}
-
-.js .over-hero main {
-  margin-top: calc(var(--header-h) * -1);
 }
 
 .js .over-hero .site-header:not(.is-scrolled):not(.is-open) {
   background: transparent;
   box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .js .over-hero .hero {
   padding-top: calc(var(--header-h) + 2rem);
+}
+
+/* < 84em (mobil/tablet): header akışta (sticky) ve hero'nun üstüne geri çekilir; yükseklik = --header-h */
+@media (max-width: 83.99em) {
+  .js .over-hero main {
+    margin-top: calc(var(--header-h) * -1);
+  }
+}
+
+/* Hero'nun en üstünde header okunurluğu için yumuşak koyu geçiş (şerit değil): yukarıdan aşağı .55 → 0, ≈ 160 px */
+.hero-header-fade {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  height: 160px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+/*
+ * MASAÜSTÜ HEADER (≥ 84em): header position:fixed (akıştan çıkar), hiçbir negatif marj yok.
+ *  - Sayfa en üstteyken: kart 88 px (logo 78 px) + üst/alt 14 px dolgu = 116 px (≥ 100em: kart 80 px → 108 px).
+ *    Hero sayfalarında header TAMAMEN şeffaf (arka plan, kenarlık, gölge, blur yok), hero y = 0'dan başlar.
+ *  - .is-scrolled (scrollY > 8): kart 60 px (logo 50 px) + 8 px dolgu = 76 px, koyu grafit + blur; 200 ms geçiş
+ *    (hareket azaltmada yok). Header fixed olduğundan kaydırmada sayfa zıplamaz.
+ *  - Hero'su olmayan sayfalarda header baştan koyudur ve içerik ona çarpmaz: ilk bölüme (page-head, 404) header
+ *    yüksekliği kadar üst dolgu verilir (--header-top-h).
+ *  - Önizleme şeridi (preview-bar) varsa şerit de fixed'dir (2,5 rem) ve header onun hemen altına oturur.
+ * Logo görseline dokunulmaz.
+ */
+@media (min-width: 84em) {
+  :root {
+    --header-h: 4.75rem; /* kaydırılmış header: 60 + 2 × 8 px */
+    --header-top-h: 7.25rem; /* en üstteki header: 88 + 2 × 14 px */
+    --logo-big: 78px;
+    --logo-small: 50px;
+    --header-pad: 14px;
+  }
+
+  .site-header {
+    position: fixed;
+    top: var(--preview-h, 0px);
+    left: 0;
+    right: 0;
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .header-inner {
+    min-height: 0;
+    padding-block: var(--header-pad);
+    transition: padding 0.2s ease;
+  }
+
+  .site-header.is-scrolled {
+    --header-pad: 8px;
+  }
+
+  .brand-logo--header img {
+    height: var(--logo-big);
+    transition: height 0.2s ease;
+  }
+
+  .site-header.is-scrolled .brand-logo--header img {
+    height: var(--logo-small);
+  }
+
+  /* hero y = 0'dan başlar; header üstte durur, hero içeriği header'ın altında kalır */
+  .js .over-hero .hero {
+    padding-top: calc(var(--header-top-h) + 2rem);
+  }
+
+  /* Hero'su olmayan sayfalar: ilk bölüm header yüksekliği kadar aşağıda başlar (başlık header'ın altına girmez) */
+  /* `main >` ile özgüllük artırılır: page-head.css (header.css'ten SONRA yüklenir) `.page-head { padding-block }`
+     kuralı aksi halde bu üst dolguyu ezerdi (örn. /iletisim/: başlık header'ın hemen altında/içinde kalıyordu) */
+  main > .page-head {
+    padding-top: calc(var(--header-top-h) + clamp(1rem, 2vw, 1.75rem));
+  }
+
+  main > .not-found {
+    padding-top: calc(var(--header-top-h) + clamp(1rem, 2vw, 1.75rem));
+  }
+
+  /* Önizleme şeridi: sabit, header'ın üstünde; gövde şerit kadar aşağı itilir */
+  .has-preview {
+    --preview-h: 2.5rem;
+    padding-top: var(--preview-h);
+  }
+
+  .has-preview .preview-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: var(--preview-h);
+    padding-block: 0;
+    line-height: var(--preview-h);
+  }
+}
+
+/* 100em ve üstü: header telefonu da görünür; sığması için büyük kart 80 px (logo 70 px) */
+@media (min-width: 100em) {
+  :root {
+    --header-top-h: 6.75rem; /* 80 + 2 × 14 px */
+    --logo-big: 70px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .header-inner,
+  .brand-logo--header,
+  .brand-logo--header img {
+    transition: none;
+  }
 }
 
 /*

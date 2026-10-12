@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { PHONE_HREF, WA_BASE, crawl, internalLinks, stubGoogle, watchErrors } from './helpers';
+import {
+  PHONE_HREF,
+  WA_BASE,
+  crawl,
+  expectH1BelowHeader,
+  internalLinks,
+  stubGoogle,
+  watchErrors,
+} from './helpers';
 
 // Normal build (taslak bayrağı KAPALI) üzerinde duman testleri.
 
@@ -427,15 +435,37 @@ test.describe('masaüstü header tek satır', () => {
     { width: 1600, height: 900 },
     { width: 1920, height: 1080 },
   ]) {
-    test(`${size.width}x${size.height}: header <= 96px, menü öğeleri aynı satırda, üstte boşluk yok`, async ({
+    test(`${size.width}x${size.height}: büyük logolu header tek satır, kaydırınca küçülür, üstte boşluk yok`, async ({
       page,
     }) => {
       await page.setViewportSize(size);
       await page.goto('/');
 
-      const header = await page.locator('.site-header').boundingBox();
+      // Sayfa en üstteyken büyük logo kartı: 88 px (100em'den itibaren 80 px) + 2 × 14 px dolgu
+      const maxTop = size.width >= 1600 ? 108.5 : 116.5;
+      const header = (await page.locator('.site-header').boundingBox()) as { y: number; height: number };
       expect(header, 'header ölçülemedi').not.toBeNull();
-      expect((header as { height: number }).height).toBeLessThanOrEqual(96);
+      expect(header.height).toBeLessThanOrEqual(maxTop);
+      expect(header.y, 'header sayfanın en üstünde (fixed)').toBe(0);
+      const card = (await page.locator('.site-header .logo-card').boundingBox()) as { y: number; height: number };
+      expect(card.height, 'üstteki logo kartı yüksekliği').toBeGreaterThanOrEqual(79);
+      // Logo kartı header sınırları içinde: taşmaz, kesilmez
+      expect(card.y, 'kart üstü header içinde').toBeGreaterThanOrEqual(header.y);
+      expect(card.y + card.height, 'kart altı header içinde').toBeLessThanOrEqual(header.y + header.height);
+      // Hero sayfasında header en üstteyken TAMAMEN şeffaf: arka plan, gölge, blur yok
+      const topStyle = await page.locator('.site-header').evaluate((el) => {
+        const css = getComputedStyle(el);
+        return { bg: css.backgroundColor, shadow: css.boxShadow, blur: css.backdropFilter };
+      });
+      expect(topStyle.bg, 'header arka planı şeffaf').toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+      expect(topStyle.shadow).toBe('none');
+      expect(topStyle.blur).toBe('none');
+      // Menü ve "Hemen Ara" logoyla dikeyde ortalı (±6 px)
+      const cardMid = card.y + card.height / 2;
+      const callBox = (await page.locator('.header-call').boundingBox()) as { y: number; height: number };
+      expect(Math.abs(callBox.y + callBox.height / 2 - cardMid)).toBeLessThanOrEqual(6);
+      const navBox = (await page.locator('#site-nav').boundingBox()) as { y: number; height: number };
+      expect(Math.abs(navBox.y + navBox.height / 2 - cardMid)).toBeLessThanOrEqual(6);
 
       // Görünür menü öğelerinin üst konumları eşit olmalı (tek satır)
       const tops = await page.$$eval('#site-nav a', (anchors) =>
@@ -455,11 +485,56 @@ test.describe('masaüstü header tek satır', () => {
       const call = await page.locator('.header-call').boundingBox();
       expect((call as { height: number }).height).toBeLessThanOrEqual(56);
 
-      // Hero, sayfanın en üstünden (y = 0) başlar: üstte açık renkli boş şerit yok
+      // Hero, sayfanın en üstünden (y = 0) başlar: header onun üstünde durur, hiçbir şerit yok
       const hero = await page.locator('.hero').boundingBox();
-      expect((hero as { y: number }).y).toBeLessThanOrEqual(1);
+      expect((hero as { y: number }).y).toBeLessThanOrEqual(0.5);
+
+      // Aşağı kaydırınca kart ≈ 60 px'e küçülür, header 76 px olur, hâlâ tek satır
+      await page.evaluate(() => window.scrollTo(0, 400));
+      await expect
+        .poll(async () => ((await page.locator('.site-header .logo-card').boundingBox()) as { height: number }).height)
+        .toBeLessThanOrEqual(61);
+      expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(77);
+      // Kaydırınca koyu grafit arka plan
+      await expect
+        .poll(() => page.locator('.site-header').evaluate((el) => getComputedStyle(el).backgroundColor))
+        .not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+      const topsAfter = await page.$$eval('#site-nav a', (anchors) =>
+        anchors
+          .filter((anchor) => (anchor as HTMLElement).offsetParent !== null)
+          .map((anchor) => Math.round(anchor.getBoundingClientRect().top)),
+      );
+      expect(new Set(topsAfter).size, `kaydırınca menü üst konumları: ${topsAfter.join(', ')}`).toBe(1);
     });
   }
+
+  test("iç sayfalarda (hero yok) başlık header'ın altında kalmaz (normal build: tüm onaylı sayfalar)", async ({ page }) => {
+    await expectH1BelowHeader(
+      page,
+      [
+        '/hakkimizda/',
+        '/iletisim/',
+        '/teklif/',
+        '/galeri/',
+        '/gizlilik/',
+        '/404.html',
+        '/hizmetler/',
+        '/hizmetler/operatorlu-is-makinesi-kiralama/',
+        '/hizmetler/hafriyat-kamyonu-ve-moloz-tasima/',
+        '/makine-kiralama/',
+        '/makine-kiralama/ekskavator-kiralama/',
+        '/makine-kiralama/kiralik-kepce-jcb/',
+        '/makine-kiralama/hafriyat-kamyonu-kiralama/',
+        '/bolgeler/',
+        '/bolgeler/yesilyurt/',
+      ],
+      [
+        { width: 1366, height: 768 },
+        { width: 1920, height: 1080 },
+        { width: 390, height: 844 },
+      ],
+    );
+  });
 
   test('1024 ve 1280: hamburger, tek satır header; 1344 satır içi menü', async ({ page }) => {
     for (const width of [1024, 1280]) {
@@ -472,6 +547,6 @@ test.describe('masaüstü header tek satır', () => {
     await page.setViewportSize({ width: 1344, height: 800 });
     await page.goto('/');
     await expect(page.locator('.nav-toggle')).toBeHidden();
-    expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(96);
+    expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(116.5);
   });
 });

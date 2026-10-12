@@ -126,6 +126,8 @@ const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true
   {hasMedia && <div class="hero-overlay" aria-hidden="true" />}
   {hasMedia && <div class="hero-vignette" aria-hidden="true" />}
   {!hasMedia && <TopoArt />}
+  {/* Header okunurluğu için hero'nun en üstünde yumuşak koyu geçiş (şerit değil; header şeffafken) */}
+  <div class="hero-header-fade" aria-hidden="true"></div>
 
   <div class="container hero-inner">
     <p class="eyebrow">Malatya · Yeşilyurt</p>
