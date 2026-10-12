@@ -40,6 +40,11 @@
   display: none;
 }
 
+/* JS açıkken çubuk ilk boyamadan itibaren yer kaplasın (gecikmeli init kaymaya yol açmasın) */
+html.js .gallery-filters[hidden] {
+  display: flex;
+}
+
 .gallery-filters button {
   display: inline-flex;
   align-items: center;

@@ -141,13 +141,21 @@ for (const width of WIDTHS) {
         for (const img of Array.from(document.images)) {
           if (img.getClientRects().length === 0) continue; // görünmeyen (kapalı lightbox vb.)
           img.scrollIntoView({ block: 'center' });
-          try {
-            await img.decode();
-          } catch {
-            bad.push(img.currentSrc || img.src || '(src yok)');
-            continue;
+          const src = img.currentSrc || img.src || '(src yok)';
+          let ok = false;
+          // decode() sayfa betikleri görseli değiştirirse (carousel/lazy srcset) EncodingError ile iptal
+          // olabilir; bu kırık görsel demek değildir. Birkaç kez bekleyip yeniden dene.
+          for (let attempt = 0; attempt < 4 && !ok; attempt += 1) {
+            if (!img.isConnected) break;
+            try {
+              await img.decode();
+            } catch {
+              await new Promise((resolve) => setTimeout(resolve, 400));
+            }
+            ok = img.complete && img.naturalWidth > 0;
           }
-          if (!(img.complete && img.naturalWidth > 0)) bad.push(img.currentSrc || img.src || '(src yok)');
+          if (!img.isConnected) continue; // betik görseli DOM'dan kaldırdı/yeniledi
+          if (!ok) bad.push(src);
         }
         return bad;
       });
