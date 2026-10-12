@@ -16,6 +16,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "playwright test",
+    "test:full": "node scripts/test-full.mjs",
     "lighthouse": "lhci autorun"
   },
   "dependencies": {

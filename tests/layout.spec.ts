@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { collectPages, scrollThrough, stubGoogle, watchConsoleAndNetwork } from './helpers';
+import { FULL, collectPages, scrollThrough, stubGoogle, watchConsoleAndNetwork } from './helpers';
 
 // Otomatik taşma/kırılma taraması: her sayfa × genişlik. Bulgular sayfa/genişlik/öğe ile listelenir.
 
 test.setTimeout(600_000);
 test.use({ reducedMotion: 'reduce' });
 
-const WIDTHS = [360, 390, 768, 1024, 1366, 1920];
+// Hızlı modda yalnız 390 ve 1366; tam modda (QA_MODE=full) 6 genişlik
+const WIDTHS = FULL ? [360, 390, 768, 1024, 1366, 1920] : [390, 1366];
 let pages: string[] = [];
 
 test.beforeAll(async ({ browser }, testInfo) => {

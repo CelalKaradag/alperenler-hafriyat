@@ -1,0 +1,82 @@
+name: Full QA
+
+# TAM kalite testi: yalnızca elle (Actions → Full QA → Run workflow) ve haftada bir (pazartesi 03:00 UTC).
+# İçerik: iPhone 13 (WebKit) dahil 3 smoke projesi, tüm sayfalarda a11y, layout 6 genişlik,
+# görsel arşiv (Chromium 6 genişlik; WebKit yalnız 390). 4 parçaya bölünür (sharding).
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+jobs:
+  full-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    env:
+      QA_MODE: full
+      SKIP_BUILD: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.13.0'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run prepare:assets
+
+      # İki test sitesi bu parça için bir kez build edilir
+      - run: node scripts/serve-for-tests.mjs --build-only
+        env:
+          SKIP_BUILD: '0'
+
+      - run: npx playwright install --with-deps chromium webkit
+
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
+
+      # Her parçanın ekran görüntüleri ve raporu ayrı artifact; birleşik "screenshots" sonraki işte
+      - name: Parça raporunu yükle
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Parça ekran görüntülerini yükle
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-part-${{ matrix.shard }}
+          path: screenshots/
+          retention-days: 3
+          if-no-files-found: ignore
+
+  merge-screenshots:
+    needs: full-qa
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      # Parçaları tek klasörde birleştirip TEK "screenshots" artifact'ı olarak yükler
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: screenshots-part-*
+          path: screenshots
+          merge-multiple: true
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 14
+          if-no-files-found: ignore

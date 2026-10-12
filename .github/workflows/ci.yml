@@ -1,6 +1,8 @@
 name: CI
 
-# Her push ve pull request'te: tip denetimi, build ve Playwright duman testleri.
+# Her push ve pull request'te HIZLI kalite testi: tip denetimi + Playwright (masaüstü Chromium 1366×768
+# ve Pixel 7). Görsel arşiv, WebKit (iPhone 13) ve tüm sayfalarda a11y/layout "Full QA" workflow'unda
+# (.github/workflows/full-qa.yml; elle ya da haftalık).
 on:
   push:
   pull_request:
@@ -8,7 +10,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
 
@@ -22,24 +24,19 @@ jobs:
 
       - run: npm run check
 
-      # prebuild: font kırpma, topo SVG'leri ve duyarlı görseller (prepare:assets) burada da çalışır
-      - run: npm run build
+      # Font kırpma, topo SVG'leri ve duyarlı görseller (build'ler için gerekli)
+      - run: npm run prepare:assets
 
-      # chromium: masaüstü + Pixel 7; webkit: iPhone 13 (iOS Safari motoru)
-      - run: npx playwright install --with-deps chromium webkit
+      # İki test sitesi (normal + PUBLIC_SHOW_DRAFTS=true) testlerden ÖNCE bir kez build edilir
+      - run: node scripts/serve-for-tests.mjs --build-only
 
+      # Hızlı modda yalnız Chromium gerekir (WebKit yalnızca Full QA'da)
+      - run: npx playwright install --with-deps chromium
+
+      # SKIP_BUILD: testler yeniden build etmez, hazır dist-test* klasörlerini önizler. 2 işçi, fullyParallel.
       - run: npm test
-
-      # Görsel kontrol arşivi: her sayfa × 6 genişlik tam sayfa ekran görüntüsü (karşılaştırma yok).
-      # Test geçse de geçmese de yüklenir; tek artifact (zip) olarak indirilir.
-      - name: Ekran görüntülerini yükle
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: screenshots
-          path: screenshots/
-          retention-days: 14
-          if-no-files-found: ignore
+        env:
+          SKIP_BUILD: '1'
 
       # Test başarısız olursa rapor ve izler indirilebilir olsun
       - name: Test raporunu yükle

@@ -1,5 +1,8 @@
 import type { Browser, Page } from '@playwright/test';
 
+/** Tam kalite modu (QA_MODE=full): hızlı modda a11y/layout daha az sayfa/genişlikle koşar, visual hiç koşmaz */
+export const FULL = process.env.QA_MODE === 'full';
+
 export const PHONE_HREF = 'tel:+905392527058';
 export const WA_BASE = 'https://wa.me/905392527058';
 
@@ -31,9 +34,10 @@ export async function collectPages(browser: Browser, baseURL: string): Promise<s
 export async function scrollThrough(page: Page): Promise<void> {
   await page.evaluate(async () => {
     const step = Math.max(300, window.innerHeight - 100);
+    const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
       window.scrollTo(0, y);
-      await new Promise((resolve) => setTimeout(resolve, 60));
+      await frame(); // gözlemciler (lazy görsel) çalışsın; sabit bekleme yok
     }
     window.scrollTo(0, 0);
   });

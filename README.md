@@ -182,12 +182,19 @@ Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştı
 
 ## Kalite kontrolleri
 
-`npm test` (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları çalıştırır; ilk kez `npx playwright install chromium webkit`:
+Test süiti ikiye ayrılır (`QA_MODE`, [playwright.config.ts](playwright.config.ts)):
+- **Hızlı (varsayılan: `npm test`, CI'da her push/PR, ≤ 15 dk):** yalnız Chromium masaüstü 1366×768 + Pixel 7; `smoke` ve `drafts` tam; `a11y` normal build'de `/`, `/hizmetler/`, `/galeri/`, `/iletisim/`, `/teklif/` ve taslaklı build'de bir bölge + bir rehber; `layout` yalnız 390 ve 1366 px; `visual` **çalışmaz**. CI'da iki test sitesi testlerden önce bir kez build edilir (`node scripts/serve-for-tests.mjs --build-only`), testler yeniden build etmez (`SKIP_BUILD=1`); 2 işçi, `fullyParallel`. Lighthouse ayrı ve paralel bir iştir.
+- **Tam (`QA_MODE=full`; yerelde `npm run test:full`):** iPhone 13 (WebKit) dahil 3 smoke projesi, tüm sayfalarda a11y, layout 6 genişlik, `visual.spec.ts` (Chromium 6 genişlik; WebKit yalnız 390).
+
+### Tam kalite testini nasıl başlatırım
+GitHub'da depoyu açın → üstte **Actions** → soldan **Full QA** → sağdaki **Run workflow** düğmesi → **Run workflow**. 4 parçaya bölünür (her biri ayrı çalışır, en çok 45 dk). Bitince çalıştırmanın sayfasında **Artifacts**: `screenshots` (birleşik tüm ekran görüntüleri, tek zip), `screenshots-part-N` ve `playwright-report-N` (parça başına rapor). Aynı iş her pazartesi 03:00 UTC'de kendiliğinden de çalışır.
+
+Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder; ilk kez `npx playwright install chromium webkit` (WebKit yalnızca tam modda gerekir). Aşağıdaki maddelerden `iPhone 13`, `a11y`/`layout` kapsamı ve `visual` yukarıdaki hızlı/tam ayrımına göre koşar:
 - **Tarayıcı kapsamı** ([playwright.config.ts](playwright.config.ts)): `smoke.spec.ts` üç projede koşar: masaüstü Chromium 1366×768, **iPhone 13 (WebKit = iOS Safari motoru)** ve **Pixel 7 (Chromium)**. Masaüstüne özel testler (header, yüzen düğme) mobil projelerde atlanır.
 - **Erişilebilirlik** (`a11y.spec.ts`, `@axe-core/playwright` 4.13.0): her iki build'de tüm sayfalar, 1366 ve 390 px genişlikte axe taraması (WCAG 2.0/2.1 A-AA + best-practice). `serious` ve `critical` ihlal testi **başarısız** eder; diğerleri konsola uyarı olarak yazılır.
 - **Yerleşim** (`layout.spec.ts`, 360/390/768/1024/1366/1920 px, her iki build, tüm sayfalar): yatay kaydırma yok; görünür öğe ekran dışına taşmıyor (kaydırılabilir/kırpan kapsayıcı içindekiler ve `aria-hidden` dekor hariç); metin kapsayıcısından taşmıyor (`nowrap` hariç); tıklanabilir öğeler (mobil alt çubuk ve yüzen düğme dahil) üst üste binmiyor; görseller yüklenmiş, kırık görsel yok; konsolda hata/uyarı ve 4xx/5xx ağ isteği yok (Google harita sahte).
 - **iOS/mobil** (`smoke.spec.ts`): hero videosu `muted` + `playsinline`; `play()` reddedilince (düşük güç modu benzetimi) video görünmez, poster kalır; mobilde butonlar/alt menü/footer bağlantıları ≥ 44 px; sihirbaz alanına odaklanınca alt çubuk gizlenir (klavye alanı örtmez). Yükseklikler `vh` yerine `svh/dvh` (adres çubuğu zıplamasın).
-- **Ekran görüntüleri** (`visual.spec.ts`): her sayfanın tam sayfa görüntüsü, 6 genişlikte, animasyonlar kapalı (`reducedMotion`), videolar duraklatılmış, harita sahte. **Karşılaştırma yapılmaz**, yalnızca `screenshots/<proje>/<genişlik>/<sayfa>.png` olarak kaydedilir. İndirmek için: GitHub → **Actions** → ilgili çalıştırma → sayfa altındaki **Artifacts** → `screenshots` (tek zip). Yerelde `screenshots/` klasörüne yazılır (git'e girmez). `npx playwright test --project=visual-drafts` ile yalnızca bunu alabilirsiniz.
+- **Ekran görüntüleri** (`visual.spec.ts`): her sayfanın tam sayfa görüntüsü, 6 genişlikte, animasyonlar kapalı (`reducedMotion`), videolar duraklatılmış, harita sahte. **Karşılaştırma yapılmaz**, yalnızca `screenshots/<proje>/<genişlik>/<sayfa>.png` olarak kaydedilir. **Yalnızca tam modda (Full QA workflow'u) çalışır**; indirmek için: GitHub → **Actions** → **Full QA** çalıştırması → sayfa altındaki **Artifacts** → `screenshots` (tek zip). Yerelde `screenshots/` klasörüne yazılır (git'e girmez). `npx playwright test --project=visual-drafts` ile yalnızca bunu alabilirsiniz.
 
 ## GitHub Actions (CI)
 
