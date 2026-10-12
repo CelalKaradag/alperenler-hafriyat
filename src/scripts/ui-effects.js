@@ -84,6 +84,7 @@ export function initUiEffects() {
           input.style.opacity = '0';
           document.body.appendChild(input);
           input.select();
+          /** Eski (deprecated) API: yalnızca navigator.clipboard yokken/izin verilmediğinde bilerek kullanılan yedek. */
           ok = document.execCommand('copy');
           input.remove();
         } catch {

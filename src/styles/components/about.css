@@ -1,0 +1,96 @@
+/* ---------- Biz kimiz ---------- */
+
+.about {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.about > * {
+  min-width: 0;
+}
+
+.about-copy {
+  max-width: 40rem;
+}
+
+.about-media {
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.about-media picture,
+.about-media img {
+  display: block;
+  width: 100%;
+  height: auto; /* width/height öznitelikleri oranı korur (CLS yok) */
+}
+
+/* Hakkımızda sayfası: metin + dikey fotoğraf */
+.about-page {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.about-page > * {
+  min-width: 0;
+}
+
+@media (min-width: 56em) {
+  .about-page--photo {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: 4.5rem;
+  }
+}
+
+/* Fotoğraf yokken: dekoratif koyu panel (topo deseni + büyük logo işareti + etiket).
+   İletişim bilgisi, telefon veya düğme YOK. */
+.about-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--on-dark);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius);
+}
+
+.about-panel > :not(.topo-art) {
+  position: relative;
+  z-index: 1;
+}
+
+.about-panel-mark {
+  width: 7.5rem;
+  height: 7.5rem;
+  color: var(--accent);
+}
+
+.about-panel-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-align: center;
+  color: var(--on-dark-muted);
+}
+
+@media (min-width: 56em) {
+  .about {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
+  }
+
+  .about-panel {
+    aspect-ratio: 4 / 5;
+  }
+}
+

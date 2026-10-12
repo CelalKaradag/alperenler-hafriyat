@@ -1,0 +1,57 @@
+/* ---------- Fiyat etkenleri listesi (ana sayfa fiyat + sihirbaz bölümü, /teklif) ---------- */
+
+.factor-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line-dark);
+}
+
+.factor-list li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.factor-list .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--accent);
+}
+
+/* ---------- Ana sayfa: fiyat etkenleri + teklif sihirbazı (tek bölüm) ---------- */
+
+.section-head .lead {
+  margin: 1.25rem 0 0;
+}
+
+.price-wizard {
+  display: grid;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.price-wizard > * {
+  min-width: 0;
+}
+
+.price-note {
+  margin: 1.25rem 0 0;
+  max-width: 30rem;
+  color: var(--text-muted);
+}
+
+/* açık zeminde kart ayrışsın */
+.section-light .wizard,
+.section-paper .wizard {
+  box-shadow: 0 10px 30px rgba(22, 24, 27, 0.08);
+}
+
+@media (min-width: 56em) {
+  .price-wizard {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 4rem;
+  }
+}
+

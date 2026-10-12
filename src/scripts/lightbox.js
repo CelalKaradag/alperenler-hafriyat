@@ -64,10 +64,23 @@ export function initLightbox() {
     } else {
       video.hidden = true;
       picture.hidden = false;
-      if (data.webp) {
+      // Tam boy görünüm: duyarlı türevler varsa srcset + sizes=100vw (en uygun boyut iner)
+      if (data.srcsetWebp) {
+        source.srcset = data.srcsetWebp;
+        source.sizes = '100vw';
+      } else if (data.webp) {
         source.srcset = data.webp;
+        source.removeAttribute('sizes');
       } else {
         source.removeAttribute('srcset');
+        source.removeAttribute('sizes');
+      }
+      if (data.srcsetJpg) {
+        image.srcset = data.srcsetJpg;
+        image.sizes = '100vw';
+      } else {
+        image.removeAttribute('srcset');
+        image.removeAttribute('sizes');
       }
       image.src = data.src;
       image.alt = data.alt || '';

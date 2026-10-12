@@ -8,4 +8,6 @@ export default defineConfig({
   // (site.publish.indexable: false).
   site: 'https://alperenler-hafriyat.netlify.app',
   output: 'static',
+  // Testler (tests/) normal ve taslaklı iki ayrı build alır; çıktı klasörü ortam değişkeniyle ayrılır.
+  outDir: process.env.ASTRO_OUT_DIR || 'dist',
 });

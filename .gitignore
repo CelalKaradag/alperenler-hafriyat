@@ -25,3 +25,9 @@ Thumbs.db
 *.swp
 
 /AlperenlerHafriyat/
+
+# test çıktıları (Playwright) ve test build klasörleri
+dist-test/
+dist-test-drafts/
+playwright-report/
+test-results/

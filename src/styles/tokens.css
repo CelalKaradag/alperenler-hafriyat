@@ -1,0 +1,46 @@
+/* ---------- Tasarım belirteçleri ---------- */
+
+:root {
+  /* koyu */
+  --bg: #14161a; /* grafit zemin */
+  --surface: #1c1f24; /* koyu yüzey */
+  --surface-2: #252931;
+  --line-dark: rgba(255, 255, 255, 0.1);
+  --on-dark: #f3f1ed;
+  --on-dark-muted: #b6bbc2; /* #14161a / #1c1f24 üzerinde AA */
+
+  /* açık (beton / kum) */
+  --sand: #efebe4;
+  --sand-2: #e6e1d8;
+  --card: #f8f6f2;
+  --text: #16181b;
+  --text-muted: #565b62; /* #efebe4 üzerinde AA */
+  --line-light: rgba(22, 24, 27, 0.14);
+
+  /* vurgu: yalnızca buton, ince çizgi, numara, küçük etiket */
+  --accent: #f5b400;
+  --accent-hover: #ffc72e;
+
+  --font-display: 'Archivo Variable', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --fs-h1: clamp(2.25rem, 1.3rem + 4.8vw, 5.25rem);
+  --fs-h2: clamp(1.9rem, 1.3rem + 2.7vw, 3.25rem);
+  --fs-h3: clamp(1.15rem, 1.05rem + 0.5vw, 1.45rem);
+  --fs-lead: clamp(1.08rem, 1rem + 0.45vw, 1.3rem);
+
+  --space-section: clamp(3.5rem, 2.25rem + 5.25vw, 6.75rem);
+  --radius: 3px;
+  --container: 80rem;
+  --gutter: clamp(1.25rem, 0.75rem + 2.6vw, 3rem);
+  --header-h: 4.5rem;
+  --bar-height: 5rem; /* çubuk (4,5 rem + üst çizgi) + biraz pay; safe-area ayrıca eklenir */
+  --focus: var(--text);
+}
+
+@media (min-width: 48em) {
+  :root {
+    --header-h: 5rem;
+  }
+}
+

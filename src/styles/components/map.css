@@ -1,0 +1,402 @@
+/* ---------- Harita şeridi (tam genişlik) + yüzen iletişim kartı ---------- */
+
+:root {
+  /* Google haritasını koyu temaya uydurur. Beğenilmezse `--map-filter: none;` yapın. */
+  --map-filter: grayscale(1) invert(0.92) contrast(0.92);
+  --map-card-w: 23.75rem; /* yüzen kartın genişliği (~380 px) */
+}
+
+.map-band {
+  background: var(--bg);
+  color: var(--on-dark);
+  border-block: 1px solid var(--line-dark);
+  --focus: var(--accent);
+}
+
+.map-band-stage {
+  position: relative;
+  /* Masaüstünde/tablette haritanın ve iğnenin ortalanacağı serbest alanın sol kenarı:
+     container sol kenarı + kart genişliği + boşluk. (% = şeridin genişliği) */
+  --map-shift: 0px;
+}
+
+@media (min-width: 48em) {
+  .map-band-stage {
+    --map-shift: calc(
+      max(0px, (100% - var(--container)) / 2) + var(--gutter) + var(--map-card-w) + 1.5rem
+    );
+  }
+
+  /* kart okunurluğu için sol kenara çok hafif koyu degrade; sağ taraf temiz */
+  .map-band-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(90deg, rgba(20, 22, 26, 0.55) 0%, rgba(20, 22, 26, 0) 55%);
+    pointer-events: none;
+  }
+}
+
+.map-card {
+  position: relative;
+  overflow: hidden;
+  min-height: var(--map-h, 260px);
+  background: var(--surface);
+  --map-h: 260px;
+}
+
+@media (min-width: 48em) {
+  .map-card {
+    --map-h: 380px;
+  }
+}
+
+@media (min-width: 64em) {
+  .map-card {
+    --map-h: 440px;
+  }
+}
+
+.map-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.map-frame {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  border: 0;
+  filter: var(--map-filter);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Haritanın görünen merkezi serbest alanın ortasına kayar: iframe sağa doğru uzatılır */
+@media (min-width: 48em) {
+  .map-frame {
+    width: calc(100% + var(--map-shift));
+  }
+}
+
+.map-card[data-state='loaded'] .map-frame {
+  opacity: 1;
+}
+
+/* Bekleme ekranı: topo deseni + nabız atan iğne (serbest alanın ortasında) */
+.map-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--map-h, 260px);
+  padding: 1rem;
+  background: var(--surface);
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+}
+
+@media (min-width: 48em) {
+  .map-stage {
+    padding-left: var(--map-shift);
+  }
+}
+
+.map-card[data-state='loaded'] .map-stage {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.map-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.map-pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--accent);
+}
+
+.map-pin svg {
+  position: relative;
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.map-pulse {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: map-pulse 2.4s ease-out infinite;
+}
+
+@keyframes map-pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+.map-show[hidden] {
+  display: none;
+}
+
+/* Koruma katmanı: yalnızca harita yüklüyken; iframe'in üstünü kaplar (pin ve iletişim kartı üstte) */
+.map-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.map-shield[hidden] {
+  display: none;
+}
+
+.map-card[data-state='loaded'] .map-shield:not([hidden]) {
+  display: block;
+}
+
+.map-shield:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -6px;
+}
+
+/* "Haritayı kullanmak için tıklayın/dokunun" etiketi: iğnenin altında, serbest alanın ortasında */
+.map-hint {
+  position: absolute;
+  left: calc(50% + var(--map-shift, 0px) / 2);
+  top: calc(50% + 1.6rem);
+  padding: 0.35rem 0.9rem;
+  background: rgba(20, 22, 26, 0.82);
+  color: var(--on-dark);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.map-hint-touch {
+  display: none;
+}
+
+/* Fare: üzerine gelince veya klavye odağında */
+@media (hover: hover) and (pointer: fine) {
+  .map-shield:hover .map-hint,
+  .map-shield:focus-visible .map-hint {
+    opacity: 1;
+  }
+}
+
+/* Dokunmatik: etiket katman varken hep görünür, metin "dokunun" */
+@media (hover: none), (pointer: coarse) {
+  .map-hint {
+    opacity: 1;
+  }
+
+  .map-hint-mouse {
+    display: none;
+  }
+
+  .map-hint-touch {
+    display: inline;
+  }
+}
+
+/* Kendi iğnemiz (yalnızca mapCoords varken): ucu (SVG'de y=22/24) serbest alanın tam merkezinde */
+.map-center-pin {
+  position: absolute;
+  left: calc(50% + var(--map-shift, 0px) / 2);
+  top: 50%;
+  z-index: 3;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-left: -1.375rem;
+  margin-top: calc(-2.75rem * 22 / 24);
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.55));
+  transition: opacity 0.4s ease;
+}
+
+.map-center-pin svg {
+  width: 100%;
+  height: 100%;
+}
+
+.map-card[data-state='loaded'] .map-center-pin {
+  opacity: 1;
+}
+
+/* Yüzen iletişim kartı: masaüstü/tablette haritanın üstünde, container'ın sol kenarına hizalı */
+.map-band-overlay {
+  position: relative;
+  z-index: 4;
+  padding-block: 0;
+}
+
+@media (min-width: 48em) {
+  .map-band-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none; /* kartın dışındaki harita alanı tıklanabilir kalır */
+  }
+}
+
+.map-info {
+  padding: 1.5rem 0 0.5rem;
+  color: var(--on-dark);
+}
+
+@media (min-width: 48em) {
+  .map-info {
+    width: var(--map-card-w);
+    max-width: 100%;
+    padding: 1.5rem;
+    background: rgba(20, 22, 26, 0.96);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--radius);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .map-info {
+      background: rgba(20, 22, 26, 0.9);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+  }
+}
+
+.map-info .eyebrow {
+  margin-bottom: 0.9rem;
+}
+
+.map-info-name {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.map-info address {
+  margin: 0;
+  color: var(--on-dark-muted);
+  line-height: 1.5;
+}
+
+.map-info-divider {
+  height: 1px;
+  margin: 1.1rem 0;
+  background: var(--line-dark);
+}
+
+.map-info-phone {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: clamp(1.45rem, 7.4vw, 1.9rem);
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.map-info-phone a {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 3px;
+  padding-bottom: 0.08em;
+  transition: background-size 0.3s ease;
+}
+
+.map-info-phone a:hover,
+.map-info-phone a:focus-visible {
+  background-size: 100% 3px;
+}
+
+.map-info-wa {
+  display: block;
+  margin: 0 0 1.1rem;
+}
+
+.map-info-wa a {
+  font-weight: 600;
+}
+
+.map-info-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.map-info-actions .btn {
+  min-height: 2.9rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 48em) {
+  .map-info-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .map-info-actions .btn {
+    flex: 1 1 auto;
+    padding-inline: 0.7rem;
+    font-size: 0.9rem;
+  }
+}
+
+.map-band-note {
+  display: flex;
+  justify-content: flex-end;
+  padding-block: 0.5rem;
+}
+
+.map-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--on-dark-muted);
+}
+

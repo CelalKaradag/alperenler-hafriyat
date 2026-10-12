@@ -1,0 +1,27 @@
+/* Hizmet detay başlık bölümü: arka planda hizmet görseli + koyu katman (metin okunur kalır) */
+.page-head-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.page-head-media picture,
+.page-head-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.page-head-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 22, 26, 0.94) 0%,
+    rgba(20, 22, 26, 0.84) 55%,
+    rgba(20, 22, 26, 0.7) 100%
+  );
+}
+

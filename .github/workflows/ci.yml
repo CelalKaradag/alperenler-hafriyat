@@ -1,0 +1,41 @@
+name: CI
+
+# Her push ve pull request'te: tip denetimi, build ve Playwright duman testleri.
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.13.0'
+          cache: npm
+
+      # package-lock.json güncel olmalı (bağımlılık eklenince yerelde `npm install` çalıştırıp lock dosyasını da kaydedin)
+      - run: npm ci
+
+      - run: npm run check
+
+      # prebuild: font kırpma, topo SVG'leri ve duyarlı görseller (prepare:assets) burada da çalışır
+      - run: npm run build
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm test
+
+      # Test başarısız olursa rapor ve izler indirilebilir olsun
+      - name: Test raporunu yükle
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

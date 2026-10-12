@@ -1,0 +1,137 @@
+/* ---------- Galeri (oran korumalı masonry) + lightbox ---------- */
+
+/* CSS sütunları: dikey ve yatay görseller karışık olsa da boşluk bırakmadan, oranlar korunarak dizilir */
+.gallery-grid {
+  columns: 1;
+  column-gap: 1.25rem;
+  margin-bottom: -1.25rem; /* son öğelerin alt marjını götürür; bağlantıyla boşluk .gallery-more'dan gelir */
+}
+
+@media (min-width: 40em) {
+  .gallery-grid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 64em) {
+  .gallery-grid {
+    columns: 3;
+  }
+}
+
+.gallery-item {
+  margin: 0 0 1.25rem;
+  break-inside: avoid;
+}
+
+.gallery-item[hidden] {
+  display: none;
+}
+
+/* /galeri/ filtre sekmeleri (JavaScript yoksa gizli, hepsi görünür) */
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.gallery-filters[hidden] {
+  display: none;
+}
+
+.gallery-filters button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 1.1rem;
+  border: 1.5px solid var(--line-light);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gallery-filters button:hover {
+  border-color: var(--text);
+}
+
+.gallery-filters button[aria-pressed='true'] {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--on-dark);
+}
+
+.gallery-filter-count {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.gallery-item figure {
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  border-radius: var(--radius);
+}
+
+.gallery-item picture,
+.gallery-item img,
+.gallery-item video {
+  display: block;
+  width: 100%;
+  height: auto; /* width/height öznitelikleri oranı korur (CLS yok) */
+  background: var(--bg);
+}
+
+.gallery-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: zoom-in;
+}
+
+.gallery-open img {
+  transition: transform 0.5s ease;
+}
+
+.gallery-open:hover img,
+.gallery-open:focus-visible img {
+  transform: scale(1.03);
+}
+
+.gallery-open::after {
+  content: '';
+  position: absolute;
+  inset: auto 0.6rem 0.6rem auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: rgba(20, 22, 26, 0.75)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3f1ed' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7'/%3E%3C/svg%3E")
+    center / 1.1rem no-repeat;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.gallery-open:hover::after,
+.gallery-open:focus-visible::after {
+  opacity: 1;
+}
+
+.gallery-item figcaption {
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--on-dark-muted);
+  background: var(--bg);
+}
+

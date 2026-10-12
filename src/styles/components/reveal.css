@@ -1,0 +1,15 @@
+/* ---------- Bölümlerin belirmesi (tek seferlik) ---------- */
+
+.reveal {
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--d, 0s);
+}
+
+/* Gizleme yalnızca reveal.js çalışınca (html.reveal-ready) uygulanır */
+.reveal-ready .reveal:not(.is-in) {
+  opacity: 0;
+  transform: translateY(24px);
+}
+

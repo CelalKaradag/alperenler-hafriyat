@@ -1,0 +1,181 @@
+/* ---------- Butonlar ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.7rem 1.6rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-family: var(--font-display);
+  font-stretch: 105%;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text);
+}
+
+/* hover: hafif koyulaşma + 1px yukarı */
+.btn-primary:hover {
+  background: #e3a600;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: none;
+}
+
+.btn-dark {
+  background: var(--text);
+  color: var(--on-dark);
+}
+
+.btn-dark:hover {
+  background: #2b2f35;
+}
+
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.7);
+  color: var(--on-dark);
+  background: transparent;
+}
+
+.btn-outline-light:hover {
+  background: var(--on-dark);
+  color: var(--text);
+}
+
+.btn-outline-dark {
+  border-color: var(--text);
+  color: var(--text);
+  background: transparent;
+}
+
+.btn-outline-dark:hover {
+  background: var(--text);
+  color: var(--on-dark);
+}
+
+/* Koyu WhatsApp butonu (yeşil ikonlu) */
+.btn-wa {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--on-dark);
+}
+
+.btn-wa:hover {
+  background: #323843;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.wa-icon {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  vertical-align: -0.2em;
+  color: #25d366;
+  flex: none;
+}
+
+.call-card-wa {
+  margin-top: 0.75rem;
+}
+
+.btn-lg {
+  min-height: 3.5rem;
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.text-link {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.on-dark .text-link {
+  color: var(--on-dark);
+}
+
+/* Küçük etiket: açık zeminde koyu yazı + sarı çizgi, koyu zeminde sarı yazı */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.1rem;
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 2rem;
+  height: 2px;
+  background: var(--accent);
+}
+
+.on-dark .eyebrow {
+  color: var(--accent);
+}
+
+.lead {
+  max-width: 40rem;
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+}
+
+.on-dark .lead {
+  color: var(--on-dark-muted);
+}
+
+.draft-badge {
+  /* Hiçbir kapsayıcıda (flex/grid) gerilmesin: içeriği kadar geniş, başa yaslı */
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  flex: none;
+  align-self: flex-start;
+  justify-self: start;
+  white-space: nowrap;
+  line-height: 1.4;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+

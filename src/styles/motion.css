@@ -1,0 +1,40 @@
+/* ---------- Hareket tercihi ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  /* Hareket tercihi: video oynamaz, yalnızca poster/arka plan görünür */
+  .hero-video {
+    display: none;
+  }
+
+  .hero-inner > *,
+  .hero-scroll-arrow,
+  .map-pulse {
+    animation: none;
+  }
+
+  .reveal-ready .reveal:not(.is-in) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .service-card:hover .service-card-more .icon,
+  .service-card:hover,
+  .service-card:focus-within,
+  .service-card:hover .service-card-media img,
+  .service-card:focus-within .service-card-media img,
+  a:hover > .arrow {
+    transform: none;
+  }
+}

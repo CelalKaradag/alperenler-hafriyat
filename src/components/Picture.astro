@@ -1,23 +1,55 @@
 ---
 import { webpSibling } from '../utils/assets';
+import { getImageSize, getResponsive } from '../utils/responsive';
 
 interface Props {
-  /** public/ altındaki JPG/PNG yolu; aynı adlı .webp varsa <picture> ile önce o sunulur */
+  /** public/ altındaki JPG yolu. Duyarlı türevler varsa (build-images.mjs) srcset/sizes üretilir */
   src: string;
   alt: string;
-  /** Gerçek piksel boyutu (CLS olmasın diye zorunlu) */
-  width: number;
-  height: number;
+  /** Meta/dosyadan okunamazsa kullanılacak yedek boyut (CLS olmasın diye) */
+  width?: number;
+  height?: number;
   class?: string;
   loading?: 'lazy' | 'eager';
+  /** Bağlama göre görüntülenen genişlik: galeri kartı, hizmet kartı, hakkımızda, tam boy... */
   sizes?: string;
+  /** LCP görseli için "high" */
+  fetchpriority?: 'high' | 'low' | 'auto';
 }
 
-const { src, alt, width, height, class: className, loading = 'lazy', sizes } = Astro.props;
-const webp = webpSibling(src);
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: className,
+  loading = 'lazy',
+  sizes,
+  fetchpriority,
+} = Astro.props;
+
+// Duyarlı türevler (480/960/1600 webp + jpg) varsa onlar; yoksa tek boy orijinal (+ aynı adlı .webp)
+const responsive = getResponsive(src);
+const size = responsive ?? getImageSize(src);
+const w = size?.width ?? width ?? 1600;
+const h = size?.height ?? height ?? 1200;
+const webp = responsive ? null : webpSibling(src);
+const effectiveSizes = sizes ?? (responsive ? '100vw' : undefined);
 ---
 
-<picture>
-  {webp && <source srcset={webp} type="image/webp" sizes={sizes} />}
-  <img src={src} alt={alt} width={width} height={height} class:list={['fade-img', className]} loading={loading} decoding="async" sizes={sizes} />
+<picture style={responsive ? `--img-placeholder: ${responsive.color}` : undefined}>
+  {responsive && <source type="image/webp" srcset={responsive.webpSet} sizes={effectiveSizes} />}
+  {!responsive && webp && <source type="image/webp" srcset={webp} />}
+  <img
+    src={src}
+    srcset={responsive?.jpgSet}
+    sizes={responsive ? effectiveSizes : undefined}
+    alt={alt}
+    width={w}
+    height={h}
+    class:list={['fade-img', className]}
+    loading={loading}
+    decoding="async"
+    fetchpriority={fetchpriority}
+  />
 </picture>

@@ -1,6 +1,7 @@
 ---
 import { site, whatsappUrl } from '../data/site';
 import { publicFileExists } from '../utils/assets';
+import { getImageSize, getResponsive } from '../utils/responsive';
 import Icon from './Icon.astro';
 import TopoArt from './TopoArt.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
@@ -23,44 +24,78 @@ const variants = [
 const hasVideo = variants.length > 0;
 
 // Posterler: yatay (masaüstü, 1080 videosu için) ve dikey (mobil, 720 videosu için).
-// Mobilde (48em altı) dikey poster kullanılır; yoksa yatay poster.
+// Mobilde (48em altı) dikey poster kullanılır; yoksa yatay poster. Poster artık bir <picture>
+// (srcset + fetchpriority="high"): LCP görseli. Duyarlı türevler yoksa özgün dosya kullanılır.
 const posterSrc = '/images/hero-poster.jpg';
 const posterMobileSrc = '/images/hero-poster-720.jpg';
 const photoSrc = '/images/hero.jpg';
 const poster = publicFileExists(posterSrc) ? posterSrc : null;
 const posterMobile = publicFileExists(posterMobileSrc) ? posterMobileSrc : null;
-const backdrop = poster ?? posterMobile ?? (publicFileExists(photoSrc) ? photoSrc : null);
-const hasMedia = hasVideo || backdrop !== null;
+const photo = publicFileExists(photoSrc) ? photoSrc : null;
+// Masaüstü (varsayılan <img>) için: yatay poster → dikey poster → fotoğraf
+const mainPoster = poster ?? posterMobile ?? photo;
+const hasMedia = hasVideo || mainPoster !== null;
 
-// Arka plan değişkenleri: CSS mobilde --hero-image-mobile, yoksa --hero-image kullanır.
-const heroStyle = [
-  backdrop ? `--hero-image: url(${backdrop})` : null,
-  posterMobile ? `--hero-image-mobile: url(${posterMobile})` : null,
-]
-  .filter(Boolean)
-  .join('; ');
-
+const mainResp = mainPoster ? getResponsive(mainPoster) : null;
+const mobileResp = posterMobile ? getResponsive(posterMobile) : null;
+const mainSize = mainPoster ? getImageSize(mainPoster) : null;
+// Mobilde ayrı dikey poster varsa (ve ana poster farklıysa) media'lı <source>
+const useMobileSource = Boolean(posterMobile && poster && posterMobile !== mainPoster);
+// <link rel="preload"> için tür tanımlı olmayan öznitelikler (imagesrcset/imagesizes/fetchpriority)
+const preloadExtras = (resp: ReturnType<typeof getResponsive>) => ({
+  imagesrcset: resp?.webpSet,
+  imagesizes: resp ? '100vw' : undefined,
+  fetchpriority: 'high' as const,
+});
+const MOBILE = '(max-width: 47.99em)';
+const DESKTOP = '(min-width: 48em)';
 // <video> için tür tanımlı olmayan, standart dışı öznitelikler
 const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true };
 ---
 
-{/* Önyükleme ekrana göre doğru posteri seçer (media). Tek poster varsa media verilmez. */}
+{/* Önyükleme: ekrana göre doğru poster (media), duyarlı türev varsa imagesrcset ile, yüksek öncelik */}
 {
-  poster && posterMobile ? (
+  mainPoster && (
     <>
-      <link rel="preload" as="image" href={posterMobile} media="(max-width: 47.99em)" />
-      <link rel="preload" as="image" href={poster} media="(min-width: 48em)" />
+      {useMobileSource && posterMobile && (
+        <link rel="preload" as="image" href={posterMobile} media={MOBILE} {...preloadExtras(mobileResp)} />
+      )}
+      <link
+        rel="preload"
+        as="image"
+        href={mainPoster}
+        media={useMobileSource ? DESKTOP : undefined}
+        {...preloadExtras(mainResp)}
+      />
     </>
-  ) : (
-    (poster ?? posterMobile) && <link rel="preload" as="image" href={poster ?? posterMobile} />
   )
 }
 
-<section
-  class:list={['hero', 'on-dark', hasMedia ? 'hero--media' : 'hero--plain']}
-  style={heroStyle || undefined}
->
+<section class:list={['hero', 'on-dark', hasMedia ? 'hero--media' : 'hero--plain']}>
   {
+    mainPoster && (
+      <picture class="hero-poster" aria-hidden="true">
+        {useMobileSource && mobileResp && (
+          <source type="image/webp" srcset={mobileResp.webpSet} sizes="100vw" media={MOBILE} />
+        )}
+        {useMobileSource && posterMobile && !mobileResp && (
+          <source srcset={posterMobile} media={MOBILE} />
+        )}
+        {mainResp && <source type="image/webp" srcset={mainResp.webpSet} sizes="100vw" />}
+        <img
+          src={mainPoster}
+          srcset={mainResp?.jpgSet}
+          sizes={mainResp ? '100vw' : undefined}
+          alt=""
+          width={mainSize?.width ?? 1920}
+          height={mainSize?.height ?? 1080}
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+      </picture>
+    )
+  }  {
     hasVideo && (
       <div class="hero-media" data-hero-media data-sources={JSON.stringify(variants)} aria-hidden="true">
         {/* JavaScript kapalıyken: tek video + native loop. JS açıkken videoları betik oluşturur. */}

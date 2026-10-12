@@ -1,0 +1,48 @@
+/* Güven şeridi (Biz Kimiz ile Hizmetler arası, rakamsız) */
+.trust-strip {
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--sand-2);
+  border-block: 1px solid var(--line-light);
+}
+
+.trust-draft {
+  margin: 0 0 1rem;
+}
+
+.trust-list {
+  display: grid;
+  gap: 1.1rem 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 64em) {
+  .trust-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.trust-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--accent);
+}
+
+.trust-icon .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+

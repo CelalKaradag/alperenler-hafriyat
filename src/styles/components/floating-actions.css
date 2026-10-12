@@ -1,0 +1,109 @@
+/* ---------- Masaüstü yüzen düğmeler ---------- */
+
+.floating-actions {
+  display: none;
+}
+
+@media (min-width: 48em) {
+  .floating-actions {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 45;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    --focus: var(--accent);
+  }
+}
+
+.floating-actions :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px rgba(20, 22, 26, 0.92);
+}
+
+.to-top,
+.wa-float {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.to-top.is-shown,
+.wa-float.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.to-top {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  background: var(--surface-2);
+  color: var(--on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.to-top:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.wa-float {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  height: 3.5rem;
+  padding: 0 0.85rem;
+  background: #1fa855;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wa-float:hover {
+  background: #188a46;
+}
+
+.wa-float .wa-icon {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin: 0;
+  color: #fff;
+}
+
+/* hover/odakta etiket sola doğru açılır */
+.wa-float-label {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 0.3s ease,
+    opacity 0.2s ease,
+    margin 0.3s ease;
+}
+
+.wa-float:hover .wa-float-label,
+.wa-float:focus-visible .wa-float-label {
+  max-width: 12rem;
+  margin-left: 0.6rem;
+  margin-right: 0.2rem;
+  opacity: 1;
+}
+

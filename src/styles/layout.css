@@ -1,0 +1,61 @@
+/* ---------- Yerleşim ---------- */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.narrow {
+  max-width: 48rem;
+}
+
+/* Dar sütunlu sayfalar da header ve diğer bölümlerle aynı sol kenardan başlar;
+   yalnızca içerik genişliği okunur sınırda tutulur. */
+.container.narrow {
+  max-width: var(--container);
+}
+
+.container.narrow > * {
+  max-width: 48rem;
+}
+
+.section {
+  padding-block: var(--space-section);
+}
+
+.section-light {
+  background: var(--sand);
+}
+
+.section-paper {
+  background: var(--sand-2);
+}
+
+.section-dark,
+.page-head,
+.hero,
+.site-header,
+.site-footer {
+  background: var(--bg);
+  color: var(--on-dark);
+}
+
+/* Sayfa başlığının hemen altındaki bölüm: kartların üstünde büyük boş alan kalmasın */
+.section--flush-top {
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
+.section-head {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.section-head h2 {
+  margin-bottom: 0;
+}
+
+.section-more {
+  margin: 2.5rem 0 0;
+}
+

@@ -36,7 +36,7 @@ const isCurrent = (href: string) => {
       <ul>
         {
           navItems.map((item) => (
-            <li>
+            <li class:list={[item.href === '/' && 'nav-home']}>
               <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
                 {item.label}
               </a>
@@ -75,7 +75,7 @@ const isCurrent = (href: string) => {
     header.classList.add('js-nav');
     toggle.hidden = false;
 
-    var desktop = window.matchMedia('(min-width: 48em)');
+    var desktop = window.matchMedia('(min-width: 72em)');
 
     function setOpen(open, returnFocus) {
       header.classList.toggle('is-open', open);

@@ -1,0 +1,360 @@
+/* ---------- Hizmet kartları ---------- */
+
+.card-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+.card-grid > * {
+  min-width: 0;
+}
+
+/* Kartlar eşit yükseklikte */
+.card-grid > .reveal {
+  display: flex;
+}
+
+.card-grid > .reveal > .service-card {
+  flex: 1;
+}
+
+@media (min-width: 30em) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 72em) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface);
+  /* Koyu yüzeyli kart: yazı/bağlantı rengi bulunduğu (açık) bölümden miras alınmaz */
+  color: var(--on-dark);
+  --focus: var(--accent);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.25s ease;
+}
+
+/* hover'da sarı ince çizgi */
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.service-card:hover,
+.service-card:focus-within {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.service-card:hover::before,
+.service-card:focus-within::before {
+  transform: scaleX(1);
+}
+
+/* Görselli kart: 16/10 görsel, alttan karta kaynaşan koyu degrade; numara + ikon görselin üstünde */
+.service-card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.service-card-media picture,
+.service-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-card-media img {
+  transition: transform 400ms ease;
+}
+
+.service-card:hover .service-card-media img,
+.service-card:focus-within .service-card-media img {
+  transform: scale(1.04);
+}
+
+.service-card-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--surface) 0%,
+    rgba(28, 31, 36, 0.62) 38%,
+    rgba(28, 31, 36, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+/* hover'da kart zemini değişmesin: degrade ile dikiş izi oluşmasın */
+.service-card--img:hover,
+.service-card--img:focus-within {
+  background: var(--surface);
+}
+
+.service-card--img .service-card-top {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  z-index: 2;
+  margin: 0;
+}
+
+.service-card--img .service-card-number {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+}
+
+.service-card--img .service-card-icon {
+  color: #fff;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.65));
+}
+
+.service-card--img .service-card-body {
+  padding-top: 1.25rem;
+}
+
+.service-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.service-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.service-card-number {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.service-card-icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--on-dark-muted);
+  transition: color 0.2s ease;
+}
+
+.service-card:hover .service-card-icon,
+.service-card:focus-within .service-card-icon {
+  color: var(--accent);
+}
+
+.service-card .draft-badge {
+  align-self: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.service-card h3 {
+  margin-bottom: 0.6rem;
+}
+
+/* tüm kart tıklanabilir (tek bağlantı) */
+.service-card h3 a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.service-card p {
+  margin: 0 0 1.5rem;
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: var(--on-dark-muted);
+}
+
+.service-card-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.service-card-more .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover .service-card-more .icon {
+  transform: translateX(4px);
+}
+
+/* Dar telefonlar (30em altı): kompakt satır kartı. Numara | ikon | başlık | ok.
+   Açıklama gizli (detay sayfasında var); dokunma alanı en az 48 px. */
+@media (max-width: 29.99em) {
+  .card-grid {
+    gap: 0.6rem;
+  }
+
+  .service-card p {
+    display: none;
+  }
+
+  .service-card-body {
+    display: grid;
+    grid-template-columns: 1.75rem 1.5rem minmax(0, 1fr) 1.25rem;
+    column-gap: 0.75rem;
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .service-card-top {
+    display: contents;
+  }
+
+  .service-card-number {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 0.95rem;
+  }
+
+  .service-card-icon {
+    grid-column: 2;
+    grid-row: 1;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .service-card h3 {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .service-card .draft-badge {
+    grid-column: 3;
+    grid-row: 2;
+    margin: 0.35rem 0 0;
+  }
+
+  .service-card-more {
+    grid-column: 4;
+    grid-row: 1;
+    margin: 0;
+    font-size: 0; /* "Detay" yazısı gizli, yalnızca ok */
+  }
+
+  .service-card-more .icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+/* Kompakt satır, görselli kart: solda 56 px kare küçük resim, yanında küçük numara + başlık, sağda ok */
+@media (max-width: 29.99em) {
+  .service-card.service-card--img {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) 1.25rem;
+    column-gap: 0.85rem;
+    align-items: center;
+    min-height: 4.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+  }
+
+  .service-card--img .service-card-media {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 3.5rem;
+    height: 3.5rem;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
+  }
+
+  .service-card--img .service-card-media::after {
+    display: none;
+  }
+
+  .service-card--img .service-card-body,
+  .service-card--img .service-card-top {
+    position: static;
+    display: contents;
+  }
+
+  .service-card--img .service-card-number {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    font-size: 0.75rem;
+    text-shadow: none;
+  }
+
+  .service-card--img .service-card-icon {
+    display: none;
+  }
+
+  .service-card--img h3 {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .service-card--img .draft-badge {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .service-card--img .service-card-more {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+  }
+}
+
+/* odak halkası tüm kartı çevrelesin */
+.service-card h3 a:focus-visible {
+  outline: none;
+}
+
+.service-card:has(h3 a:focus-visible) {
+  outline: 3px solid var(--card-ring, var(--text));
+  outline-offset: 3px;
+}
+
+.on-dark .service-card {
+  --card-ring: var(--accent);
+}
+

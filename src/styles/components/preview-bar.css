@@ -1,0 +1,15 @@
+/* Önizleme sürümü şeridi (yalnızca PUBLIC_SHOW_DRAFTS=true ile alınan build'de) */
+.preview-bar {
+  /* Türkçe büyük harf noktaları (Ö, İ) kesilmesin: geniş satır yüksekliği ve dikey dolgu */
+  padding: 0.55rem var(--gutter);
+  background: var(--accent);
+  color: var(--text);
+  font-size: clamp(0.72rem, 3.3vw, 0.8rem);
+  font-weight: 700;
+  line-height: 1.7;
+  text-align: center;
+  white-space: nowrap; /* mobilde de tek satır */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

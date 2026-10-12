@@ -90,6 +90,8 @@ let hasImages = false;
                     data-kind="image"
                     data-src={entry.src}
                     data-webp={entry.webp ?? ''}
+                    data-srcset-webp={entry.webpSet ?? ''}
+                    data-srcset-jpg={entry.jpgSet ?? ''}
                     data-alt={entry.alt}
                     data-width={entry.width}
                     data-height={entry.height}
@@ -120,7 +122,7 @@ let hasImages = false;
                     playsinline
                     width={entry.width}
                     height={entry.height}
-                    poster={entry.poster}
+                    poster={entry.posterSmall}
                     aria-label={entry.title}
                   >
                     <source src={entry.src} type="video/mp4" />
@@ -133,7 +135,7 @@ let hasImages = false;
                   data-lightbox-open
                   data-kind="video"
                   data-video={entry.src}
-                  data-poster={entry.poster ?? ''}
+                  data-poster={entry.posterLarge ?? ''}
                   data-alt={entry.title}
                   data-width={entry.width}
                   data-height={entry.height}
@@ -141,13 +143,12 @@ let hasImages = false;
                   aria-label={`Videoyu oynat: ${entry.title}`}
                 >
                   {entry.poster && (
-                    <img
+                    <Picture
                       src={entry.poster}
                       alt=""
                       width={entry.width}
                       height={entry.height}
-                      loading="lazy"
-                      decoding="async"
+                      sizes="(min-width: 64em) 33vw, (min-width: 40em) 50vw, 78vw"
                     />
                   )}
                   <span class="gallery-play" aria-hidden="true">

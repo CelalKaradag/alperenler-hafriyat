@@ -1,0 +1,124 @@
+/* ---------- Hizmet detay ---------- */
+
+.detail-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: start;
+}
+
+.detail-grid > * {
+  min-width: 0;
+}
+
+@media (min-width: 64em) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: 5rem;
+  }
+
+  .call-card {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+  }
+}
+
+/* Düşük ekran yüksekliğinde (kart header altında kesilirdi) sticky iptal */
+@media (max-height: 36rem) {
+  .call-card {
+    position: static;
+  }
+}
+
+.prose p {
+  max-width: 42rem;
+}
+
+.check-list {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 42rem;
+}
+
+.check-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.check-list .icon {
+  margin-top: 0.2rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 2px;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+}
+
+.call-card {
+  padding: 2rem 1.75rem;
+  background: var(--bg);
+  color: var(--on-dark);
+  border-top: 2px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.call-card > .icon {
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.call-card h2 {
+  font-size: 1.5rem;
+}
+
+.call-card p {
+  color: var(--on-dark-muted);
+}
+
+.call-card .btn {
+  width: 100%;
+}
+
+.link-list {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+/* 2 sütun: 7 öğe 4+3 dengeli durur (3'lü ızgarada son satırda tek öğe kalırdı) */
+@media (min-width: 48em) {
+  .link-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.link-list a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.link-list a:hover {
+  border-color: var(--accent);
+}
+
+.link-list a span {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-list-arrow {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+

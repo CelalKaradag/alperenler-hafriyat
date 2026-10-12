@@ -1,0 +1,117 @@
+/* Oynat ikonu (mobil video düğmesi) */
+.gallery-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.gallery-play .icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0.9rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  background: rgba(20, 22, 26, 0.72);
+  color: #fff;
+  fill: currentColor;
+}
+
+.gallery-more {
+  margin: 1.5rem 0 0;
+}
+
+.gallery-counter {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* Masaüstü: video kendi yerinde oynar; mobil video düğmesi ve sayaç yok */
+@media (min-width: 48em) {
+  .gallery-item .gallery-open--video,
+  .gallery-counter {
+    display: none;
+  }
+}
+
+/* Mobil (48em altı) */
+@media (max-width: 47.99em) {
+  .gallery-video {
+    display: none; /* video, poster + oynat ikonuyla lightbox'ta oynar */
+  }
+
+  .gallery-grid {
+    columns: auto;
+    margin-bottom: 0;
+  }
+
+  .gallery-item {
+    margin: 0;
+  }
+
+  .gallery-item .gallery-open {
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .gallery-item .gallery-open picture,
+  .gallery-item .gallery-open img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-open::after {
+    display: none;
+  }
+
+  /* /galeri/: 2 sütun, kareye yakın (1/1) kırpılmış küçük görseller */
+  .gallery-grid--page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .gallery-grid--page .gallery-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--radius);
+  }
+
+  .gallery-grid--page .gallery-play .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.6rem;
+  }
+
+  /* Ana sayfa "Sahadan": yatay kaydırmalı şerit (scroll-snap), sonraki kartın kenarı görünür */
+  .gallery-grid--home {
+    display: flex;
+    gap: 0.75rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) 0.25rem;
+    scroll-padding-inline: var(--gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .gallery-grid--home::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-grid--home .gallery-item {
+    flex: 0 0 78%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius);
+    scroll-snap-align: start;
+  }
+}

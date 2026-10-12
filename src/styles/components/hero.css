@@ -1,0 +1,336 @@
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  isolation: isolate; /* içindeki z-index'ler (video düğmesi vb.) header'ın yığınına karışmaz */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* Mobilde ekranın ~%75'i: butonlar ilk ekranda kalır */
+  min-height: 75vh;
+  min-height: 75svh;
+  padding-block: 2.5rem 4.75rem;
+  background-size: cover;
+  background-position: center;
+}
+
+@media (min-width: 48em) {
+  .hero {
+    min-height: 80vh;
+    min-height: min(90svh, 56rem);
+    padding-block: clamp(4rem, 10vw, 8rem);
+  }
+}
+
+/* Video veya fotoğraf varken */
+.hero--media {
+  background-color: var(--bg);
+}
+
+/* Poster artık <picture> (srcset + fetchpriority=high, LCP). Mobilde dikey poster <source media> ile gelir;
+   dikey video ve poster object-fit: cover ile hero'yu doldurur. Videonun altında durur. */
+.hero-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+
+.hero-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Video katmanı: kendi kompozit katmanında; üstünde blur/filtre yok */
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  backface-visibility: hidden;
+}
+
+.hero-video.is-visible {
+  opacity: 1;
+}
+
+/* Alttan yukarı koyu degrade: yazı her karede okunur */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(20, 22, 26, 0.95) 0%,
+    rgba(20, 22, 26, 0.74) 45%,
+    rgba(20, 22, 26, 0.56) 100%
+  );
+}
+
+/* Video/fotoğraf yokken: topoğrafik çizgiler + kontur yazı */
+.hero--plain {
+  background-image:
+    radial-gradient(ellipse 70% 60% at 78% 45%, rgba(255, 255, 255, 0.045), transparent 70%),
+    linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
+}
+
+/* Eş yükselti haritası: tüm alanı kaplar, solda (metnin arkasında) radyal maskeyle solar */
+.topo-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Desen public/topo/*.svg dosyalarından gelir (scripts/generate-topo.mjs); tarayıcı önbelleğe alır */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.18;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 85% 110% at 82% 45%, #000 18%, transparent 78%);
+  mask-image: radial-gradient(ellipse 85% 110% at 82% 45%, #000 18%, transparent 78%);
+}
+
+/* Kart ve sayfa başlıklarında daha da soluk, maske yok */
+.topo-art--soft {
+  opacity: 0.08;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.topo-art--hero {
+  background-image: url('/topo/hero.svg');
+}
+
+.topo-art--soft:not(.topo-art--low) {
+  background-image: url('/topo/soft.svg');
+}
+
+.topo-art--low {
+  background-image: url('/topo/low.svg');
+}
+
+/* Derinlik: çok hafif statik film greni + sağ üstte sıcak (amber) ışık */
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero::before {
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.9 0 0 0 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+.hero::after {
+  background: radial-gradient(
+    ellipse 55% 60% at 92% 0%,
+    rgba(245, 180, 0, 0.13),
+    transparent 70%
+  );
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 3;
+}
+
+.hero-inner > * {
+  max-width: 46rem;
+}
+
+.hero h1 {
+  margin-bottom: 0.4em;
+}
+
+.hero-sub {
+  max-width: 36rem;
+  font-size: var(--fs-lead);
+  color: var(--on-dark-muted);
+}
+
+.hero-inner h1,
+.hero-inner .hero-sub {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Açılışta sırayla yumuşak beliriş */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-inner > * {
+  animation: hero-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.hero-inner > :nth-child(1) {
+  animation-delay: 0.05s;
+}
+.hero-inner > :nth-child(2) {
+  animation-delay: 0.15s;
+}
+.hero-inner > :nth-child(3) {
+  animation-delay: 0.3s;
+}
+.hero-inner > :nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+/* Videoyu durdur / oynat */
+.hero-toggle {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 1.25rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(20, 22, 26, 0.65);
+  color: var(--on-dark);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.hero-toggle[hidden] {
+  display: none;
+}
+
+.hero-toggle:hover {
+  background: rgba(20, 22, 26, 0.9);
+  border-color: var(--accent);
+}
+
+.hero-toggle svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.hero-toggle-play {
+  display: none;
+}
+
+.hero-toggle[aria-pressed='true'] .hero-toggle-pause {
+  display: none;
+}
+
+.hero-toggle[aria-pressed='true'] svg.hero-toggle-play {
+  display: block;
+}
+
+.hero-toggle[aria-pressed='true'] span.hero-toggle-play {
+  display: inline;
+}
+
+/* Masaüstü (48em ve üstü): düğme hero'nun sağ altında (mobil konumdan bağımsız, açıkça sıfırlanır) */
+@media (min-width: 48em) {
+  .hero-toggle {
+    top: auto;
+    right: var(--gutter);
+    bottom: 1.25rem;
+  }
+}
+
+/* Mobil (48em altı): "Durdur/Oynat" küçük yuvarlak ikon düğmesi, sağ üstte (header altı); kaydır okuyla çakışmaz */
+@media (max-width: 47.99em) {
+  .hero-toggle {
+    top: calc(var(--header-h) + 0.75rem);
+    bottom: auto;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+  }
+
+  .hero-toggle span.hero-toggle-pause,
+  .hero-toggle[aria-pressed='true'] span.hero-toggle-play {
+    display: none;
+  }
+}
+
+/* Aşağı kaydır göstergesi */
+.hero-scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-left: -1.375rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  color: var(--on-dark);
+  text-decoration: none;
+}
+
+.hero-scroll:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.hero-scroll-arrow {
+  width: 1.4rem;
+  height: 1.4rem;
+  animation: hero-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes hero-bob {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* Mobilde iki buton yan yana */
+@media (max-width: 47.99em) {
+  .hero .btn-row {
+    flex-wrap: nowrap;
+  }
+
+  .hero .btn-lg {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 0.75rem;
+  }
+}
+

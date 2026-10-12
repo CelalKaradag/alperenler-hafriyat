@@ -1,0 +1,49 @@
+/* ---------- Rakam şeridi (animasyonsuz) ---------- */
+
+/* Açık zeminli şerit: iki koyu bölüm art arda gelmesin diye koyu değil */
+.stats {
+  background: var(--sand-2);
+  color: var(--text);
+  border-block: 1px solid var(--line-light);
+  padding-block: clamp(2rem, 5vw, 3.25rem);
+}
+
+.stats-grid {
+  display: grid;
+  gap: 2rem 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  text-align: center;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.stat-icon {
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.4rem;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: clamp(2.25rem, 7vw, 3.5rem);
+  font-weight: 850;
+  line-height: 1;
+  padding-bottom: 0.15em;
+  border-bottom: 3px solid var(--accent);
+}
+
+.stat-label {
+  margin-top: 0.4rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+

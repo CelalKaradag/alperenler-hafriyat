@@ -1,0 +1,29 @@
+/* ---------- Mobil sabit arama çubuğu ---------- */
+
+.call-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem var(--gutter) calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  --focus: var(--accent);
+}
+
+.call-bar .btn {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (min-width: 48em) {
+  .call-bar {
+    display: none;
+  }
+
+  body {
+    padding-bottom: 0;
+  }
+}
+

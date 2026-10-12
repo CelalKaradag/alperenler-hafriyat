@@ -160,6 +160,29 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 
 **Ölçüm (Lighthouse):** `npm run build` ardından `npm run preview` ile yayına yakın çıktı üzerinde test edin (`npm run dev` üzerinde değil). Önce/sonra için `public/fonts` ve `dist/_astro` boyutlarına, ana sayfa HTML'inin boyutuna (`(Get-Item dist\index.html).Length`) bakın.
 
+## Duyarlı görseller (sharp)
+
+[scripts/build-images.mjs](scripts/build-images.mjs) (`prepare:assets` içinde, `predev`/`prebuild` ile otomatik): `public/images/` altındaki tüm `.jpg` kaynaklardan (galeri, hakkımızda, hero posterleri) **480, 960 ve 1600 px** genişlikte webp + jpg türevleri üretir: `public/images/_r/<ad>-<genişlik>.(webp|jpg)`. Kaynaktan büyük türev üretilmez; kaynağın kendi genişliği de bir türev olarak eklenir.
+- Her görselin boyutu ve **baskın rengi** (`sharp stats().dominant`) [src/data/image-meta.json](src/data/image-meta.json)'a yazılır. `Picture.astro` bununla `srcset` + `sizes` (bağlama göre), `width/height` ve yer tutucu zemin rengi (baskın renk) üretir; meta yoksa eski davranışa (tek boy görsel + sabit kum rengi, `image-size.ts`) düşer. Lightbox tam boyda ve hero posterinde de `srcset` kullanılır; hero posteri `fetchpriority="high"` taşır.
+- Kaynak değişmediyse atlanır (`public/images/_r/.cache.json`). Hata olursa (sharp yoksa/çalışmazsa) build durmaz, mevcut türevler ve orijinal görseller kullanılır.
+- **`public/images/_r/` ve `src/data/image-meta.json` Git'e girer**, böylece Netlify'da sharp çalışmasa bile hazır görseller kullanılır. Yeni görsel eklenince `npm run dev`/`build` türevleri üretir; üretilenleri commit etmeyi unutmayın.
+- `<video poster>` ve galeri video posterleri de `_r` türevlerinden gelir (küçük webp).
+
+## CSS yapısı
+
+[src/styles/global.css](src/styles/global.css) yalnızca `@import` sırasıdır. Kurallar şu dosyalardadır (sıra, aynı özgüllükte sonraki kuralın kazandığı özgün tek dosyadaki sırayla aynıdır; yeni dosya eklerken sırayı gözetin): `fonts.css`, `tokens.css`, `base.css`, `utilities.css`, `layout.css`, `components/*.css` (buton, header, hero, kartlar, galeri, lightbox, harita, footer, sihirbaz, SSS, etkiler…), `motion.css` (hareket azaltma, en sonda). Kullanılmayan kurallar silindi: `.footer-phone`, `a.info-value`, `.section-surface`.
+
+## Testler (Playwright)
+
+`npm test` ([playwright.config.ts](playwright.config.ts), [tests/](tests/)): önce [scripts/serve-for-tests.mjs](scripts/serve-for-tests.mjs) siteyi iki kez build eder (normal → `dist-test/` :4321, `PUBLIC_SHOW_DRAFTS=true` → `dist-test-drafts/` :4322) ve önizler, sonra:
+- `smoke.spec.ts` (normal build): tüm sayfalar 200 / konsolda hata yok / tek H1; iç bağlantılar 404 vermiyor; `tel:` ve `wa.me` doğru numara; taslak sayfalar ve önizleme şeridi yok; mobil (390×844) menü ve sayfa geçişi sonrası menü, yatay taşma; galeri lightbox'ı (açılır, Escape ile kapanır, ClientRouter geçişi sonrası yine açılır); teklif sihirbazı 3 adım ve WhatsApp mesajı.
+- `drafts.spec.ts` (taslaklı build): taslak sayfalar var, önizleme şeridi/rozetler görünür, JSON-LD'de `Service`/`FAQPage` yok.
+Google harita istekleri testte sahte yanıtla karşılanır. Yerelde çalıştırmak zorunlu değildir; ilk kez: `npx playwright install chromium`.
+
+## GitHub Actions (CI)
+
+[.github/workflows/ci.yml](.github/workflows/ci.yml): her `push` ve `pull_request`'te Node 24.13.0, `npm ci`, `npm run check`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`. Sonucu görmek için GitHub'da depoyu açıp üstteki **Actions** sekmesine girin, ilgili çalıştırmaya (commit adı) tıklayın; her adımın yeşil/kırmızı durumu ve logu orada görünür. Test başarısız olursa sayfanın altındaki **Artifacts** bölümünden `playwright-report` indirilir (içindeki `index.html`'i tarayıcıda açın). `npm ci` için `package-lock.json` güncel olmalıdır: bağımlılık ekleyince yerelde `npm install` çalıştırıp lock dosyasını da commit edin.
+
 ## Netlify önizleme
 
 [netlify.toml](netlify.toml) ile siteyi Netlify'a önizleme olarak koyabilirsiniz (`npm run build`, yayın klasörü `dist`, Node `24.13.0`).

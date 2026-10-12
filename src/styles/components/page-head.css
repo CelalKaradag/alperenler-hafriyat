@@ -1,0 +1,54 @@
+/* ---------- Sayfa başlığı ---------- */
+
+.page-head {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(2.5rem, 5.5vw, 4.5rem);
+}
+
+.page-head > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Breadcrumb: Ana Sayfa / Hizmetler / X */
+.breadcrumb {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  color: var(--on-dark-muted);
+}
+
+.breadcrumb li + li::before {
+  content: '/';
+  margin-right: 0.6rem;
+  color: var(--accent);
+}
+
+.breadcrumb [aria-current='page'] {
+  color: var(--on-dark);
+  overflow-wrap: anywhere;
+}
+
+.page-head h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 1.3rem + 3.8vw, 4.25rem);
+  /* uzun başlıklar 360 px'te taşmasın */
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+.page-head .lead {
+  margin: 1.25rem 0 0;
+}
+
+.page-head .draft-badge {
+  margin-top: 1rem;
+}
+

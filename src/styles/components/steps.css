@@ -1,0 +1,59 @@
+/* ---------- Nasıl çalışıyoruz ---------- */
+
+.steps {
+  display: grid;
+  gap: 3rem 2rem;
+}
+
+.step {
+  min-width: 0;
+}
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.step-number {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: clamp(3.5rem, 2.5rem + 4vw, 5.5rem);
+  font-weight: 850;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  border-bottom: 4px solid var(--accent);
+  padding-bottom: 0.15em;
+}
+
+/* ince bağlantı çizgisi */
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--line-light);
+}
+
+.step:last-child .step-line {
+  display: none;
+}
+
+.step-icon {
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
+}
+
+.step p {
+  max-width: 22rem;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+@media (min-width: 48em) {
+  .steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

@@ -1,0 +1,74 @@
+/* ---------- Küçük cilalar ---------- */
+
+::selection {
+  background: var(--accent);
+  color: var(--text);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #444a53 var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444a53;
+  border: 2px solid var(--bg);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5b626d;
+}
+
+/* 404 */
+.not-found {
+  position: relative;
+  overflow: hidden;
+}
+
+.not-found-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.nf-code {
+  margin: 0 0 0.1em;
+  font-family: var(--font-display);
+  font-stretch: 118%;
+  font-weight: 900;
+  font-size: clamp(5.5rem, 4rem + 14vw, 14rem);
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+/* Gizlilik (taslak hukuki metin) */
+.draft-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  color: var(--on-dark);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.todo {
+  padding: 0.05em 0.35em;
+  background: rgba(245, 180, 0, 0.35);
+  color: var(--text);
+  border-radius: 2px;
+}
+

@@ -1,7 +1,6 @@
 ---
 import type { Service } from '../data/services';
 import { publicFileExists } from '../utils/assets';
-import { imageSize } from '../utils/image-size';
 import Icon from './Icon.astro';
 import Picture from './Picture.astro';
 
@@ -16,7 +15,6 @@ interface Props {
 
 const { service, index, basePath = '/hizmetler/' } = Astro.props;
 const image = publicFileExists(service.image) ? service.image : null;
-const size = image ? imageSize(image) : null;
 const number = String(index).padStart(2, '0');
 ---
 
@@ -27,8 +25,6 @@ const number = String(index).padStart(2, '0');
         <Picture
           src={image}
           alt=""
-          width={size?.width ?? 1600}
-          height={size?.height ?? 1000}
           sizes="(min-width: 72em) 25vw, (min-width: 30em) 50vw, 56px"
         />
       </div>
