@@ -3851,6 +3851,552 @@ html {
   border-radius: 2px;
 }
 
+/* ================= Aşama 9A: premium görsel katman ================= */
+/* Tüm yeni animasyonlar yalnızca transform/opacity kullanır (düzen tetiklemez). */
+
+/* ---- Tipografi ve ritim ---- */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li,
+figcaption {
+  text-wrap: pretty;
+}
+
+/* uzun metinlerde en fazla ~65 karakter satır uzunluğu */
+.prose p,
+.about-copy p,
+.faq-answer p,
+.price-note,
+.guide-note,
+.step p {
+  max-width: 65ch;
+}
+
+/* Numaralı bölüm etiketleri: "01 — Biz kimiz" (sıra, bölümlerin gerçek sırasından otomatik) */
+main.numbered {
+  counter-reset: sec;
+}
+
+main.numbered .section-head .eyebrow {
+  counter-increment: sec;
+}
+
+main.numbered .section-head .eyebrow::before {
+  content: counter(sec, decimal-leading-zero) ' —';
+  width: auto;
+  height: auto;
+  background: none;
+  color: currentColor;
+}
+
+/* ---- Hero ---- */
+/* Başlık satır satır alttan maskeyle açılır; alt başlık ve butonlar 120 ms arayla */
+.hero-inner > h1 {
+  animation: none;
+}
+
+.h1-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.h1-line > span {
+  display: block;
+  animation: h1-line-up 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.h1-line:first-child > span {
+  animation-delay: 0.15s;
+}
+
+.h1-line:last-child > span {
+  animation-delay: 0.27s;
+}
+
+@keyframes h1-line-up {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.hero-inner > :nth-child(3) {
+  animation-delay: 0.55s;
+}
+
+.hero-inner > :nth-child(4) {
+  animation-delay: 0.67s;
+}
+
+/* video üstüne çok hafif vinyet (kenarlar koyu) */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.42) 100%);
+  pointer-events: none;
+}
+
+/* Kayan şerit: hizmet adları, çok yavaş, soluk; üzerine gelince durur */
+.marquee {
+  overflow: hidden;
+  padding-block: 0.9rem;
+  background: var(--bg);
+  border-block: 1px solid var(--line-dark);
+  color: var(--on-dark-muted);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  opacity: 0.7;
+  animation: marquee-scroll 120s linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-half {
+  display: flex;
+  flex: none;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee-item::after {
+  content: '·';
+  margin-inline: 1.5rem;
+  color: var(--accent);
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---- Hizmet kartları: fareyi takip eden hafif ışık (ui-effects.js --mx/--my verir) ---- */
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(245, 180, 0, 0.11),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .service-card:hover::after {
+    opacity: 1;
+  }
+}
+
+/* ---- Nasıl çalışıyoruz ---- */
+.step-number {
+  position: relative;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text);
+}
+
+/* aktif adımda numara sarıya dolar (koyu kontur kalır) */
+.step-number::after {
+  content: attr(data-n);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.step.is-active .step-number::after {
+  opacity: 1;
+}
+
+/* adımlar arası çizgi kaydırdıkça soldan sağa dolar (desteklemeyen tarayıcıda dolu çizgi) */
+.step-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.step-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--text);
+  transform-origin: left;
+}
+
+@supports (animation-timeline: view()) {
+  .step-line::after {
+    transform: scaleX(0);
+    animation: step-line-fill linear both;
+    animation-timeline: view();
+    animation-range: cover 10% cover 45%;
+  }
+}
+
+@keyframes step-line-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---- Görsel yer tutucu + yumuşak fade-in ---- */
+:root {
+  --img-placeholder: #d6d0c3; /* kum rengi (ortalama renk JPEG'den okunamadığı için sabit) */
+}
+
+picture:has(> img.fade-img) {
+  display: block;
+  background: var(--img-placeholder);
+}
+
+img.fade-img {
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.service-card-media img.fade-img {
+  transition:
+    opacity 0.5s ease,
+    transform 400ms ease;
+}
+
+/* JavaScript çalışıyorsa yüklenene kadar saydam; çalışmazsa 4 sn sonra yine görünür */
+.js img.fade-img:not(.is-loaded) {
+  opacity: 0;
+  animation: img-fade-fallback 0.4s ease 4s forwards;
+}
+
+@keyframes img-fade-fallback {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Lightbox açılış/kapanış ---- */
+.lightbox[open],
+.lightbox[open]::backdrop {
+  animation: lb-fade 0.25s ease;
+}
+
+@keyframes lb-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-group(lb-img) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---- Mikro etkileşimler ---- */
+.btn:active,
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-icon {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.55rem;
+  flex: none;
+}
+
+.btn:hover .btn-icon {
+  animation: icon-ring 0.5s ease 1;
+}
+
+@keyframes icon-ring {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-14deg);
+  }
+  40% {
+    transform: rotate(12deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(5deg);
+  }
+}
+
+/* sarı düğmede hover'da tek seferlik içten parlayan çizgi */
+.btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.btn-primary:hover::after {
+  animation: btn-shine 0.8s ease 1 both;
+}
+
+@keyframes btn-shine {
+  0% {
+    transform: translateX(-130%) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(330%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+/* telefonu kopyala (iletişim sayfası) */
+.copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  margin-top: 0.9rem;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.95rem;
+  border: 1.5px solid var(--text);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.copy-btn[hidden] {
+  display: none;
+}
+
+.copy-btn .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.copy-btn:hover {
+  background: var(--text);
+  color: var(--on-dark);
+}
+
+.copy-status {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.copy-status.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- İletişim sayfası: 3 büyük seçenek kartı ---- */
+.option-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 48em) {
+  .option-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+.option-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  padding: 1.5rem 3.25rem 1.4rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-top: 2px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.option-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--text);
+  box-shadow: 0 12px 28px rgba(22, 24, 27, 0.1);
+}
+
+.option-icon,
+.option-card .wa-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 0 0.6rem;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--accent);
+}
+
+.option-icon .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.option-card .wa-icon {
+  padding: 0.65rem;
+  color: #25d366;
+  vertical-align: baseline;
+}
+
+.option-title {
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.option-desc {
+  color: var(--text-muted);
+}
+
+.option-arrow {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  transition: transform 0.2s ease;
+}
+
+.option-card:hover .option-arrow {
+  transform: translateX(4px);
+}
+
+/* ---- 404: logo işareti "kazıyormuş" gibi sallanır ---- */
+.nf-mark {
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  transform-origin: 22% 92%;
+  animation: nf-dig 2.4s ease-in-out infinite;
+}
+
+@keyframes nf-dig {
+  0%,
+  100% {
+    transform: rotate(-8deg) translateY(0);
+  }
+  45% {
+    transform: rotate(7deg) translateY(2px);
+  }
+  60% {
+    transform: rotate(5deg) translateY(4px);
+  }
+}
+
+/* ---- Hareket azaltma: yukarıdaki animasyonların hepsi kapalı / sade ---- */
+@media (prefers-reduced-motion: reduce) {
+  .h1-line > span,
+  .marquee-track,
+  .btn:hover .btn-icon,
+  .btn-primary:hover::after,
+  .nf-mark,
+  .lightbox[open],
+  .lightbox[open]::backdrop,
+  .js img.fade-img:not(.is-loaded) {
+    animation: none;
+  }
+
+  .js img.fade-img:not(.is-loaded) {
+    opacity: 1;
+  }
+
+  .step-line::after {
+    animation: none;
+    transform: none;
+  }
+
+  .service-card::after {
+    display: none;
+  }
+
+  .btn:active,
+  .btn-primary:active,
+  .option-card:hover {
+    transform: none;
+  }
+}
 /* ---------- Hareket tercihi ---------- */
 
 @media (prefers-reduced-motion: reduce) {

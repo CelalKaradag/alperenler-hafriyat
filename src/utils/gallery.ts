@@ -25,7 +25,7 @@ export interface ResolvedVideo {
 export type ResolvedEntry = ResolvedImage | ResolvedVideo;
 
 /**
- * Dosyası public/ altında bulunan galeri öğeleri (sıra gallery.ts'tekiyle aynı).
+ * Dosyası public/ altında bulunan galeri öğeleri (sıra gallery.ts’tekiyle aynı).
  * Boyutlar verilmediyse dosyadan okunur; okunamazsa görsel için 4:3, video için 16:9 varsayılır.
  */
 export function getGalleryEntries(): ResolvedEntry[] {

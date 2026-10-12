@@ -14,12 +14,14 @@ interface Props {
   description: string;
   /** true: header, sayfanın ilk bölümü (hero) üstünde şeffaf başlar */
   overHero?: boolean;
-  /** false: footer'daki harita şeridini gizler (sayfada zaten büyük harita varsa) */
+  /** false: footer’daki harita şeridini gizler (sayfada zaten büyük harita varsa) */
   footerMap?: boolean;
-  /** false: footer'daki "Projeniz için teklif alın" şeridini gizler (ana sayfada iletişim bölümü var) */
+  /** false: footer’daki "Projeniz için teklif alın" şeridini gizler (ana sayfada iletişim bölümü var) */
   footerCta?: boolean;
   /** true: site yayına çıksa bile sayfa noindex kalır */
   noindex?: boolean;
+  /** true: bölüm başlıklarındaki küçük etiket (eyebrow) "01 — " gibi sırayla numaralanır */
+  numbered?: boolean;
 }
 
 const {
@@ -29,6 +31,7 @@ const {
   footerMap = true,
   footerCta = true,
   noindex = false,
+  numbered = false,
 } = Astro.props;
 
 // Dosya yoksa etiket basılmaz (README: apple-touch-icon.png)
@@ -67,7 +70,7 @@ const heroFont = publicFileExists('/fonts/archivo-latin.woff2') ? '/fonts/archiv
       )
     }
     <Header />
-    <main id="icerik" tabindex="-1">
+    <main id="icerik" tabindex="-1" class:list={[numbered && 'numbered']}>
       <slot />
     </main>
     <Footer map={footerMap} cta={footerCta} />

@@ -3,8 +3,8 @@
  * etkenler anlatılır. Hukuki tavsiye içermez.
  *
  * `onaylandi: false` → sayfa yalnızca `showDrafts` (src/data/drafts.ts) true iken üretilir
- * (`npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` önizleme build'i), "TASLAK" rozetiyle; sitemap'e ve
- * JSON-LD'ye girmez. Firma metni onaylayınca `onaylandi: true` yapılır.
+ * (`npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` önizleme build’i), "TASLAK" rozetiyle; sitemap’e ve
+ * JSON-LD’ye girmez. Firma metni onaylayınca `onaylandi: true` yapılır.
  */
 import { showDrafts } from './drafts';
 
@@ -29,7 +29,7 @@ export const priceGuide = {
   title: 'Hafriyat Fiyatları Nasıl Belirlenir?',
   seoTitle: 'Hafriyat Fiyatları Nasıl Belirlenir? | Alperenler Hafriyat',
   description:
-    "Hafriyat, kazı, makine kiralama ve kamyon taşıma fiyatlarını hangi etkenlerin belirlediği; Malatya'da teklif için hangi bilgilerin yeterli olduğu.",
+    "Hafriyat, kazı, makine kiralama ve kamyon taşıma fiyatlarını hangi etkenlerin belirlediği; Malatya’da teklif için hangi bilgilerin yeterli olduğu.",
   lead: 'Hafriyat ve kazı işlerinde fiyat sabit bir listeyle değil, işin koşullarıyla belirlenir. Bu sayfa fiyatı etkileyen etkenleri anlatır; rakam vermez. Net fiyat için işi öğrenmemiz gerekir.',
   sections: [
     {

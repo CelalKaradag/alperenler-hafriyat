@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import LogoMark from '../components/LogoMark.astro';
 import TopoArt from '../components/TopoArt.astro';
 import { site } from '../data/site';
 ---
@@ -12,12 +14,15 @@ import { site } from '../data/site';
   <section class="section section-dark on-dark not-found">
     <TopoArt />
     <div class="container narrow not-found-inner">
+      <LogoMark class="nf-mark" />
       <p class="nf-code" aria-hidden="true">404</p>
       <h1>Sayfa bulunamadı</h1>
       <p class="lead">Aradığınız sayfa kazılmış olabilir.</p>
       <div class="btn-row">
         <a class="btn btn-primary btn-lg" href="/">Ana Sayfa</a>
-        <a class="btn btn-outline-light btn-lg" href={site.phone.href}>Hemen Ara</a>
+        <a class="btn btn-outline-light btn-lg" href={site.phone.href}>
+          <Icon class="btn-icon" name="phone" />Hemen Ara
+        </a>
       </div>
     </div>
   </section>

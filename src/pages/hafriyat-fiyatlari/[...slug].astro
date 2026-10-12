@@ -12,7 +12,7 @@ import {
 } from '../../data/price-guide';
 import { breadcrumbSchema, faqSchema } from '../../utils/schema';
 
-// /hafriyat-fiyatlari/ yalnızca onaylıysa veya showDrafts (dev / önizleme build'i) iken üretilir.
+// /hafriyat-fiyatlari/ yalnızca onaylıysa veya showDrafts (dev / önizleme build’i) iken üretilir.
 export function getStaticPaths() {
   return guideVisible ? [{ params: { slug: undefined } }] : [];
 }

@@ -5,7 +5,7 @@
  *  - `npm run dev` sırasında her zaman (import.meta.env.DEV),
  *  - ya da build sırasında `PUBLIC_SHOW_DRAFTS=true` ortam değişkeni verilmişse (önizleme sürümü).
  *
- * Taslaklar görünür olduğunda "TASLAK" rozetleri çıkar; JSON-LD'ye (Service, FAQPage) taslaklar
+ * Taslaklar görünür olduğunda "TASLAK" rozetleri çıkar; JSON-LD’ye (Service, FAQPage) taslaklar
  * ASLA girmez (yalnızca `onaylandi: true`). Gerçek yayında `PUBLIC_SHOW_DRAFTS` verilmemelidir.
  */
 export const showDrafts: boolean =

@@ -8,7 +8,7 @@ const steps = [
     icon: 'phone',
     title: 'Bizi arayın',
     // Numara metin olarak yazılmaz (ana sayfada yalnızca header ve footer harita kartında görünür)
-    text: whatsappUrl ? "Telefonla veya WhatsApp'tan bize ulaşın." : 'Bizi telefonla arayın.',
+    text: whatsappUrl ? "Telefonla veya WhatsApp’tan bize ulaşın." : 'Bizi telefonla arayın.',
   },
   {
     number: '02',
@@ -31,12 +31,12 @@ const steps = [
       <p class="eyebrow">Süreç</p>
       <h2 id="calisma-baslik">Nasıl çalışıyoruz?</h2>
     </div>
-    <ol class="steps">
+    <ol class="steps" data-steps>
       {
         steps.map((step) => (
           <li class="step">
             <div class="step-head">
-              <span class="step-number" aria-hidden="true">{step.number}</span>
+              <span class="step-number" data-n={step.number} aria-hidden="true">{step.number}</span>
               <span class="step-line" aria-hidden="true"></span>
             </div>
             <Icon class="step-icon" name={step.icon} />

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import HeroMarquee from '../components/HeroMarquee.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import StatsStrip from '../components/StatsStrip.astro';
 import TrustStrip from '../components/TrustStrip.astro';
@@ -25,9 +26,10 @@ const hasAboutImage = publicFileExists(aboutImage);
 
 <BaseLayout
   overHero
+  numbered
   footerCta={false}
   title={`${site.name} | Malatya Yeşilyurt`}
-  description={`${site.legalName}, Malatya Yeşilyurt'ta. İhtiyacınızı konuşmak için doğrudan arayabilirsiniz: ${site.phone.display}.`}
+  description={`${site.legalName}, Malatya Yeşilyurt’ta. İhtiyacınızı konuşmak için doğrudan arayabilirsiniz: ${site.phone.display}.`}
 >
   <Fragment slot="head">
     <JsonLd data={localBusinessSchema(Astro.site)} />
@@ -35,6 +37,7 @@ const hasAboutImage = publicFileExists(aboutImage);
   </Fragment>
 
   <Hero scrollTarget="#firma" />
+  <HeroMarquee />
 
   <section id="firma" class="section section-light" aria-labelledby="firma-baslik">
     <div class="container about reveal">
@@ -44,7 +47,7 @@ const hasAboutImage = publicFileExists(aboutImage);
           <h2 id="firma-baslik">{site.legalName}</h2>
         </div>
         <p>
-          {site.legalName}, Koyunoğlu Mahallesi'nde, Yeşilyurt / Malatya adresinde yer alır.
+          {site.legalName}, Koyunoğlu Mahallesi’nde, Yeşilyurt / Malatya adresinde yer alır.
           Çalışmaya başlamadan önce ihtiyacı doğrudan konuşmak, işin doğru anlaşılması için en
           sağlıklı yoldur.
         </p>
@@ -88,7 +91,7 @@ const hasAboutImage = publicFileExists(aboutImage);
           </div>
           <div class="card-grid">
             {visibleServices.map((service, i) => (
-              <div class="reveal" style={`--d: ${(i % 4) * 0.07}s`}>
+              <div class="reveal" style={`--d: ${(i % 4) * 0.08}s`}>
                 <ServiceCard service={service} index={i + 1} />
               </div>
             ))}
@@ -109,6 +112,6 @@ const hasAboutImage = publicFileExists(aboutImage);
 
   <FaqSection />
 
-  <!-- Fiyat + sihirbaz (açık zemin): footer'ın koyu harita şeridinden önce son bölüm. SSS görünürse zemin tonu değişir. -->
+  <!-- Fiyat + sihirbaz (açık zemin): footer’ın koyu harita şeridinden önce son bölüm. SSS görünürse zemin tonu değişir. -->
   <PriceWizard tone={visibleFaqs.length > 0 ? 'paper' : 'light'} />
 </BaseLayout>

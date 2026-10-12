@@ -27,7 +27,7 @@ export interface SiteConfig {
     country: string;
   };
   /**
-   * Firmanın Google İşletme Profili / Maps yer bağlantısı. Tanımlıysa "Google Maps'te aç",
+   * Firmanın Google İşletme Profili / Maps yer bağlantısı. Tanımlıysa "Google Maps’te aç",
    * "Yol tarifi al" ve diğer harita bağlantıları bunu kullanır; tanımsızsa adres araması kullanılır.
    * Şimdilik tanımsız (doğrulanmış bağlantı yok).
    */
@@ -35,10 +35,10 @@ export interface SiteConfig {
   /**
    * Doğrulanmış koordinat (enlem/boylam). null iken harita adres aramasıyla çalışır.
    * Tanımlıysa gömülü harita bu noktaya odaklanır, kendi sarı iğnemiz tam ortaya konur
-   * ve JSON-LD'ye `geo` eklenir. Koordinat uydurulmaz; doğrulanmadan doldurulmamalıdır.
+   * ve JSON-LD’ye `geo` eklenir. Koordinat uydurulmaz; doğrulanmadan doldurulmamalıdır.
    */
   mapCoords: { lat: number; lng: number } | null;
-  /** Doğrulanmış sosyal medya / işletme profili bağlantıları. Tanımlı değilse JSON-LD'ye eklenmez. */
+  /** Doğrulanmış sosyal medya / işletme profili bağlantıları. Tanımlı değilse JSON-LD’ye eklenmez. */
   sameAs?: string[];
   publish: {
     /**
@@ -73,7 +73,7 @@ const target = coords ? `${coords.lat},${coords.lng}` : encodedAddress;
 /** Koordinat tanımlı mı? (tanımlıysa MapCard kendi iğnesini ortaya koyar) */
 export const hasMapCoords = coords !== null;
 
-/** "Google Maps'te aç" bağlantısı: İşletme Profili bağlantısı varsa o, yoksa koordinat/adres araması */
+/** "Google Maps’te aç" bağlantısı: İşletme Profili bağlantısı varsa o, yoksa koordinat/adres araması */
 export const mapsUrl =
   site.mapsPlaceUrl ?? `https://www.google.com/maps/search/?api=1&query=${target}`;
 

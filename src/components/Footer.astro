@@ -4,6 +4,7 @@ import { visibleMachines } from '../data/machines';
 import { guideVisible } from '../data/price-guide';
 import { visibleServices } from '../data/services';
 import { site, whatsappUrl } from '../data/site';
+import Icon from './Icon.astro';
 import LogoMark from './LogoMark.astro';
 import MapBand from './MapBand.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
@@ -30,7 +31,9 @@ const hasServices = visibleServices.length > 0;
             <p>İhtiyacınızı anlatın, işin koşullarına göre teklif hazırlayalım.</p>
           </div>
           <div class="btn-row">
-            <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+            <a class="btn btn-primary btn-lg" href={site.phone.href}>
+              <Icon class="btn-icon" name="phone" />Hemen Ara
+            </a>
             {whatsappUrl && <WhatsAppButton class="btn btn-wa btn-lg" href={whatsappUrl} />}
           </div>
         </div>

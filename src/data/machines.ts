@@ -2,8 +2,8 @@
  * Makine kiralama sayfaları (/makine-kiralama/ ve /makine-kiralama/<slug>/).
  *
  * `onaylandi: false` → yalnızca `showDrafts` (src/data/drafts.ts) true iken görünür ve "TASLAK"
- * rozeti taşır: `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i.
- * Normal yayın çıktısında sayfa, menü/liste bağlantısı ve sitemap girdisi üretilmez; JSON-LD'ye girmez.
+ * rozeti taşır: `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build’i.
+ * Normal yayın çıktısında sayfa, menü/liste bağlantısı ve sitemap girdisi üretilmez; JSON-LD’ye girmez.
  *
  * DİKKAT: Bu makinelerin firmada bulunduğu henüz ONAYLANMADI. Firma hangi makinelerin gerçekten
  * bulunduğunu doğrulamadan `onaylandi: true` yapılmamalıdır. Metinlerde rakam, fiyat, süre,
@@ -24,7 +24,7 @@ export interface Machine {
   uses: string[];
   /** Teklif için gerekenler */
   quoteNeeds: string[];
-  /** İlgili hizmet slug'ları (services.ts) */
+  /** İlgili hizmet slug’ları (services.ts) */
   relatedServices: string[];
   icon: IconName;
   /** Galeri görseli (JPG; aynı adlı .webp varsa <picture> ile önce o) */
@@ -32,7 +32,7 @@ export interface Machine {
   onaylandi: boolean;
 }
 
-// Hizmet slug'ları (services.ts)
+// Hizmet slug’ları (services.ts)
 const S = {
   hafriyat: 'hafriyat-ve-temel-kazisi',
   yikim: 'bina-yikim-ve-kirim',
@@ -62,10 +62,10 @@ export const machines: Machine[] = [
     title: 'Kiralık Kepçe (Kazıcı Yükleyici)',
     seoName: 'Kiralık Kepçe (Kazıcı Yükleyici)',
     summary:
-      "Kazı ve yükleme işlerini tek makineyle yürüten kazıcı yükleyici (kepçe); operatörlü kiralama Malatya'da iş ve sahaya göre görüşülür.",
+      "Kazı ve yükleme işlerini tek makineyle yürüten kazıcı yükleyici (kepçe); operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Kazıcı yükleyici, halk arasında kepçe olarak da bilinir; önünde yükleme kovası, arkasında kazı kolu bulunan bir iş makinesidir. Aynı makine hem kazı yapabilir hem de malzemeyi yükleyip yerinden oynatabildiği için küçük ve orta ölçekli işlerde sık tercih edilir.',
-      "Malatya'da arsa hazırlığı, hat kazısı ve dolgu gibi işlerde makinenin sahaya girebilmesi, zeminin türü ve işin hacmi hangi makinenin uygun olacağını belirler; bu yüzden iş önce konuşulur.",
+      "Malatya’da arsa hazırlığı, hat kazısı ve dolgu gibi işlerde makinenin sahaya girebilmesi, zeminin türü ve işin hacmi hangi makinenin uygun olacağını belirler; bu yüzden iş önce konuşulur.",
     ],
     uses: [
       'Küçük ve orta ölçekli temel veya hendek kazılarında',
@@ -84,10 +84,10 @@ export const machines: Machine[] = [
     title: 'Ekskavatör Kiralama',
     seoName: 'Ekskavatör Kiralama',
     summary:
-      "Derin ve geniş kazılar için paletli ekskavatör; operatörlü kiralama Malatya'da iş ve sahaya göre görüşülür.",
+      "Derin ve geniş kazılar için paletli ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Paletli ekskavatör; uzun kolu ve kovası sayesinde derin ve geniş kazılarda, ağır zeminlerde ve yüksek hacimli işlerde kullanılan temel kazı makinesidir. Kol ucuna kırıcı gibi farklı ataşmanlar takılabildiği için aynı makine farklı işlerde de çalışabilir.',
-      "Malatya'da temel kazısı, altyapı hattı, yıkım sonrası hafriyat ve arazi düzleme gibi işlerde ekskavatör sıkça gerekir. Kazı derinliği, zemin ve çıkacak malzemenin miktarı makinenin ve sayısının belirlenmesinde etkilidir.",
+      "Malatya’da temel kazısı, altyapı hattı, yıkım sonrası hafriyat ve arazi düzleme gibi işlerde ekskavatör sıkça gerekir. Kazı derinliği, zemin ve çıkacak malzemenin miktarı makinenin ve sayısının belirlenmesinde etkilidir.",
     ],
     uses: [
       'Derin ve geniş temel kazılarında',
@@ -106,10 +106,10 @@ export const machines: Machine[] = [
     title: 'Mini Ekskavatör Kiralama',
     seoName: 'Mini Ekskavatör Kiralama',
     summary:
-      "Dar alanlarda ve hassas çalışmalarda küçük ekskavatör; operatörlü kiralama Malatya'da iş ve sahaya göre görüşülür.",
+      "Dar alanlarda ve hassas çalışmalarda küçük ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Mini ekskavatör, normal ekskavatörün küçültülmüş hâlidir; dar sokaklarda, bina aralarında, bahçelerde ve kapıdan geçmesi gereken sahalarda çalışabilir. Daha küçük olduğu için yüzeye ve çevredeki yapılara daha az yük bindirir.',
-      "Malatya'da şehir içi dar sokaklarda hat kazısı, bahçe düzenlemesi ve ince işlerde mini ekskavatör tercih edilir. Hangi makinenin uygun olacağı sahanın giriş genişliğine, zemine ve işin hacmine bağlıdır.",
+      "Malatya’da şehir içi dar sokaklarda hat kazısı, bahçe düzenlemesi ve ince işlerde mini ekskavatör tercih edilir. Hangi makinenin uygun olacağı sahanın giriş genişliğine, zemine ve işin hacmine bağlıdır.",
     ],
     uses: [
       'Dar sokak ve bina arası hat kazılarında',
@@ -128,7 +128,7 @@ export const machines: Machine[] = [
     title: 'Kırıcılı Ekskavatör Kiralama',
     seoName: 'Kırıcılı Ekskavatör Kiralama',
     summary:
-      "Sert zemin, kaya ve beton için kırıcı takılmış ekskavatör; operatörlü kiralama Malatya'da iş ve sahaya göre görüşülür.",
+      "Sert zemin, kaya ve beton için kırıcı takılmış ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Kırıcılı ekskavatör, kol ucuna hidrolik kırıcı takılmış ekskavatördür. Normal kova ile ilerlenemeyen sert zeminleri, kayayı ve betonu kırarak kazıya devam etmeyi sağlar.',
       'Taşlık ve kayalık arsalarda temel kazısı, hat kazısı ve beton kırım işlerinde gerekir. Kırıcı çalışırken titreşim ve gürültü oluşabildiğinden çevredeki yapılara mesafe ve çalışma düzeni işe başlamadan konuşulmalıdır.',
@@ -150,10 +150,10 @@ export const machines: Machine[] = [
     title: 'Hafriyat Kamyonu Kiralama',
     seoName: 'Hafriyat Kamyonu Kiralama',
     summary:
-      "Toprak, moloz ve benzeri malzemeyi sahadan taşıyan damperli kamyon; kiralama Malatya'da iş ve sahaya göre görüşülür.",
+      "Toprak, moloz ve benzeri malzemeyi sahadan taşıyan damperli kamyon; kiralama Malatya’da iş ve sahaya göre görüşülür.",
     detail: [
       'Hafriyat kamyonu, kazıdan çıkan toprağın, enkazın veya dolgu malzemesinin sahadan taşınması için kullanılan damperli kamyondur. Kazı makinesiyle birlikte çalıştığında malzeme sahada birikmeden uzaklaştırılır.',
-      "Malatya'da taşıma işinin planı; sahadan boşaltma noktasına mesafeye, sahaya kamyon girişinin kolaylığına ve malzemenin türüne göre yapılır. Hafriyat toprağı ve molozun ilgili belediyenin izin verdiği alanlara götürülmesi gerekir.",
+      "Malatya’da taşıma işinin planı; sahadan boşaltma noktasına mesafeye, sahaya kamyon girişinin kolaylığına ve malzemenin türüne göre yapılır. Hafriyat toprağı ve molozun ilgili belediyenin izin verdiği alanlara götürülmesi gerekir.",
     ],
     uses: [
       'Kazıdan çıkan toprağın sahadan taşınmasında',
@@ -172,7 +172,7 @@ export const machines: Machine[] = [
   },
 ];
 
-/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build'i) iken taslaklar da. */
+/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build’i) iken taslaklar da. */
 export const visibleMachines: Machine[] = machines.filter(
   (machine) => machine.onaylandi || showDrafts,
 );

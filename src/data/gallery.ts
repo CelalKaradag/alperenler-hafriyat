@@ -15,7 +15,7 @@
 
 export interface GalleryBase {
   featured?: boolean;
-  /** İlgili hizmetlerin slug'ları (hizmet detay sayfasındaki "Sahadan kareler" şeridi için) */
+  /** İlgili hizmetlerin slug’ları (hizmet detay sayfasındaki "Sahadan kareler" şeridi için) */
   services?: string[];
   width?: number;
   height?: number;
@@ -43,7 +43,7 @@ export type GalleryItem = GalleryImage | GalleryVideo;
 
 const DIR = '/images/galeri';
 
-// Hizmet slug'ları (services.ts)
+// Hizmet slug’ları (services.ts)
 const S = {
   hafriyat: 'hafriyat-ve-temel-kazisi',
   yikim: 'bina-yikim-ve-kirim',

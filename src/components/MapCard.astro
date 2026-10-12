@@ -5,9 +5,9 @@ import TopoArt from './TopoArt.astro';
 
 <!--
   Harita alanı (MapBand içinde kullanılır). Görünür alana yaklaşınca (src/scripts/map-card.js,
-  IntersectionObserver) Google Maps iframe'i kendiliğinden yüklenir; yüklenene kadar bu kart bekleme
-  ekranıdır. Başlangıçta HTML'de iframe YOK. Yüklenemezse kart kalır (iletişim kartındaki
-  "Google Maps'te aç" düğmesi her zaman görünür). Save-Data açıksa otomatik yükleme yapılmaz;
+  IntersectionObserver) Google Maps iframe’i kendiliğinden yüklenir; yüklenene kadar bu kart bekleme
+  ekranıdır. Başlangıçta HTML’de iframe YOK. Yüklenemezse kart kalır (iletişim kartındaki
+  "Google Maps’te aç" düğmesi her zaman görünür). Save-Data açıksa otomatik yükleme yapılmaz;
   "Haritayı göster" düğmesi çıkar.
 -->
 <div
@@ -45,7 +45,7 @@ import TopoArt from './TopoArt.astro';
   </div>
 
   <!--
-    Koruma katmanı: harita yüklenince iframe'in üstünü kaplar; sayfa normal kayar ve Google'ın
+    Koruma katmanı: harita yüklenince iframe’in üstünü kaplar; sayfa normal kayar ve Google’ın
     "ctrl + kaydırma" uyarısı çıkmaz. Tıklayınca/dokununca kalkar (src/scripts/map-card.js).
     Yüzen iletişim kartı (MapBand) bunun üstünde kalır.
   -->
@@ -57,7 +57,7 @@ import TopoArt from './TopoArt.astro';
   </button>
 
   <!--
-    Koordinat tanımlıysa Google iğnesi çıkmaz (embed'de q yok); kendi sarı iğnemiz serbest alanın
+    Koordinat tanımlıysa Google iğnesi çıkmaz (embed’de q yok); kendi sarı iğnemiz serbest alanın
     tam ortasına konur, iğnenin ucu merkezdedir. Yalnızca harita yüklenince görünür.
   -->
   {

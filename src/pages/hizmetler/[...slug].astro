@@ -54,7 +54,7 @@ const title = service
   : `Hizmetler | ${site.name}`;
 const description = service
   ? service.summary
-  : `${site.legalName} hizmetleri: hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya'da ihtiyacınızı konuşmak için arayın.`;
+  : `${site.legalName} hizmetleri: hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya’da ihtiyacınızı konuşmak için arayın.`;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
@@ -205,7 +205,7 @@ const description = service
             <p class="eyebrow">Neler yapıyoruz?</p>
             <h1>Hizmetler</h1>
             <p class="lead">
-              Hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya'da ihtiyacınızı anlatmak için
+              Hafriyat, kazı, yıkım ve iş makinesi işleri. Malatya’da ihtiyacınızı anlatmak için
               bizi arayabilirsiniz.
             </p>
           </div>
@@ -215,7 +215,9 @@ const description = service
           <div class="container">
             <div class="card-grid">
               {visibleServices.map((item, i) => (
-                <ServiceCard service={item} index={i + 1} />
+                <div class="reveal" style={`--d: ${(i % 4) * 0.08}s`}>
+                  <ServiceCard service={item} index={i + 1} />
+                </div>
               ))}
             </div>
           </div>

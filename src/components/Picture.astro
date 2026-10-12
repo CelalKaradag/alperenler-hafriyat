@@ -19,5 +19,5 @@ const webp = webpSibling(src);
 
 <picture>
   {webp && <source srcset={webp} type="image/webp" sizes={sizes} />}
-  <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding="async" sizes={sizes} />
+  <img src={src} alt={alt} width={width} height={height} class:list={['fade-img', className]} loading={loading} decoding="async" sizes={sizes} />
 </picture>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { site, whatsappUrl } from '../data/site';
+import { mapsDirectionsUrl, site, whatsappUrl } from '../data/site';
+import Icon from '../components/Icon.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import MapBand from '../components/MapBand.astro';
 import JsonLd from '../components/JsonLd.astro';
@@ -21,27 +22,65 @@ import { localBusinessSchema } from '../utils/schema';
     </div>
   </section>
 
-  <section class="section section-light">
-    <div class="container contact-grid">
-      <div class="contact-card">
-        <h2>Telefon</h2>
-        <p class="contact-value"><a href={site.phone.href}>{site.phone.display}</a></p>
+  <section class="section section-light section--flush-top">
+    <div class="container">
+      <!-- Üç büyük seçenek: tüm kart tıklanabilir. Çalışma saati yazılmaz (doğrulanmadı). -->
+      <ul class="option-grid">
+        <li>
+          <a class="option-card" href={site.phone.href}>
+            <span class="option-icon"><Icon name="phone" /></span>
+            <span class="option-title">Ara</span>
+            <span class="option-desc">Doğrudan telefonla ulaşın.</span>
+            <Icon class="option-arrow" name="arrow" />
+          </a>
+        </li>
         {
           whatsappUrl && (
-            <div class="btn-row">
-              <WhatsAppButton class="btn btn-dark" href={whatsappUrl} />
-            </div>
+            <li>
+              <WhatsAppButton class="option-card option-card--wa" href={whatsappUrl}>
+                <span class="option-title">WhatsApp’tan yaz</span>
+                <span class="option-desc">Mesajınızı yazın, size dönelim.</span>
+                <Icon class="option-arrow" name="arrow" />
+              </WhatsAppButton>
+            </li>
           )
         }
-      </div>
+        <li>
+          <a
+            class="option-card"
+            href={mapsDirectionsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="option-icon"><Icon name="pin" /></span>
+            <span class="option-title">Yol tarifi al</span>
+            <span class="option-desc">Haritada yol tarifini açın.</span>
+            <Icon class="option-arrow" name="arrow" />
+            <span class="visually-hidden"> (yeni sekmede açılır)</span>
+          </a>
+        </li>
+      </ul>
 
-      <div class="contact-card">
-        <h2>Adres</h2>
-        <address class="contact-value">{site.address}</address>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h2>Telefon</h2>
+          <p class="contact-value"><a href={site.phone.href}>{site.phone.display}</a></p>
+          <div class="copy-row">
+            <button class="copy-btn" type="button" data-copy={site.phone.display} hidden>
+              <Icon name="quote" />Kopyala
+            </button>
+            <span class="copy-status" role="status" aria-live="polite" data-copy-status></span>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <h2>Adres</h2>
+          <address class="contact-value">{site.address}</address>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Sayfanın kendi haritası (footer'daki harita bu sayfada gizli) -->
+  <!-- Sayfanın kendi haritası (footer’daki harita bu sayfada gizli) -->
   <MapBand />
 </BaseLayout>

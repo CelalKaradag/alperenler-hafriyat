@@ -1,0 +1,25 @@
+---
+import { visibleServices } from '../data/services';
+
+// Yalnızca görünür hizmet listesinden; hizmet yoksa hiçbir şey basılmaz.
+const names = visibleServices.map((service) => service.title);
+// Her yarı en az ekran genişliğini geçsin diye az öğede liste tekrarlanır
+const repeat = names.length >= 6 ? 2 : 4;
+const half = Array.from({ length: repeat }).flatMap(() => names);
+---
+
+{
+  names.length > 0 && (
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        {[0, 1].map(() => (
+          <div class="marquee-half">
+            {half.map((name) => (
+              <span class="marquee-item">{name}</span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

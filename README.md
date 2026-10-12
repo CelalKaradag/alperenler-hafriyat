@@ -180,6 +180,19 @@ Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce dol
 3. [src/data/site.ts](src/data/site.ts) → `publish.indexable: true`, `astro.config.mjs` → `site` (gerçek alan adı). Gizlilik sayfası `noindex` kalır.
 4. Yayın öncesi kontrol listesindeki diğer maddeler (gizlilik sayfası yer tutucuları, logo, `og-image.png`, koordinat/İşletme Profili).
 
+## Premium görsel katman (Aşama 9A)
+
+- **Hero:** başlık satır satır alttan maskeyle açılır (700 ms), alt başlık ve butonlar 120 ms arayla; video üstünde çok hafif vinyet. Altında yavaş "kayan şerit" (yalnızca görünür hizmet adları, `aria-hidden`, üzerine gelince durur; [HeroMarquee.astro](src/components/HeroMarquee.astro)).
+- **Numaralı bölüm etiketleri:** `BaseLayout`'a `numbered` verilen sayfada (şu an ana sayfa) `.section-head` içindeki etiketler CSS sayaçlarıyla "01 — …", "02 — …" diye gerçek sıraya göre numaralanır.
+- **Tipografi:** başlıklarda `text-wrap: balance`, paragraflarda `pretty`, uzun metinlerde en çok 65ch; metinlerdeki kesme işaretleri tipografik (’).
+- **Hizmet kartları:** fareyi takip eden hafif ışık (`--mx/--my`, yalnızca fare/hover cihazlarda), 80 ms kademeli belirme.
+- **Nasıl çalışıyoruz:** adımlar arası çizgi kaydırdıkça dolar (`animation-timeline: view()`; desteklemeyen tarayıcıda dolu çizgi), numaralar kontur yazı, aktif adımda sarıya dolar.
+- **Görseller:** yer tutucu zemin + yüklenince yumuşak fade-in. **Ortalama renk:** JPEG'den ortalama rengi saf JS ile çıkarmak (DCT çözümü) paket olmadan makul değil; bu yüzden tüm görsellerde sabit kum rengi (`--img-placeholder`) kullanılır.
+- **Lightbox:** View Transitions API varsa görsel karttan büyüyerek açılır / karta küçülerek kapanır (`view-transition-name: lb-img`); yoksa fade. Videolarda ve hareket azaltmada geçiş yok.
+- **Mikro etkileşimler:** basınca `scale(.98)`, sarı düğmede hover'da tek seferlik parlama, "Hemen Ara" düğmelerinde telefon ikonu hover'da titrer; iletişim sayfasında telefon için "Kopyala" düğmesi (JavaScript yoksa gizli) ve `aria-live` bildirimi.
+- **İletişim sayfası:** üstte üç büyük seçenek kartı (Ara / WhatsApp'tan yaz / Yol tarifi al); çalışma saati yazılmaz (doğrulanmadı). **404:** logo işareti "kazıyormuş" gibi sallanır.
+- Animasyonlar yalnızca `transform`/`opacity` kullanır; `prefers-reduced-motion` açıkken hepsi kapalı veya sade.
+
 ## Hizmet görselleri, güven şeridi
 
 - **Hizmet görselleri:** `services.ts` içindeki `image` alanı galeri dosyalarını kullanır (`/images/galeri/*.jpg`, aynı adlı `.webp` varsa `<picture>` ile önce o). Masaüstü kartında 16/10 görsel, alttan karta kaynaşan koyu degrade ve görselin üstünde numara + ikon; hover'da görsel 400 ms'de `scale(1.04)` (hareket azaltmada yok). Mobil kompakt satırda solda 56 px kare küçük resim, yanında küçük numara. Detay sayfasının başlık bölümünün arka planı aynı görseldir (koyu katman + soluk topo deseni).

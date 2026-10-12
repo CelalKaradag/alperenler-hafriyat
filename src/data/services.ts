@@ -3,8 +3,8 @@
  *
  * `onaylandi: true`  → her yerde görünür (menü, ana sayfa, /hizmetler, detay sayfaları).
  * `onaylandi: false` → YALNIZCA `showDrafts` (src/data/drafts.ts) true iken görünür ve "TASLAK" rozeti taşır:
- *                      `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build'i.
- *                      Normal yayın çıktısında ne kart ne menü ne de sayfa üretilir; JSON-LD'ye girmez.
+ *                      `npm run dev` veya `PUBLIC_SHOW_DRAFTS=true` ile alınan önizleme build’i.
+ *                      Normal yayın çıktısında ne kart ne menü ne de sayfa üretilir; JSON-LD’ye girmez.
  *
  * Firma bir hizmeti doğruladığında yalnızca `onaylandi` değerini `true` yapmak yeterlidir.
  * Metinlerde deneyim, makine sayısı, süre, fiyat veya garanti ifadesi yoktur; eklenmemelidir.
@@ -48,9 +48,9 @@ export const services: Service[] = [
     title: 'Hafriyat ve Temel Kazısı',
     seoName: 'Temel Kazısı',
     summary:
-      "Bina, depo ve benzeri yapılar için temel kazısı ve hafriyat işleri; sert zemin ve taşlık arazide de Malatya'da ihtiyaca göre planlanır.",
+      "Bina, depo ve benzeri yapılar için temel kazısı ve hafriyat işleri; sert zemin ve taşlık arazide de Malatya’da ihtiyaca göre planlanır.",
     detail: [
-      "Temel kazısı, bir yapının oturacağı zeminin projeye uygun ölçü ve seviyede açılmasıdır. Malatya'da arsanın zemini her yerde aynı değildir; yumuşak toprak, sert zemin ve taşlık arazi farklı makine ve yaklaşım gerektirebilir.",
+      "Temel kazısı, bir yapının oturacağı zeminin projeye uygun ölçü ve seviyede açılmasıdır. Malatya’da arsanın zemini her yerde aynı değildir; yumuşak toprak, sert zemin ve taşlık arazi farklı makine ve yaklaşım gerektirebilir.",
       'Hafriyat işlerinde çıkan toprağın sahada nasıl toplanacağı ve nereye taşınacağı da işin bir parçasıdır. Bu yüzden iş başlamadan önce arsanın durumunu, kazı derinliğini ve çıkacak malzemeyi birlikte konuşmak gerekir.',
     ],
     whenNeeded: [
@@ -71,7 +71,7 @@ export const services: Service[] = [
     summary:
       'Eski veya kullanılmayan yapıların yıkımı, kırım işleri ve ortaya çıkan molozun sahadan uzaklaştırılması.',
     detail: [
-      "Yıkım, yapının yerinde bırakılmasının mümkün olmadığı ya da yeni bir yapıya yer açılması gerektiği durumlarda gündeme gelir. Malatya'da yıkım işi çoğu zaman hafriyat ve moloz taşıma ile birlikte planlanır.",
+      "Yıkım, yapının yerinde bırakılmasının mümkün olmadığı ya da yeni bir yapıya yer açılması gerektiği durumlarda gündeme gelir. Malatya’da yıkım işi çoğu zaman hafriyat ve moloz taşıma ile birlikte planlanır.",
       'Yapının türü, çevresindeki yapılar ve sahaya giriş durumu işin nasıl yürütüleceğini belirler. İş öncesinde yeri görerek konuşmak, planın doğru yapılmasına yardımcı olur.',
     ],
     whenNeeded: [
@@ -93,7 +93,7 @@ export const services: Service[] = [
       'Kanalizasyon, su ve benzeri hatlar için kanal ve hat kazısı; kazı sonrası dolgu ve kapama işlerinin planlanması.',
     detail: [
       'Altyapı kazıları genellikle dar ve uzun hatlar halinde yapılır. Hattın derinliği, zemin cinsi ve çevresindeki yapılar kazının nasıl yürütüleceğini etkiler.',
-      "Malatya'da bu tür işlerde hattın geçeceği güzergâhı önceden görmek ve kazı ile kapama aşamalarını birlikte düşünmek işin düzenli ilerlemesine yardımcı olur.",
+      "Malatya’da bu tür işlerde hattın geçeceği güzergâhı önceden görmek ve kazı ile kapama aşamalarını birlikte düşünmek işin düzenli ilerlemesine yardımcı olur.",
     ],
     whenNeeded: [
       'Yeni bir kanalizasyon veya su hattı döşenecekse',
@@ -114,7 +114,7 @@ export const services: Service[] = [
       'Arazinin düzlenmesi (tesviye) ve ulaşım için yol açma işleri; orman ve dağ yolu gibi engebeli sahalar dahil.',
     detail: [
       'Arazi düzleme, eğimli ya da engebeli bir alanın kullanıma uygun seviyeye getirilmesidir. Yol açma ise sahaya araç ve makinenin ulaşabilmesi için güzergâh oluşturmayı kapsar.',
-      "Malatya'da arazi yapısı bölgeden bölgeye değişir; bu yüzden eğim, zemin ve erişim durumu işe başlamadan önce birlikte değerlendirilir.",
+      "Malatya’da arazi yapısı bölgeden bölgeye değişir; bu yüzden eğim, zemin ve erişim durumu işe başlamadan önce birlikte değerlendirilir.",
     ],
     whenNeeded: [
       'İnşaat, tarım veya depolama için arazinin düzlenmesi gerektiğinde',
@@ -134,7 +134,7 @@ export const services: Service[] = [
     summary: 'Sert zemin ve kayalık alanlarda, kırıcı takılmış ekskavatörle kaya kırma işleri.',
     detail: [
       'Kazı sırasında kaya veya çok sert zemine rastlandığında standart kova ile ilerlemek mümkün olmayabilir. Bu durumda ekskavatöre takılan hidrolik kırıcı ile zemin kırılarak kazı sürdürülür.',
-      "Taşlık ve kayalık arsalarda Malatya'da da bu ihtiyaçla karşılaşılabilir. Çevredeki yapılara mesafe ve çalışma düzeni, iş başlamadan önce konuşulmalıdır.",
+      "Taşlık ve kayalık arsalarda Malatya’da da bu ihtiyaçla karşılaşılabilir. Çevredeki yapılara mesafe ve çalışma düzeni, iş başlamadan önce konuşulmalıdır.",
     ],
     whenNeeded: [
       'Kazı sırasında kaya veya çok sert zemin çıktığında',
@@ -152,10 +152,10 @@ export const services: Service[] = [
     title: 'Operatörlü İş Makinesi Kiralama',
     seoName: 'Operatörlü İş Makinesi Kiralama',
     summary:
-      "Operatörlü ekskavatör, mini ekskavatör ve kazıcı yükleyici kiralama; saatlik veya günlük çalışma Malatya'da görüşülür.",
+      "Operatörlü ekskavatör, mini ekskavatör ve kazıcı yükleyici kiralama; saatlik veya günlük çalışma Malatya’da görüşülür.",
     detail: [
       'Bazı işler için makine satın almak yerine ihtiyaç süresince operatörlü makine kiralamak daha uygun olabilir. Ekskavatör kazı ve yükleme için, mini ekskavatör dar alanlar için, kazıcı yükleyici ise kazı ve yüklemenin birlikte yapıldığı sahalar için tercih edilir.',
-      "Kiralama saatlik veya günlük olarak konuşulur. Malatya'daki sahanın büyüklüğüne, zemine ve işin niteliğine göre hangi makinenin uygun olduğu birlikte belirlenir.",
+      "Kiralama saatlik veya günlük olarak konuşulur. Malatya’daki sahanın büyüklüğüne, zemine ve işin niteliğine göre hangi makinenin uygun olduğu birlikte belirlenir.",
     ],
     whenNeeded: [
       'Kısa süreli ya da tek seferlik bir kazı veya yükleme işi olduğunda',
@@ -187,7 +187,7 @@ export const services: Service[] = [
     summary: 'Kazıdan çıkan toprak, moloz ve benzeri malzemenin kamyonla sahadan taşınması.',
     detail: [
       'Kazı ve yıkım işlerinde çıkan malzemenin sahada birikmemesi için taşıma işi kazıyla birlikte planlanır. Toprak, moloz veya karışık malzeme için taşıma düzeni farklı olabilir.',
-      "Malatya'da taşıma işinde, sahadan boşaltma noktasına olan mesafe ve sahaya kamyon girişinin kolaylığı planı etkiler.",
+      "Malatya’da taşıma işinde, sahadan boşaltma noktasına olan mesafe ve sahaya kamyon girişinin kolaylığı planı etkiler.",
     ],
     whenNeeded: [
       'Kazıdan çıkan toprağın sahadan uzaklaştırılması gerektiğinde',
@@ -214,7 +214,7 @@ export const services: Service[] = [
       'Dolgu için uygun toprak temini ve inşaat veya arsa sahalarında temizlik, tesviye öncesi hazırlık işleri.',
     detail: [
       'Dolgu toprağı; temel çevresini, çukurları veya alçak alanları doldurmak ve sahayı seviyelemek için kullanılır. Hangi malzemenin uygun olduğu dolgunun amacına göre değişir.',
-      "Saha temizliği ise inşaat öncesi veya sonrası alanda biriken malzemenin, bitki örtüsünün ve atıkların kaldırılmasıdır. Malatya'da arsa ve şantiye temizliği çoğu zaman dolgu ve taşıma ile birlikte planlanır.",
+      "Saha temizliği ise inşaat öncesi veya sonrası alanda biriken malzemenin, bitki örtüsünün ve atıkların kaldırılmasıdır. Malatya’da arsa ve şantiye temizliği çoğu zaman dolgu ve taşıma ile birlikte planlanır.",
     ],
     whenNeeded: [
       'Temel çevresi veya alçak alan doldurulacağında',
@@ -229,7 +229,7 @@ export const services: Service[] = [
   },
 ];
 
-/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build'i) iken taslaklar da. */
+/** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build’i) iken taslaklar da. */
 export const visibleServices: Service[] = services.filter(
   (service) => service.onaylandi || showDrafts,
 );

@@ -1,6 +1,7 @@
 ---
 import { site, whatsappUrl } from '../data/site';
 import { publicFileExists } from '../utils/assets';
+import Icon from './Icon.astro';
 import TopoArt from './TopoArt.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
 
@@ -88,17 +89,24 @@ const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true
     )
   }
   {hasMedia && <div class="hero-overlay" aria-hidden="true" />}
+  {hasMedia && <div class="hero-vignette" aria-hidden="true" />}
   {!hasMedia && <TopoArt />}
 
   <div class="container hero-inner">
     <p class="eyebrow">Malatya · Yeşilyurt</p>
-    <h1>{site.name}</h1>
+    {/* Satır satır alttan maskeyle açılır; ekran okuyucu `Alperenler Hafriyat` okur */}
+    <h1>
+      <span class="h1-line"><span>Alperenler</span></span>{' '}
+      <span class="h1-line"><span>Hafriyat</span></span>
+    </h1>
     <p class="hero-sub">
-      {site.legalName}, Malatya'nın Yeşilyurt ilçesinde faaliyet gösteriyor. İşinizin ihtiyacını
+      {site.legalName}, Malatya’nın Yeşilyurt ilçesinde faaliyet gösteriyor. İşinizin ihtiyacını
       anlatmak için doğrudan bizi arayabilirsiniz.
     </p>
     <div class="btn-row">
-      <a class="btn btn-primary btn-lg" href={site.phone.href}>Hemen Ara</a>
+      <a class="btn btn-primary btn-lg" href={site.phone.href}>
+        <Icon class="btn-icon" name="phone" />Hemen Ara
+      </a>
       {
         whatsappUrl ? (
           <WhatsAppButton class="btn btn-outline-light btn-lg" href={whatsappUrl} />

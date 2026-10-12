@@ -6,7 +6,7 @@ import { site } from '../data/site';
 import { getGalleryEntries } from '../utils/gallery';
 
 /**
- * Basit kendi sitemap'imiz (/sitemap.xml). `@astrojs/sitemap` kullanılmaz.
+ * Basit kendi sitemap’imiz (/sitemap.xml). `@astrojs/sitemap` kullanılmaz.
  *  - Yalnızca site.publish.indexable === true iken ÜRETİLİR (aksi halde dosya hiç oluşmaz).
  *  - Taslak içerik ASLA girmez: hizmet, makine ve fiyat rehberi için yalnızca `onaylandi: true`
  *    olanlar listelenir (PUBLIC_SHOW_DRAFTS açık olsa bile).

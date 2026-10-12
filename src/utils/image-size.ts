@@ -7,7 +7,7 @@ export interface ImageSize {
 }
 
 /**
- * public/ altındaki bir JPEG'in gerçek piksel boyutunu (build/dev sırasında) dosyadan okur.
+ * public/ altındaki bir JPEG’in gerçek piksel boyutunu (build/dev sırasında) dosyadan okur.
  * Paket gerekmez: JPEG başlıklarındaki SOF işaretçisi ve EXIF yönü (telefon fotoğrafları
  * 90° döndürülmüş saklanabilir) okunur. Okunamazsa null döner.
  */

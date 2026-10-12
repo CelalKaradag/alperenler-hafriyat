@@ -1,6 +1,7 @@
 ---
 import { navItems } from '../data/nav';
 import { site } from '../data/site';
+import Icon from './Icon.astro';
 import LogoMark from './LogoMark.astro';
 
 const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
@@ -49,7 +50,9 @@ const isCurrent = (href: string) => {
       <span class="header-phone-label">Bizi arayın</span>
       <span class="header-phone-number">{site.phone.display}</span>
     </a>
-    <a class="btn btn-primary header-call" href={site.phone.href}>Hemen Ara</a>
+    <a class="btn btn-primary header-call" href={site.phone.href}>
+      <Icon class="btn-icon" name="phone" />Hemen Ara
+    </a>
   </div>
 
   <!--

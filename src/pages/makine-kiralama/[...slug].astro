@@ -47,7 +47,7 @@ const title = machine
   : `Makine Kiralama Malatya | ${site.name}`;
 const description = machine
   ? machine.summary
-  : `${site.legalName} operatörlü makine kiralama: kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya'da ihtiyacınızı konuşmak için arayın.`;
+  : `${site.legalName} operatörlü makine kiralama: kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya’da ihtiyacınızı konuşmak için arayın.`;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
@@ -196,7 +196,7 @@ const description = machine
             <p class="eyebrow">Operatörlü makineler</p>
             <h1>Makine Kiralama</h1>
             <p class="lead">
-              Kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya'da
+              Kepçe, ekskavatör, mini ekskavatör, kırıcılı ekskavatör ve hafriyat kamyonu. Malatya’da
               ihtiyacınızı anlatmak için bizi arayabilirsiniz.
             </p>
             {visibleMachines.some((item) => !item.onaylandi) && (

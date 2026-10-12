@@ -81,12 +81,58 @@ export function initLightbox() {
     next.hidden = single;
   }
 
+  // View Transitions API varsa görsel karttan büyüyerek açılır / karta küçülerek kapanır; yoksa
+  // CSS ile yumuşak fade (hareket azaltmada ikisi de yok). Aynı anda tek eleman bu adı taşır.
+  const canTransition = () =>
+    typeof document.startViewTransition === 'function' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const thumbOf = (button) => (button && button.dataset.kind === 'image' ? button.querySelector('img') : null);
+
   function open(i, trigger) {
     opener = trigger;
-    show(i);
-    lockScroll(true);
-    dialog.showModal();
-    close.focus();
+    const run = () => {
+      show(i);
+      lockScroll(true);
+      dialog.showModal();
+      close.focus();
+    };
+    const thumb = thumbOf(trigger);
+    if (thumb && canTransition()) {
+      thumb.style.viewTransitionName = 'lb-img';
+      const transition = document.startViewTransition(() => {
+        thumb.style.viewTransitionName = '';
+        image.style.viewTransitionName = 'lb-img';
+        run();
+      });
+      transition.finished.catch(() => {}).finally(() => {
+        image.style.viewTransitionName = '';
+      });
+    } else {
+      run();
+    }
+  }
+
+  function closeAnimated() {
+    if (!dialog.open) return;
+    const current = visibleOpeners()[index];
+    const thumb = thumbOf(current);
+    const rect = thumb && thumb.getBoundingClientRect();
+    const onScreen = rect && rect.bottom > 0 && rect.top < window.innerHeight;
+    // video gösteriliyorsa (video.hidden false) küçülme geçişi yapılmaz
+    if (thumb && onScreen && video.hidden && canTransition()) {
+      image.style.viewTransitionName = 'lb-img';
+      const transition = document.startViewTransition(() => {
+        image.style.viewTransitionName = '';
+        thumb.style.viewTransitionName = 'lb-img';
+        dialog.close();
+      });
+      transition.finished.catch(() => {}).finally(() => {
+        thumb.style.viewTransitionName = '';
+      });
+    } else {
+      dialog.close();
+    }
   }
 
   function onOpenerClick(event) {
@@ -121,7 +167,7 @@ export function initLightbox() {
 
   function onDialogClick(event) {
     // Arka plana (dialog'un kendisine) tıklanınca kapat
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog) closeAnimated();
   }
 
   function onClose() {
@@ -134,10 +180,17 @@ export function initLightbox() {
   openers.forEach((button) => button.addEventListener('click', onOpenerClick));
   prev.addEventListener('click', () => show(index - 1));
   next.addEventListener('click', () => show(index + 1));
-  close.addEventListener('click', () => dialog.close());
+  close.addEventListener('click', closeAnimated);
   dialog.addEventListener('keydown', onKeyDown);
   dialog.addEventListener('click', onDialogClick);
   dialog.addEventListener('close', onClose);
+  // Escape: yerel kapatmayı durdurup animasyonlu kapat (View Transitions varsa)
+  dialog.addEventListener('cancel', (event) => {
+    if (canTransition()) {
+      event.preventDefault();
+      closeAnimated();
+    }
+  });
 
   return () => {
     stopVideo();

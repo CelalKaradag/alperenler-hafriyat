@@ -11,6 +11,7 @@ import { initFloatingActions } from './floating-actions.js';
 import { initLightbox } from './lightbox.js';
 import { initGalleryFilters } from './gallery-filter.js';
 import { initGalleryCarousel } from './gallery-carousel.js';
+import { initUiEffects } from './ui-effects.js';
 
 let cleanups = [];
 let lastBody = null;
@@ -35,6 +36,7 @@ function run() {
     initFloatingActions(),
     initLightbox(),
     initGalleryCarousel(),
+    initUiEffects(),
   ].filter(Boolean);
   initQuoteWizards();
   initGalleryFilters();
