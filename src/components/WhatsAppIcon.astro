@@ -8,12 +8,18 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
+<!--
+  WhatsApp glyph'i DOLGULU (fill) bir şekildir: çizgi ikon kuralları (Icon.astro: fill="none", stroke) geçerli
+  değildir. svg ve path'te fill/stroke açıkça verilir; ayrıca .icon-whatsapp CSS kuralı (button.css) genel
+  ikon stillerinden daha özgüldür.
+-->
 <svg
-  class:list={['wa-icon', className]}
+  class:list={['wa-icon', 'icon-whatsapp', className]}
   viewBox="0 0 24 24"
   fill="currentColor"
+  stroke="none"
   aria-hidden="true"
   focusable="false"
 >
-  <path d={whatsappPath}></path>
+  <path d={whatsappPath} fill="currentColor" stroke="none"></path>
 </svg>

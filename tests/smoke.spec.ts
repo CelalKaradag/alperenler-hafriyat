@@ -93,6 +93,35 @@ test('firma onaylı sayfalar normal build\'de var: bölgeler, 3 makine, 2 hizmet
   }
 });
 
+test('WhatsApp ikonları görünür: svg > 10×10 px ve path dolgusu "none" değil', async ({ page }) => {
+  let checked = 0;
+  for (const path of [
+    '/',
+    '/iletisim/',
+    '/teklif/',
+    '/hizmetler/operatorlu-is-makinesi-kiralama/',
+    '/makine-kiralama/ekskavator-kiralama/',
+    '/bolgeler/yesilyurt/',
+  ]) {
+    await page.goto(path);
+    // Sayfanın sonuna kadar kaydır: footer/harita kartındaki düğmeler de ölçülebilsin
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    for (const link of await page.locator('a[href*="wa.me"]').all()) {
+      if (!(await link.isVisible())) continue; // gizli (örn. sihirbaz sonucu, kaydırılmamış yüzen düğme)
+      const svg = link.locator('svg.icon-whatsapp');
+      await expect(svg, `${path}: WhatsApp bağlantısında WhatsAppIcon yok`).toHaveCount(1);
+      const box = await svg.boundingBox();
+      expect(box, `${path}: svg ölçülemedi`).not.toBeNull();
+      expect((box as { width: number }).width, `${path} svg genişlik`).toBeGreaterThan(10);
+      expect((box as { height: number }).height, `${path} svg yükseklik`).toBeGreaterThan(10);
+      const fill = await svg.locator('path').evaluate((el) => getComputedStyle(el).fill);
+      expect(fill, `${path}: path fill`).not.toBe('none');
+      checked += 1;
+    }
+  }
+  expect(checked, 'hiç görünür WhatsApp bağlantısı bulunamadı').toBeGreaterThan(0);
+});
+
 test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerde geçmez', async ({ page, request }) => {
   await page.goto('/');
   const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });

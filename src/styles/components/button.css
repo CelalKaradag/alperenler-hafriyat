@@ -97,6 +97,13 @@
   flex: none;
 }
 
+/* WhatsApp glyph'i dolguludur; genel ikon (çizgi) kuralları onu boş/görünmez yapamasın */
+.icon-whatsapp,
+.icon-whatsapp * {
+  fill: currentColor !important;
+  stroke: none !important;
+}
+
 .call-card-wa {
   margin-top: 0.75rem;
 }
