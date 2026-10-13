@@ -86,6 +86,10 @@ const SERVICES_BY_NAME: Record<string, string[]> = {
   'gabion-duvar': [S.dolgu],
   'bayrakli-arazi-calismasi': [S.arazi, S.makine],
   'duzlenmis-saha': [S.arazi, S.dolgu],
+  'sehir-ici-temel-kazisi-ekskavatorler': [S.hafriyat, S.tasima, S.makine],
+  'drone-sehir-ici-temel-kazisi': [S.hafriyat, S.tasima],
+  'drone-santiye-tepeden': [S.hafriyat],
+  'drone-dag-arazisinde-saha-acma': [S.arazi],
 };
 
 const photo = (name: string, alt: string, extra: GalleryBase = {}): GalleryImage => ({
@@ -106,13 +110,25 @@ const video = (name: string, title: string, extra: GalleryBase = {}): GalleryVid
 });
 
 export const gallery: GalleryItem[] = [
-  // İlk beş öğe
+  // Yeni (öne çıkanlar): şehir içi temel kazısı fotoğrafı ve havadan görünüm
+  photo(
+    'sehir-ici-temel-kazisi-ekskavatorler',
+    'Şehir içi temel kazısında çalışan ekskavatörler ve damperli kamyonlar',
+    { featured: true },
+  ),
+  video('drone-sehir-ici-temel-kazisi', 'Şehir içi temel kazısı, havadan görünüm', {
+    width: 960,
+    height: 540,
+    featured: true,
+  }),
+
+  // İlk beş öğe (eski öne çıkanlardan santiye-temel-kazisi ve kazi-calismasi artık featured değil: yeni öğeler öne çıksın)
   photo(
     'santiye-temel-kazisi',
     'Şehir içinde temel kazısı yapılan şantiye, Hitachi ekskavatörler ve kamyonlar',
-    { width: 1600, height: 1200, featured: true },
+    { width: 1600, height: 1200 },
   ),
-  video('kazi-calismasi', 'Kazı çalışması', { width: 540, height: 960, featured: true }),
+  video('kazi-calismasi', 'Kazı çalışması', { width: 540, height: 960 }),
   photo('derin-kazi-hitachi', 'Derin temel kazısında çalışan Hitachi ekskavatör', {
     width: 1000,
     height: 1333,
@@ -148,4 +164,9 @@ export const gallery: GalleryItem[] = [
   photo('gabion-duvar', 'Taş duvar çalışması'),
   photo('bayrakli-arazi-calismasi', 'Dağlık arazide ekskavatör çalışması'),
   video('duzlenmis-saha', 'Düzlenmiş saha'),
+  video('drone-santiye-tepeden', 'Büyük şantiyede hafriyat, tepeden görünüm', { width: 960, height: 540 }),
+  video('drone-dag-arazisinde-saha-acma', 'Dağ arazisinde saha açma, havadan görünüm', {
+    width: 960,
+    height: 540,
+  }),
 ];

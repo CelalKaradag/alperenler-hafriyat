@@ -102,6 +102,36 @@
       960
     ]
   },
+  "/images/galeri/drone-dag-arazisinde-saha-acma-poster.jpg": {
+    "key": "drone-dag-arazisinde-saha-acma-poster",
+    "width": 960,
+    "height": 540,
+    "color": "#a88888",
+    "widths": [
+      480,
+      960
+    ]
+  },
+  "/images/galeri/drone-santiye-tepeden-poster.jpg": {
+    "key": "drone-santiye-tepeden-poster",
+    "width": 960,
+    "height": 540,
+    "color": "#181818",
+    "widths": [
+      480,
+      960
+    ]
+  },
+  "/images/galeri/drone-sehir-ici-temel-kazisi-poster.jpg": {
+    "key": "drone-sehir-ici-temel-kazisi-poster",
+    "width": 960,
+    "height": 540,
+    "color": "#181818",
+    "widths": [
+      480,
+      960
+    ]
+  },
   "/images/galeri/duzlenmis-saha-poster.jpg": {
     "key": "duzlenmis-saha-poster",
     "width": 540,
@@ -223,6 +253,17 @@
       540
     ]
   },
+  "/images/galeri/sehir-ici-temel-kazisi-ekskavatorler.jpg": {
+    "key": "sehir-ici-temel-kazisi-ekskavatorler",
+    "width": 1600,
+    "height": 1200,
+    "color": "#a88858",
+    "widths": [
+      480,
+      960,
+      1600
+    ]
+  },
   "/images/galeri/sokakta-kanal-kazisi.jpg": {
     "key": "sokakta-kanal-kazisi",
     "width": 736,
@@ -288,7 +329,7 @@
     "key": "hero-poster-720",
     "width": 720,
     "height": 1280,
-    "color": "#080808",
+    "color": "#a88888",
     "widths": [
       480,
       720
@@ -296,13 +337,14 @@
   },
   "/images/hero-poster.jpg": {
     "key": "hero-poster",
-    "width": 1280,
-    "height": 720,
-    "color": "#b8a888",
+    "width": 1920,
+    "height": 1080,
+    "color": "#b89888",
     "widths": [
       480,
       960,
-      1280
+      1600,
+      1920
     ]
   },
   "/images/logo/alperenler-logo-1536.jpg": {
