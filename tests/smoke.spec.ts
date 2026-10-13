@@ -284,7 +284,7 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
   for (const [width, isColumns, filoColumns] of [
     [360, 2, 2],
     [390, 2, 2],
-    [768, 2, 2],
+    [768, 3, 2],
     [1024, 3, 2],
     [1200, 3, 3],
     [1366, 3, 5],
@@ -412,10 +412,10 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     const isTops = await topsOf('.stats-grid--is .stat');
     const filoTops = await topsOf('.stats-grid--filo .stat');
     const rows = (tops: number[]) => new Set(tops).size;
-    expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(width >= 1024 ? 1 : 2);
+    expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(width >= 640 ? 1 : 2);
     expect(rows(filoTops), `${width}px filo satır: ${filoTops.join(', ')}`).toBe(Math.ceil(5 / filoColumns));
-    if (width < 1024) {
-      // üst grupta tek kalan öğe ortalı
+    if (width < 640) {
+      // üst grupta (40em altında 2 + 1) tek kalan öğe ortalı
       const last = (await strip.locator('.stats-grid--is .stat').last().boundingBox()) as { x: number; width: number };
       expect(Math.abs(last.x + last.width / 2 - width / 2), 'tek kalan öğe ortalı').toBeLessThanOrEqual(2);
     }
@@ -461,6 +461,19 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
         expect(card.iconAboveValue, 'ikon sayının üstünde (dikey kart)').toBe(true);
         expect(card.align).toBe('center');
         expect(card.clipped, 'kart içeriği taşmaz').toBe(false);
+      }
+    }
+    if (width >= 640) {
+      // 40em ve üstünde üst grup 3 sütun yan yana; sayılar birbirine değmez (≥ 16 px)
+      const values = await strip.locator('.stats-grid--is .stat-value').evaluateAll((nodes) =>
+        nodes.map((n) => {
+          const r = n.getBoundingClientRect();
+          return { top: Math.round(r.top), left: r.left, right: r.right };
+        }),
+      );
+      expect(new Set(values.map((v) => v.top)).size, `${width}px: 3 sayı aynı satırda`).toBe(1);
+      for (let k = 1; k < values.length; k += 1) {
+        expect(values[k].left - values[k - 1].right, `${width}px: sayılar arası boşluk`).toBeGreaterThanOrEqual(16);
       }
     }
     // Gruplar alt alta

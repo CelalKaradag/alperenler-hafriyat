@@ -153,6 +153,18 @@
   font-size: clamp(3rem, 7vw, 5rem);
 }
 
+/* 40em ve üstü: üst grup 3 sütun yan yana (40em altında 2 + 1 kalır). 768 px'te sayılar birbirine değmez:
+   sayı "clamp(3rem, 7vw, 5rem)" ≈ 54 px, sütun ≈ 210 px, "1.653" ≈ 150 px. */
+@media (min-width: 40em) {
+  .stats-grid--is {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stats-grid--is .stat:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
 /* Masaüstü: üst grup 3 sütun, öğeler arasında ince dikey ayraç (grafit, opacity .2); mobilde ayraç yok */
 @media (min-width: 64em) {
   .stats-grid--is {
