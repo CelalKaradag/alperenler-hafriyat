@@ -18,6 +18,8 @@ export interface SiteConfig {
   mersisNo: string;
   /** Ticaret sicil no (firma kaşesinden, kesin) */
   tradeRegistryNo: string;
+  /** Kuruluş yılı (müşteri onaylı): ana sayfa, Hakkımızda ve JSON-LD foundingDate */
+  foundedYear: number;
   /** Telefon: görünen biçim ve tel: bağlantısı */
   phone: { display: string; href: string };
   /**
@@ -72,6 +74,7 @@ export const site: SiteConfig = {
   taxId: '0570602318',
   mersisNo: '0057060231800001',
   tradeRegistryNo: '27135',
+  foundedYear: 2008,
   email: 'alperenler.hrf.ltd@gmail.com',
   phone: { display: '0539 252 70 58', href: 'tel:+905392527058' },
   whatsappNumber: '905392527058',

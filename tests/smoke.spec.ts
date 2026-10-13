@@ -1255,3 +1255,22 @@ test('Google Maps engellenirse harita kartı bozuk iframe göstermez; adres ve b
   await expect(band.getByRole('link', { name: /Google Maps/ })).toBeVisible();
   await card.click({ position: { x: 10, y: 10 }, trial: true });
 });
+
+test('biz kimiz / hakkımızda: 2008, 3 ilke kartı, Hedefimiz, foundingDate, 360px taşma yok', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#firma-baslik')).toHaveText("2008'den bu yana Malatya'da hafriyat ve iş makinesi hizmetleri");
+  await expect(page.locator('#firma')).toContainText('2008 yılından bu yana');
+  const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
+  expect(ld.join('')).toContain('"foundingDate":"2008"');
+
+  await page.setViewportSize({ width: 360, height: 800 });
+  const response = await page.goto('/hakkimizda/');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('main')).toContainText('2008 yılından bu yana');
+  await expect(page.locator('.pillar')).toHaveCount(3);
+  await expect(page.getByRole('heading', { name: 'Hedefimiz' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'İşe başlamadan önce sahayı tanırız' })).toBeVisible();
+  expect(await page.locator('meta[name="description"]').getAttribute('content')).toContain("2008'den bu yana");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

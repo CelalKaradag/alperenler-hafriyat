@@ -21,6 +21,8 @@ import { visibleServices } from '../data/services';
 import { publicFileExists } from '../utils/assets';
 
 // Fotoğraf yoksa sağ sütunda dekoratif koyu panel görünür (iletişim bilgisi yok).
+const aboutIntro =
+  "Alperenler Hafriyat İnşaat, 2008 yılından bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.";
 const aboutImage = '/images/hakkimizda.jpg';
 const hasAboutImage = publicFileExists(aboutImage);
 ---
@@ -45,13 +47,9 @@ const hasAboutImage = publicFileExists(aboutImage);
       <div class="about-copy">
         <div class="section-head">
           <p class="eyebrow">Biz Kimiz</p>
-          <h2 id="firma-baslik">{site.legalName}</h2>
+          <h2 id="firma-baslik">2008'den bu yana Malatya'da hafriyat ve iş makinesi hizmetleri</h2>
         </div>
-        <p>
-          {site.legalName}, Koyunoğlu Mahallesi’nde, Yeşilyurt / Malatya adresinde yer alır.
-          Çalışmaya başlamadan önce ihtiyacı doğrudan konuşmak, işin doğru anlaşılması için en
-          sağlıklı yoldur.
-        </p>
+        <p>{aboutIntro}</p>
         <p>
           <a class="text-link" href="/hakkimizda/">Hakkımızda<span class="arrow" aria-hidden="true">→</span></a>
         </p>

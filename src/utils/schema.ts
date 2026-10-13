@@ -24,6 +24,7 @@ function organization(base?: URL): JsonObject {
     '@type': 'GeneralContractor',
     name: site.name,
     legalName: site.registeredName,
+    foundingDate: String(site.foundedYear),
     taxID: site.taxId,
     identifier: { '@type': 'PropertyValue', propertyID: 'MERSİS', value: site.mersisNo },
     telephone,

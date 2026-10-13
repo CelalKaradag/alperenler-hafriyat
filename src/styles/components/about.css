@@ -131,3 +131,58 @@
   }
 }
 
+
+/* Hakkımızda: 3 ilke kartı (masaüstü 3 sütun, mobilde alt alta) + hedef */
+.about-intro {
+  max-width: 44rem;
+  margin: 0 0 2rem;
+  font-size: 1.125rem;
+}
+
+.pillars {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pillar {
+  min-width: 0;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.pillar .icon {
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.pillar h3 {
+  margin: 0 0 0.5rem;
+}
+
+.pillar p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.about-goal {
+  max-width: 44rem;
+  margin-top: 2.5rem;
+}
+
+.about-goal p {
+  margin: 0;
+}
+
+@media (min-width: 56em) {
+  .pillars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}

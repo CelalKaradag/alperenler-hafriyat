@@ -11,6 +11,25 @@ import { mapsDirectionsUrl, mapsUrl, site } from '../data/site';
 import { publicFileExists } from '../utils/assets';
 import { imageSize } from '../utils/image-size';
 
+const intro =
+  "Alperenler Hafriyat İnşaat, 2008 yılından bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.";
+const pillars = [
+  {
+    icon: 'pin',
+    title: 'İşe başlamadan önce sahayı tanırız',
+    text: 'Gelen her talebi hızla değerlendiriyor, çalışılacak alanın zemin ve arazi yapısını ekibimizle yerinde inceliyoruz. Planlamayı sahaya göre yapıyor, işi baştan doğru kuruyoruz.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Söz verdiğimiz sürede teslim',
+    text: 'Üstlendiğimiz işleri taahhüt ettiğimiz süre içinde tamamlayıp teslim etmeyi temel ilkemiz olarak görüyoruz.',
+  },
+  {
+    icon: 'machine',
+    title: 'Büyüyen ve yenilenen filo',
+    text: 'Artan iş hacmine paralel olarak iş makinelerimizi, araç ve ekipmanlarımızı yeniliyor, daha hızlı ve verimli hizmet için yatırım yapmaya devam ediyoruz.',
+  },
+] as const;
 const photo = '/images/hakkimizda.jpg';
 const hasPhoto = publicFileExists(photo);
 const photoSize = hasPhoto ? imageSize(photo) : null;
@@ -18,7 +37,7 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
 
 <BaseLayout
   title={`Hakkımızda | ${site.name}`}
-  description={`${site.legalName} hakkında kısa bilgi ve iletişim yolları. Merkezimiz Yeşilyurt / Malatya.`}
+  description={`${site.legalName}, ${site.foundedYear}'den bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Merkezimiz Yeşilyurt / Malatya.`}
 >
   <section class:list={['page-head', 'on-dark', hasPhoto && 'page-head--tall']}>
     {
@@ -43,14 +62,29 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
   </section>
 
   <section class="section section-light">
+    <div class="container">
+      <p class="about-intro">{intro}</p>
+      <ul class="pillars">
+        {
+          pillars.map((p) => (
+            <li class="pillar">
+              <Icon name={p.icon} />
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="about-goal">
+        <h2>Hedefimiz</h2>
+        <p>Uzman ekibimiz ve güçlü filomuzla kaliteden ve müşteri memnuniyetinden ödün vermeden çalışmak; çevremizle birlikte daha verimli ve çağdaş bir hizmet anlayışını büyütmek.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-light">
     <div class="container about-page">
       <div class="prose">
-        <h2>Kimiz?</h2>
-        <p>
-          {site.legalName}, Malatya’nın Yeşilyurt ilçesinde, Koyunoğlu Mahallesi’ndeki adresinden
-          çalışır. İş talepleri telefonla alınır; ihtiyaç önce konuşulur, sonra netleştirilir.
-        </p>
-
         <h2>Bize nasıl ulaşırsınız?</h2>
         <p>En hızlı yol telefondur. Adresimiz ve harita bağlantısı iletişim sayfasında yer alır.</p>
 
