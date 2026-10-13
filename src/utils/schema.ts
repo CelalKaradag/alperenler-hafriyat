@@ -24,7 +24,7 @@ function organization(base?: URL): JsonObject {
     '@type': 'GeneralContractor',
     name: site.name,
     legalName: site.registeredName,
-    foundingDate: String(site.foundedYear),
+    foundingDate: site.foundingDate,
     taxID: site.taxId,
     identifier: { '@type': 'PropertyValue', propertyID: 'MERSİS', value: site.mersisNo },
     telephone,
@@ -50,7 +50,9 @@ function organization(base?: URL): JsonObject {
     };
   }
   if (site.email) data.email = site.email;
-  if (site.sameAs && site.sameAs.length > 0) data.sameAs = site.sameAs;
+  if (site.mapsPlaceUrl) data.hasMap = site.mapsPlaceUrl;
+  const sameAs = [...(site.sameAs ?? []), ...(site.social.tiktok ? [site.social.tiktok] : [])];
+  if (sameAs.length > 0) data.sameAs = sameAs;
   return data;
 }
 

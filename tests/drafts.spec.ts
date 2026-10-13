@@ -200,8 +200,15 @@ for (const width of [360, 390, 1366]) {
     await expect(section.getByRole('img', { name: '5 üzerinden 5' }).first()).toBeVisible();
     await expect(section.getByRole('img', { name: '5 üzerinden 4' })).toHaveCount(1);
     await expect(section.getByRole('img', { name: '5 üzerinden 3' })).toHaveCount(1);
-    // google bağlantıları tanımsız: butonlar gizli
-    await expect(section.locator('.reviews-actions')).toHaveCount(0);
+    // Google bağlantıları tanımlı: iki düğme yeni sekmede açılır
+    const all = section.getByRole('link', { name: /Google'da tüm yorumlar/ });
+    const write = section.getByRole('link', { name: /Google'da yorum yazın/ });
+    await expect(all).toHaveAttribute('href', 'https://g.page/r/CUW_reguN3B4EBE');
+    await expect(write).toHaveAttribute('href', 'https://g.page/r/CUW_reguN3B4EBE/review');
+    for (const link of [all, write]) {
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+    }
     // sayfa yatay taşmıyor; kart şerit içinde kaydırılabilir
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, 'yatay taşma').toBeLessThanOrEqual(0);

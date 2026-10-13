@@ -1,0 +1,29 @@
+---
+import { tiktokPath } from '../utils/icons';
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const url = site.social.tiktok;
+---
+
+{
+  url && (
+    <a
+      class:list={['social-link', className]}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${site.name} TikTok hesabı`}
+      data-tiktok
+    >
+      <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" focusable="false">
+        <path d={tiktokPath} fill="currentColor" stroke="none" />
+      </svg>
+      <span>TikTok</span>
+    </a>
+  )
+}

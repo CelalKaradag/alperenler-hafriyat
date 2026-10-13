@@ -18,8 +18,12 @@ export interface SiteConfig {
   mersisNo: string;
   /** Ticaret sicil no (firma kaşesinden, kesin) */
   tradeRegistryNo: string;
-  /** Kuruluş yılı (müşteri onaylı): ana sayfa, Hakkımızda ve JSON-LD foundingDate */
+  /** Kuruluş yılı (müşteri onaylı): ana sayfa, Hakkımızda */
   foundedYear: number;
+  /** Kuruluş tarihi (ISO, JSON-LD foundingDate) */
+  foundingDate: string;
+  /** Firmanın onaylı sosyal medya hesapları (footer, iletişim sayfası, JSON-LD sameAs) */
+  social: { tiktok?: string };
   /** Telefon: görünen biçim ve tel: bağlantısı */
   phone: { display: string; href: string };
   /**
@@ -75,11 +79,19 @@ export const site: SiteConfig = {
   mersisNo: '0057060231800001',
   tradeRegistryNo: '27135',
   foundedYear: 2008,
+  foundingDate: '2008',
+  social: { tiktok: 'https://www.tiktok.com/@kaptanblacck' },
+  // Google İşletme Profili (müşteri onaylı kısa bağlantı): profil, yorumlar ve yol tarifi buradan açılır.
+  // mapCoords: işletme sahibinin Google Maps'te binanın üstünden aldığı koordinat (kısa bağlantı koordinat içermiyor).
+  mapsPlaceUrl: 'https://maps.app.goo.gl/U4xZsNWxEhQWsY3x6',
+  // Google İşletme Profili yorum bağlantıları (müşteri onaylı). Yalnızca ReviewsSection kullanır; yorum listesi boşken görünmez.
+  googleReviewsUrl: 'https://g.page/r/CUW_reguN3B4EBE',
+  googleWriteReviewUrl: 'https://g.page/r/CUW_reguN3B4EBE/review',
   email: 'alperenler.hrf.ltd@gmail.com',
   phone: { display: '0539 252 70 58', href: 'tel:+905392527058' },
   whatsappNumber: '905392527058',
   address: 'Koyunoğlu Mh. Erikli Sk. No:34/2/8, Yeşilyurt / Malatya',
-  mapCoords: null,
+  mapCoords: { lat: 38.316073, lng: 38.2685777 },
   addressParts: {
     street: 'Koyunoğlu Mh. Erikli Sk. No:34/2/8',
     district: 'Yeşilyurt',
@@ -101,9 +113,8 @@ export const hasMapCoords = coords !== null;
 export const mapsUrl =
   site.mapsPlaceUrl ?? `https://www.google.com/maps/search/?api=1&query=${target}`;
 
-/** "Yol tarifi al" bağlantısı: İşletme Profili bağlantısı varsa o, yoksa koordinata/adrese yol tarifi */
-export const mapsDirectionsUrl =
-  site.mapsPlaceUrl ?? `https://www.google.com/maps/dir/?api=1&destination=${target}`;
+/** "Yol tarifi al" bağlantısı: koordinat varsa koordinata, yoksa adrese yol tarifi (profil bağlantısı kullanılmaz) */
+export const mapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${target}`;
 
 /**
  * Gömülü harita (iframe) adresi.
@@ -112,7 +123,7 @@ export const mapsDirectionsUrl =
  */
 export const mapsEmbedUrl = coords
   ? `https://www.google.com/maps?ll=${coords.lat},${coords.lng}&z=16&output=embed`
-  : `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
+  : `https://www.google.com/maps?q=${encodeURIComponent(`${site.legalName}, ${site.address}`)}&output=embed`;
 
 /** Varsayılan hazır WhatsApp mesajı */
 export const whatsappDefaultMessage =

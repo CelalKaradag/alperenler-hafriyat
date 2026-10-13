@@ -17,7 +17,7 @@ const regionAnswer = 'Bulunduğunuz yeri yazın veya arayın.';
 /** Cevaba onaylı ilçelerin listesi otomatik eklenir (taslak bölgeler asla yazılmaz) */
 const regionAnswerWithList =
   approvedRegionNames.length > 0
-    ? `Malatya’nın tüm ilçelerinde hizmet veriyoruz: ${approvedRegionNames.join(', ')}. ${regionAnswer}`
+    ? `Malatya merkez, ilçeleri ve şehir dışındaki projelerde hizmet veriyoruz. İlçeler: ${approvedRegionNames.join(', ')}. ${regionAnswer}`
     : regionAnswer;
 
 export interface Faq {
@@ -66,7 +66,7 @@ export const faqs: Faq[] = [
   {
     question: 'Hangi bölgelere hizmet veriyorsunuz?',
     answer: regionAnswerWithList,
-    onaylandi: true, // firma onayı: Malatya'nın tüm ilçelerine hizmet veriliyor
+    onaylandi: true, // firma onayı: Malatya merkez, ilçeleri ve şehir dışındaki projelerde hizmet veriliyor
   },
 ];
 

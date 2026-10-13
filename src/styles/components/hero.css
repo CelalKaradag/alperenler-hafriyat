@@ -334,3 +334,93 @@
   }
 }
 
+
+/* Mobil/masaüstü alt başlık metni: masaüstünde mevcut metin, mobilde kısa metin */
+.hero-sub-mobile {
+  display: none;
+}
+
+/*
+ * MOBİL (48em altı): hero iki parçalı dikey yığın.
+ *  - ÜST: video/poster alanı (sabit yükseklik, CSS'te belli: layout shift yok). Üstünde yazı, buton, overlay,
+ *    vinyet, film greni, amber ışık YOK. Yalnızca header okunurluk geçişi, alttaki %18'lik --bg geçişi ve
+ *    Durdur/Oynat ikonu.
+ *  - ALT: koyu panel (--bg), üst kenarında ince, hafif eğimli sarı şerit; eyebrow, h1, alt başlık, butonlar.
+ * Masaüstü (48em ve üstü) kuralları değişmez.
+ */
+@media (max-width: 47.99em) {
+  .hero,
+  .js .over-hero .hero {
+    --hero-video-h: clamp(18rem, 56svh, 34rem);
+    display: block;
+    min-height: 0;
+    padding-block: var(--hero-video-h) 0;
+  }
+
+  .hero-poster,
+  .hero-media {
+    inset: 0 0 auto 0;
+    height: var(--hero-video-h);
+  }
+
+  .hero-overlay,
+  .hero-vignette,
+  .hero::before,
+  .hero-scroll {
+    display: none;
+  }
+
+  /* videonun en altında ~%18'lik yumuşak geçiş: transparent → --bg */
+  .hero::after {
+    inset: auto 0 auto 0;
+    top: calc(var(--hero-video-h) * 0.82);
+    height: calc(var(--hero-video-h) * 0.18 + 1px);
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
+
+  .hero-inner {
+    padding-top: 1.5rem;
+    padding-bottom: 1.75rem;
+    background: var(--bg);
+  }
+
+  /* ince, hafif eğimli sarı şerit (sayı şeridindeki dil) */
+  .hero-inner::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 auto 0;
+    z-index: 1;
+    height: 10px;
+    background: var(--accent);
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    margin-bottom: 0.35em;
+    font-size: clamp(1.85rem, 8vw, 2.35rem);
+    line-height: 1.05;
+  }
+
+  .hero-inner h1,
+  .hero-inner .hero-sub {
+    text-shadow: none;
+  }
+
+  .hero-sub {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .hero-sub-desktop {
+    display: none;
+  }
+
+  .hero-sub-mobile {
+    display: inline;
+  }
+
+  .hero .btn-lg {
+    min-height: 3rem;
+  }
+}

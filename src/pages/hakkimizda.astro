@@ -5,14 +5,14 @@ import GallerySection from '../components/GallerySection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import Icon from '../components/Icon.astro';
 import Picture from '../components/Picture.astro';
+import ReferencesSection from '../components/ReferencesSection.astro';
 import TopoArt from '../components/TopoArt.astro';
 import { visibleServices } from '../data/services';
 import { mapsDirectionsUrl, mapsUrl, site } from '../data/site';
 import { publicFileExists } from '../utils/assets';
 import { imageSize } from '../utils/image-size';
 
-const intro =
-  "Alperenler Hafriyat İnşaat, 2008 yılından bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.";
+const intro = `Alperenler Hafriyat İnşaat, ${site.foundedYear} yılından bu yana Malatya'da hafriyat, kazı, altyapı ve iş makinesi hizmetleri veriyor. Malatya merkez ve ilçelerinin yanı sıra şehir dışındaki projelerde de çalışıyoruz. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.`;
 const pillars = [
   {
     icon: 'pin',
@@ -37,7 +37,7 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
 
 <BaseLayout
   title={`Hakkımızda | ${site.name}`}
-  description={`${site.legalName}, ${site.foundedYear}'den bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Merkezimiz Yeşilyurt / Malatya.`}
+  description={`${site.legalName}, ${site.foundedYear}'den bu yana Malatya'da hafriyat, kazı, altyapı ve iş makinesi hizmetleri veriyor. Referanslarımız ve tamamlanan işlerimiz.`}
 >
   <section class:list={['page-head', 'on-dark', hasPhoto && 'page-head--tall']}>
     {
@@ -58,26 +58,61 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
     <div class="container narrow">
       <p class="eyebrow">Hakkımızda</p>
       <h1>{site.legalName}</h1>
+      <p class="page-head-sub">{`${site.foundedYear}'den bu yana Malatya'da`}</p>
     </div>
   </section>
 
-  <section class="section section-light">
+  <section class="section section-light about-intro-section">
     <div class="container">
       <p class="about-intro">{intro}</p>
+    </div>
+  </section>
+
+  <section class="section section-paper about-pillars-section" aria-labelledby="ilkeler-baslik">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Çalışma ilkelerimiz</p>
+        <h2 id="ilkeler-baslik">Çalışma ilkelerimiz</h2>
+      </div>
       <ul class="pillars">
         {
           pillars.map((p) => (
             <li class="pillar">
-              <Icon name={p.icon} />
+              <span class="pillar-icon"><Icon name={p.icon} /></span>
               <h3>{p.title}</h3>
               <p>{p.text}</p>
             </li>
           ))
         }
       </ul>
+    </div>
+  </section>
+
+  <section class="section section-light about-infra-section" aria-labelledby="altyapi-baslik">
+    <div class="container">
+      <div class="prose">
+        <h2 id="altyapi-baslik">Altyapı ve taş duvar</h2>
+        <p>Hafriyat ve kazının yanında altyapı işlerinde de uzun soluklu bir deneyime sahibiz. Kurumsal projelerde ve İller Bankası işlerinde taşeron olarak Ankara, Manisa, Sivas ve Malatya'da altyapı çalışmaları yürüttük. Taş duvar işçiliğindeki deneyimli kadromuzla bu alanda da hizmet veriyoruz.</p>
+      </div>
+    </div>
+  </section>
+
+  <ReferencesSection />
+
+  <section class="section section-light about-quote-section">
+    <div class="container">
+      <blockquote class="about-quote">
+        <p>{`Altyapıdaki tecrübemiz ve taş duvar işçiliğindeki kadromuzla, ${site.foundedYear}'den bu yana olduğu gibi bugün de tüm gönüllerde taht kuruyoruz.`}</p>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section section-dark on-dark about-goal-band" aria-labelledby="hedef-baslik">
+    <div class="container">
       <div class="about-goal">
-        <h2>Hedefimiz</h2>
-        <p>Uzman ekibimiz ve güçlü filomuzla kaliteden ve müşteri memnuniyetinden ödün vermeden çalışmak; çevremizle birlikte daha verimli ve çağdaş bir hizmet anlayışını büyütmek.</p>
+        <p class="eyebrow">Hedefimiz</p>
+        <h2 id="hedef-baslik" class="visually-hidden">Hedefimiz</h2>
+        <p class="about-goal-text">Uzman ekibimiz ve güçlü filomuzla kaliteden ve müşteri memnuniyetinden ödün vermeden çalışmak; çevremizle birlikte daha verimli ve çağdaş bir hizmet anlayışını büyütmek.</p>
       </div>
     </div>
   </section>

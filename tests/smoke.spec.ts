@@ -251,21 +251,15 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   await page.goto('/makine-kiralama/kiralik-kepce-jcb/');
   await expect(page.locator('main')).toContainText('Filomuzda 2 adet JCB');
 
-  // Onaylı ilçe sayısı: /bolgeler/ listesindeki ilçe bağlantıları (regions.ts'ten; elle yazılmaz)
-  await page.goto('/bolgeler/');
-  const regionCount = await page.locator('main .link-list li').count();
-  expect(regionCount).toBeGreaterThan(0);
-
-  // Ana sayfa sayı şeridi, iki grup. Üst: 1.653 Tamamlanan iş, 1.500 Mutlu müşteri, N İlçede hizmet;
+  // Ana sayfa sayı şeridi, iki grup. Üst: 1.653 Tamamlanan iş, 1.500 Mutlu müşteri (ilçe kartı yok);
   // alt (Filomuz): 7 Paletli ekskavatör, 2 JCB, 7 Kamyon, 2 Lowbed tır. Sayılar Türkçe biçimli (1.653).
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded(); // sayaç görünüme girince 0'dan sayar; bitince son sayı
   const items = page.locator('.stats .stat');
-  await expect(items).toHaveCount(8);
+  await expect(items).toHaveCount(7);
   const expected = [
     ['1.653', 'Tamamlanan iş'],
     ['1.500', 'Mutlu müşteri'],
-    [String(regionCount), 'İlçede hizmet'],
     ['7', 'Paletli ekskavatör'],
     ['2', 'Mini ekskavatör'],
     ['2', 'JCB'],
@@ -286,17 +280,19 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
   for (const [width, isColumns, filoColumns] of [
     [360, 2, 2],
     [390, 2, 2],
-    [768, 3, 2],
-    [1024, 3, 2],
-    [1200, 3, 3],
-    [1366, 3, 5],
+    [768, 2, 2],
+    [1024, 2, 2],
+    [1200, 2, 3],
+    [1366, 2, 5],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     const strip = page.locator('[data-stats]');
     await strip.scrollIntoViewIfNeeded();
-    await expect(strip.locator('.stat')).toHaveCount(8);
-    await expect(strip.locator('.stat-icon')).toHaveCount(8);
+    await expect(strip.locator('.stat')).toHaveCount(7);
+    await expect(strip.locator('.stat-icon')).toHaveCount(7);
+    await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(2);
+    await expect(strip).not.toContainText('İlçede hizmet');
 
     // Başlık: eyebrow "RAKAMLARLA" + h2 "Alperenler Hafriyat"
     await expect(strip.locator('.stats-eyebrow')).toHaveText('Rakamlarla');
@@ -305,7 +301,7 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     await expect(strip.locator('.stats-grid--is')).toBeVisible();
     await expect(strip.locator('.stats-grid--filo')).toBeVisible();
     await expect(strip.locator('.stats-group-label')).toHaveText('Filomuz');
-    await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(3);
+    await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(2);
     await expect(strip.locator('.stats-grid--filo .stat--card')).toHaveCount(5);
     // Kartlar giriş animasyonundan sonra tam görünür: önce JS kurulumu + görünüme giriş (.is-in), sonra son kartın
     // (en uzun gecikmeli) animasyonu biter (opacity 1, transform yok). Aksi halde ölçüm animasyon sırasında yapılırdı.
@@ -313,11 +309,12 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     await expect
       .poll(() =>
         strip
-          .locator('.stat--card')
-          .last()
-          .evaluate((el) => `${getComputedStyle(el).opacity}|${getComputedStyle(el).transform}`),
+          .locator('.stat')
+          .evaluateAll((els) =>
+            els.every((el) => getComputedStyle(el).opacity === '1' && getComputedStyle(el).transform === 'none'),
+          ),
       )
-      .toBe('1|none');
+      .toBe(true);
 
     const css = await strip.evaluate((el) => {
       const q = (selector: string) => el.querySelector(selector) as Element;
@@ -414,13 +411,8 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     const isTops = await topsOf('.stats-grid--is .stat');
     const filoTops = await topsOf('.stats-grid--filo .stat');
     const rows = (tops: number[]) => new Set(tops).size;
-    expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(width >= 640 ? 1 : 2);
+    expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(1); // 2 kart her genişlikte tek satır
     expect(rows(filoTops), `${width}px filo satır: ${filoTops.join(', ')}`).toBe(Math.ceil(5 / filoColumns));
-    if (width < 640) {
-      // üst grupta (40em altında 2 + 1) tek kalan öğe ortalı
-      const last = (await strip.locator('.stats-grid--is .stat').last().boundingBox()) as { x: number; width: number };
-      expect(Math.abs(last.x + last.width / 2 - width / 2), 'tek kalan öğe ortalı').toBeLessThanOrEqual(2);
-    }
     // Filo kartlarında son satırda kalanlar ortalı (2 + 2 + 1 / 3 + 2)
     if (filoColumns > 1 && filoColumns < 5) {
       const boxes = (await strip.locator('.stats-grid--filo .stat').evaluateAll((nodes) =>
@@ -502,7 +494,7 @@ test('sayı şeridi: "22–35 ton" notu ekskavatör kartında, "3 ton" notu yaln
   expect(note.color).toBe('rgb(239, 235, 228)');
   expect(note.opacity).toBe('0.75');
 });
-test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görünür (1.653 / 1.500 / ilçe / 7 / 2 / 7 / 2)', async ({
+test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görünür (1.653 / 1.500 / 7 / 2 / 2 / 7 / 2)', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -512,11 +504,7 @@ test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görün
   const values = await page.locator('[data-stats] .stat-value').evaluateAll((nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  expect(values).toHaveLength(8);
-  expect(values[0]).toBe('1.653');
-  expect(values[1]).toBe('1.500');
-  expect(Number(values[2])).toBeGreaterThan(0); // ilçe sayısı
-  expect(values.slice(3)).toEqual(['7', '2', '2', '7', '2']);
+  expect(values).toEqual(['1.653', '1.500', '7', '2', '2', '7', '2']);
   // Hareket azaltmada kartlar gizlenip kaydırılmaz: ilk okumada tam görünür
   const cardStates = await page.locator('[data-stats] .stat--card').evaluateAll((nodes) =>
     nodes.map((n) => ({ opacity: getComputedStyle(n).opacity, transform: getComputedStyle(n).transform })),
@@ -561,7 +549,7 @@ test('SSS: bölge cevabı tüm ilçeleri listeler', async ({ page }) => {
   await page.goto('/');
   const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });
   await faq.locator('summary').click();
-  await expect(faq).toContainText('Malatya’nın tüm ilçelerinde hizmet veriyoruz:');
+  await expect(faq).toContainText('Malatya merkez, ilçeleri ve şehir dışındaki projelerde hizmet veriyoruz.');
   await expect(faq).toContainText('Yeşilyurt');
   await expect(faq).toContainText('Yazıhan');
   await expect(faq).toContainText('Bulunduğunuz yeri yazın veya arayın.');
@@ -1256,21 +1244,217 @@ test('Google Maps engellenirse harita kartı bozuk iframe göstermez; adres ve b
   await card.click({ position: { x: 10, y: 10 }, trial: true });
 });
 
-test('biz kimiz / hakkımızda: 2008, 3 ilke kartı, Hedefimiz, foundingDate, 360px taşma yok', async ({ page }) => {
+test('biz kimiz (ana sayfa): 2008 başlığı ve JSON-LD foundingDate', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#firma-baslik')).toHaveText("2008'den bu yana Malatya'da hafriyat ve iş makinesi hizmetleri");
   await expect(page.locator('#firma')).toContainText('2008 yılından bu yana');
   const ld = await page.locator('script[type="application/ld+json"]').allTextContents();
   expect(ld.join('')).toContain('"foundingDate":"2008"');
+});
 
-  await page.setViewportSize({ width: 360, height: 800 });
-  const response = await page.goto('/hakkimizda/');
-  expect(response?.status()).toBe(200);
-  await expect(page.locator('main')).toContainText('2008 yılından bu yana');
-  await expect(page.locator('.pillar')).toHaveCount(3);
-  await expect(page.getByRole('heading', { name: 'Hedefimiz' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'İşe başlamadan önce sahayı tanırız' })).toBeVisible();
-  expect(await page.locator('meta[name="description"]').getAttribute('content')).toContain("2008'den bu yana");
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
+for (const width of [360, 390, 768, 1366]) {
+  test(`hakkımızda ${width}px: yeni bölümler, 2008, 13 ilçe yok, StatsStrip yok, taşma yok`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    const response = await page.goto('/hakkimizda/');
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('h1')).toHaveText('Alperenler Hafriyat İnşaat');
+    await expect(page.locator('.page-head-sub')).toHaveText("2008'den bu yana Malatya'da");
+    await expectH1BelowHeader(page, ['/hakkimizda/'], [{ width, height: 800 }]);
+    await expect(page.locator('.about-intro')).toContainText('2008 yılından bu yana Malatya');
+    await expect(page.locator('.about-intro')).toContainText('şehir dışındaki projelerde de çalışıyoruz');
+    await expect(page.locator('.pillar')).toHaveCount(3);
+    await expect(page.getByRole('heading', { name: 'Altyapı ve taş duvar' })).toBeVisible();
+    await expect(page.locator('main')).toContainText('İller Bankası işlerinde taşeron olarak Ankara, Manisa, Sivas ve Malatya');
+    await expect(page.getByRole('heading', { name: 'Referanslarımız ve Tamamlanan İşler' })).toBeVisible();
+    await expect(page.locator('.ref-card')).toHaveCount(8);
+    await expect(page.locator('.ref-card').first()).toContainText('Malatya 4. ve 6. Etap');
+    const orman = page.locator('.ref-card').nth(1);
+    await expect(orman.locator('.ref-mark')).toHaveText('ORMAN');
+    await expect(orman).toContainText('Hekimhan Orman Müdürlüğü');
+    await expect(orman).toContainText('Orman yolu yapımı');
+    await expect(page.locator('.about-quote')).toContainText("2008'den bu yana olduğu gibi bugün de tüm gönüllerde taht kuruyoruz.");
+    await expect(page.locator('.about-goal-band')).toContainText('Hedefimiz');
+    await expect(page.getByRole('heading', { name: 'Bize nasıl ulaşırsınız?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Konum' })).toBeVisible();
+    await expect(page.locator('[data-stats]')).toHaveCount(0);
+    expect(await page.locator('main').innerText()).not.toMatch(/13 ilçe/i);
+    expect(await page.locator('meta[name="description"]').getAttribute('content')).toBe(
+      "Alperenler Hafriyat İnşaat, 2008'den bu yana Malatya'da hafriyat, kazı, altyapı ve iş makinesi hizmetleri veriyor. Referanslarımız ve tamamlanan işlerimiz.",
+    );
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
+test('kuruluş yılı 2008 her yerde; harita bağlantıları, TikTok ve JSON-LD (foundingDate, hasMap, sameAs)', async ({ page }) => {
+  const TIKTOK = 'https://www.tiktok.com/@kaptanblacck';
+  const PLACE = 'https://maps.app.goo.gl/U4xZsNWxEhQWsY3x6';
+  const pages = await crawl(page);
+  for (const path of pages) {
+    await page.goto(path);
+    expect(await page.content(), `${path} içinde 2000`).not.toContain('2000-04-07');
+  }
+
+  await page.goto('/');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('');
+  expect(ld).toContain('"foundingDate":"2008"');
+  expect(ld).toContain(`"hasMap":"${PLACE}"`);
+  expect(ld).toContain(`"sameAs":["${TIKTOK}"]`);
+
+  // Harita bağlantıları profile gider
+  const band = page.locator('.map-info').first();
+  await expect(band.getByRole('link', { name: /Google Maps/ })).toHaveAttribute('href', PLACE);
+  await expect(band.getByRole('link', { name: /Yol tarifi al/ })).toHaveAttribute(
+    'href',
+    'https://www.google.com/maps/dir/?api=1&destination=38.316073,38.2685777',
+  );
+  expect(ld).toContain('"geo":{"@type":"GeoCoordinates","latitude":38.316073,"longitude":38.2685777}');
+  // Gömülü harita bu koordinata ortalanır ve kendi iğnemiz konur
+  await expect(page.locator('[data-map-card]').first()).toHaveAttribute('data-embed', /ll=38\.316073,38\.2685777/);
+  await expect(page.locator('.map-center-pin').first()).toHaveCount(1);
+
+  for (const [path, width] of [['/', 360], ['/iletisim/', 390], ['/iletisim/', 1366]] as const) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(path);
+    const link = page.locator('a[data-tiktok]').first();
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toHaveAttribute('href', TIKTOK);
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', /noopener/);
+    await expect(link).toHaveAttribute('aria-label', 'Alperenler Hafriyat TikTok hesabı');
+    const box = await link.boundingBox();
+    expect(box!.height, `${path} ${width} dokunma hedefi`).toBeGreaterThanOrEqual(44);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  }
+});
+
+test('Google yorum yazma bağlantısı: iletişim kartı + footer; yıldız/puan yok; 44 px; taşma yok', async ({ page }) => {
+  const WRITE = 'https://g.page/r/CUW_reguN3B4EBE/review';
+  for (const [path, width] of [['/', 360], ['/iletisim/', 390], ['/iletisim/', 1366]] as const) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(path);
+    const links = page.locator('a[data-review-link]');
+    expect(await links.count(), `${path} bağlantı sayısı`).toBeGreaterThan(0);
+    for (let i = 0; i < (await links.count()); i++) {
+      const link = links.nth(i);
+      await link.scrollIntoViewIfNeeded();
+      await expect(link).toHaveAttribute('href', WRITE);
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      const box = await link.boundingBox();
+      expect(box!.height, `${path} ${width} dokunma hedefi`).toBeGreaterThanOrEqual(44);
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  }
+  await page.goto('/iletisim/');
+  const card = page.locator('.contact-card', { has: page.getByRole('heading', { name: 'Bizi değerlendirin' }) });
+  await expect(card).toContainText("Hizmetimizden memnun kaldıysanız Google'da yorum bırakabilirsiniz.");
+  await expect(card.locator('svg')).toHaveCount(0);
+  await expect(page.locator('main')).not.toContainText(/★|\d+[,.]\d yıldız|AggregateRating/);
+});
+
+for (const [width, height] of [
+  [360, 740],
+  [390, 844],
+  [430, 932],
+] as const) {
+  test(`mobil hero ${width}x${height}: videoda yazı/buton yok, butonlar ilk ekranda, taşma yok, h1 ≤ 2 satır`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('/');
+    await page.waitForTimeout(1500); // açılış animasyonları (hero-rise, h1 satır maskesi) bitsin
+    const geo = await page.evaluate(() => {
+      const r = (sel: string) => document.querySelector(sel)!.getBoundingClientRect();
+      const media = r('.hero-poster');
+      const h1 = r('.hero h1');
+      const lineH = parseFloat(getComputedStyle(document.querySelector('.hero h1')!).lineHeight);
+      const sub = document.querySelector('.hero-sub-mobile') as HTMLElement;
+      const subLines = sub.getBoundingClientRect().height / parseFloat(getComputedStyle(sub).lineHeight);
+      return {
+        mediaBottom: media.bottom,
+        mediaHeight: media.height,
+        h1Top: h1.top,
+        h1Lines: Math.round(h1.height / lineH),
+        subLines: Math.round(subLines),
+        eyebrowTop: r('.hero-inner .eyebrow').top,
+        btns: Array.from(document.querySelectorAll('.hero .btn-lg')).map((b) => b.getBoundingClientRect().bottom),
+        btnHeights: Array.from(document.querySelectorAll('.hero .btn-lg')).map((b) => b.getBoundingClientRect().height),
+        overlay: getComputedStyle(document.querySelector('.hero-overlay')!).display,
+        vignette: getComputedStyle(document.querySelector('.hero-vignette')!).display,
+        scroll: getComputedStyle(document.querySelector('.hero-scroll')!).display,
+        desktopSub: getComputedStyle(document.querySelector('.hero-sub-desktop')!).display,
+        heroH1Size: parseFloat(getComputedStyle(document.querySelector('.hero h1')!).fontSize),
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        stripe: getComputedStyle(document.querySelector('.hero-inner')!, '::before').clipPath,
+      };
+    });
+    // video alanında h1/buton/eyebrow yok: hepsi video alanının altında
+    expect(geo.eyebrowTop, 'eyebrow video altında').toBeGreaterThanOrEqual(geo.mediaBottom - 1);
+    expect(geo.h1Top, 'h1 video altında').toBeGreaterThanOrEqual(geo.mediaBottom - 1);
+    expect(geo.overlay).toBe('none');
+    expect(geo.vignette).toBe('none');
+    expect(geo.scroll).toBe('none');
+    expect(geo.desktopSub).toBe('none');
+    expect(geo.stripe).not.toBe('none');
+    expect(geo.h1Lines, 'h1 en fazla 2 satır').toBeLessThanOrEqual(2);
+    expect(geo.subLines, 'alt başlık en fazla 3 satır').toBeLessThanOrEqual(3);
+    expect(geo.heroH1Size).toBeLessThanOrEqual(37.6);
+    for (const bottom of geo.btns) expect(bottom, 'butonlar ilk ekranda').toBeLessThanOrEqual(height);
+    for (const h of geo.btnHeights) expect(h).toBeGreaterThanOrEqual(48);
+    expect(geo.overflow).toBeLessThanOrEqual(0);
+    // video alanı yüksekliği CSS'te sabit: clamp(18rem, 56svh, 34rem)
+    expect(Math.round(geo.mediaHeight)).toBe(Math.round(Math.min(Math.max(288, height * 0.56), 544)));
+  });
+}
+
+test('referanslar: ana sayfada Biz Kimiz sonrası ve Hakkımızda; 8 kart, sıra, altyapı çipleri; 2/3/4 sütun; taşma yok; "13 ilçe" yok', async ({ page }) => {
+  const names = [
+    'Emlak Konut GYO A.Ş.',
+    'Hekimhan Orman Müdürlüğü',
+    'TCDD Genel Müdürlüğü',
+    'Malatya MASKİ Genel Müdürlüğü',
+    'Ankara ASKİ Genel Müdürlüğü',
+    'Manisa MASKİ Genel Müdürlüğü',
+    'Sivas SİBESKİ Genel Müdürlüğü',
+    'İstanbul İSKİ Genel Müdürlüğü',
+  ];
+  for (const [path, width, columns] of [
+    ['/', 360, 2],
+    ['/hakkimizda/', 390, 2],
+    ['/', 768, 3],
+    ['/hakkimizda/', 1366, 4],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(path);
+    const section = page.locator('.refs-section');
+    await expect(section.getByRole('heading', { name: 'Referanslarımız ve Tamamlanan İşler' })).toBeVisible();
+    await expect(section.locator('.ref-card')).toHaveCount(8);
+    expect(await section.locator('.ref-name').allTextContents()).toEqual(names);
+    expect(await section.locator('.ref-mark').allTextContents()).toEqual([
+      'EMLAK KONUT', 'ORMAN', 'TCDD', 'MASKİ', 'ASKİ', 'MASKİ', 'SİBESKİ', 'İSKİ',
+    ]);
+    await expect(section.locator('.ref-card').first()).toContainText('Malatya 4. ve 6. Etap');
+    await expect(section.locator('.ref-card').nth(1)).toContainText('Orman yolu yapımı');
+    await expect(section.locator('.refs-chip')).toHaveCount(5);
+    await expect(section.locator('.refs-chip').nth(0)).toHaveText(/Ankara\s*Beypazarı, Polatlı/);
+    await expect(section.locator('.refs-chip').nth(2)).toHaveText(/Sivas\s*Çarkışla, Gemerek, Kangal/);
+    await expect(section.locator('.refs-chip').nth(4)).toHaveText('İller Bankası A.Ş. projeleri');
+    await section.scrollIntoViewIfNeeded();
+    const cols = await section.locator('.refs-grid').evaluate(
+      (el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length,
+    );
+    expect(cols, `${path} ${width}px sütun`).toBe(columns);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    expect(await page.locator('main').innerText()).not.toMatch(/13 ilçe/i);
+  }
+  // Ana sayfada Biz Kimiz'den sonra, rakam şeridinden önce
+  await page.goto('/');
+  const order = await page.evaluate(() => {
+    const idx = (sel: string) => Array.from(document.querySelectorAll('main section')).indexOf(document.querySelector(sel)!);
+    return [idx('#firma'), idx('.refs-section'), idx('[data-stats]')];
+  });
+  expect(order[0]).toBeLessThan(order[1]);
+  expect(order[1]).toBeLessThan(order[2]);
 });

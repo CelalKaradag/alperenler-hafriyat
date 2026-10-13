@@ -2,6 +2,7 @@
 import { mapsDirectionsUrl, mapsUrl, site, whatsappUrl } from '../data/site';
 import EmailText from './EmailText.astro';
 import Icon from './Icon.astro';
+import TikTokLink from './TikTokLink.astro';
 import MapCard from './MapCard.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
 ---
@@ -36,6 +37,24 @@ import WhatsAppButton from './WhatsAppButton.astro';
                 <Icon name="mail" />
                 <span class="mail-text"><EmailText email={site.email} /></span>
               </a>
+            </p>
+          )
+        }
+        {
+          (site.social.tiktok || site.googleWriteReviewUrl) && (
+            <p class="map-info-social">
+              {site.social.tiktok && <TikTokLink />}
+              {site.googleWriteReviewUrl && (
+                <a
+                  class="social-link"
+                  href={site.googleWriteReviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-review-link
+                >
+                  Google'da yorum yazın<span class="visually-hidden"> (yeni sekmede açılır)</span>
+                </a>
+              )}
             </p>
           )
         }

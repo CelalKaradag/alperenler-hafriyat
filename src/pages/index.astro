@@ -6,6 +6,7 @@ import ServiceCard from '../components/ServiceCard.astro';
 import StatsStrip from '../components/StatsStrip.astro';
 import TrustStrip from '../components/TrustStrip.astro';
 import GallerySection from '../components/GallerySection.astro';
+import ReferencesSection from '../components/ReferencesSection.astro';
 import ReviewsSection from '../components/ReviewsSection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import PriceWizard from '../components/PriceWizard.astro';
@@ -22,7 +23,7 @@ import { publicFileExists } from '../utils/assets';
 
 // Fotoğraf yoksa sağ sütunda dekoratif koyu panel görünür (iletişim bilgisi yok).
 const aboutIntro =
-  "Alperenler Hafriyat İnşaat, 2008 yılından bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.";
+  `Alperenler Hafriyat İnşaat, ${site.foundedYear} yılından bu yana Malatya'da hafriyat, kazı ve iş makinesi hizmetleri veriyor. Yıllar içinde edindiğimiz deneyimi, disiplinli çalışma anlayışımızı ve müşteri memnuniyetini önceleyen yaklaşımımızı her işe yansıtıyoruz.`;
 const aboutImage = '/images/hakkimizda.jpg';
 const hasAboutImage = publicFileExists(aboutImage);
 ---
@@ -47,7 +48,7 @@ const hasAboutImage = publicFileExists(aboutImage);
       <div class="about-copy">
         <div class="section-head">
           <p class="eyebrow">Biz Kimiz</p>
-          <h2 id="firma-baslik">2008'den bu yana Malatya'da hafriyat ve iş makinesi hizmetleri</h2>
+          <h2 id="firma-baslik">{`${site.foundedYear}'den bu yana Malatya'da hafriyat ve iş makinesi hizmetleri`}</h2>
         </div>
         <p>{aboutIntro}</p>
         <p>
@@ -75,6 +76,8 @@ const hasAboutImage = publicFileExists(aboutImage);
         )
       }    </div>
   </section>
+
+  <ReferencesSection />
 
   <StatsStrip />
 

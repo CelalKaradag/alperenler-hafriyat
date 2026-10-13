@@ -1,0 +1,49 @@
+---
+import { corporateReferences, infrastructure } from '../data/references';
+---
+
+{
+  (corporateReferences.length > 0 || infrastructure.length > 0) && (
+    <section class="section section-paper refs-section" aria-labelledby="referanslar-baslik">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Referanslar</p>
+          <h2 id="referanslar-baslik">Referanslarımız ve Tamamlanan İşler</h2>
+        </div>
+
+        {
+          corporateReferences.length > 0 && (
+            <>
+              <h3 class="refs-subtitle">Kurumsal referanslar</h3>
+              <ul class="refs-grid">
+                {corporateReferences.map((ref) => (
+                  <li class="ref-card">
+                    <span class="ref-mark">{ref.mark}</span>
+                    <span class="ref-name">{ref.name}</span>
+                    {ref.note && <span class="ref-note">{ref.note}</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        {
+          infrastructure.length > 0 && (
+            <>
+              <h3 class="refs-subtitle">Altyapı taşeronluğu</h3>
+              <ul class="refs-chips">
+                {infrastructure.map((item) => (
+                  <li class="refs-chip">
+                    <strong>{item.name}</strong>
+                    {item.districts && <span>{item.districts.join(', ')}</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+      </div>
+    </section>
+  )
+}
