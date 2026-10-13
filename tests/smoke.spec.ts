@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import {
   PHONE_HREF,
@@ -728,6 +730,38 @@ test('resmi bilgiler: footer (ünvan, MERSİS, sicil, V.D.), gizlilik (vergi no 
     .locator('footer .footer-ids span')
     .evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().right));
   for (const right of itemBoxes) expect(right, 'kayıt öğesi ekran içinde').toBeLessThanOrEqual(360 + 0.5);
+});
+test('galeri: aynı dosya içeriğine (hash) sahip iki fotoğraf yok; ana sayfa Sahadan sırası', async ({ page, request }) => {
+  await page.goto('/galeri/');
+  // Galerideki her fotoğrafın JPG kaynağı indirilir ve SHA-256 hash'i hesaplanır
+  const sources = await page
+    .locator('.gallery-open[data-kind="image"]')
+    .evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.src ?? ''));
+  expect(sources.length, 'galeride fotoğraf yok').toBeGreaterThan(5);
+  const byHash = new Map<string, string[]>();
+  for (const src of sources) {
+    const response = await request.get(src);
+    expect(response.status(), src).toBe(200);
+    const hash = createHash('sha256').update(await response.body()).digest('hex');
+    byHash.set(hash, [...(byHash.get(hash) ?? []), src]);
+  }
+  const duplicates = [...byHash.values()].filter((list) => list.length > 1);
+  expect(duplicates, `yinelenen fotoğraf dosyaları: ${JSON.stringify(duplicates)}`).toEqual([]);
+  // Aynı kaynak adı iki kez de verilmemiş olmalı
+  expect(new Set(sources).size).toBe(sources.length);
+
+  // Ana sayfa "Sahadan": ilk iki öne çıkan öğe şantiye temel kazısı fotoğrafı ve şehir içi drone videosu
+  await page.goto('/');
+  const firstTwo = await page
+    .locator('.gallery-grid--home .gallery-open')
+    .evaluateAll((nodes) =>
+      nodes.slice(0, 2).map((node) => {
+        const data = (node as HTMLElement).dataset;
+        return data.src ?? data.video ?? '';
+      }),
+    );
+  expect(firstTwo[0]).toContain('santiye-temel-kazisi');
+  expect(firstTwo[1]).toContain('drone-sehir-ici-temel-kazisi');
 });
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
   await page.goto('/hakkimizda/');

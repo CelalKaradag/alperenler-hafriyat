@@ -86,7 +86,6 @@ const SERVICES_BY_NAME: Record<string, string[]> = {
   'gabion-duvar': [S.dolgu],
   'bayrakli-arazi-calismasi': [S.arazi, S.makine],
   'duzlenmis-saha': [S.arazi, S.dolgu],
-  'sehir-ici-temel-kazisi-ekskavatorler': [S.hafriyat, S.tasima, S.makine],
   'drone-sehir-ici-temel-kazisi': [S.hafriyat, S.tasima],
   'drone-santiye-tepeden': [S.hafriyat],
   'drone-dag-arazisinde-saha-acma': [S.arazi],
@@ -110,11 +109,13 @@ const video = (name: string, title: string, extra: GalleryBase = {}): GalleryVid
 });
 
 export const gallery: GalleryItem[] = [
-  // Yeni (öne çıkanlar): şehir içi temel kazısı fotoğrafı ve havadan görünüm
+  // Ana sayfa "Sahadan" (öne çıkanlar) bu sırayla başlar: şehir içi temel kazısı fotoğrafı + havadan görünüm.
+  // (Müşteri aynı karenin ikinci kopyasını da göndermişti; yinelenen dosya kaldırıldı. tests/smoke.spec.ts içeriği
+  // aynı olan iki galeri fotoğrafı bulunmadığını doğrular.)
   photo(
-    'sehir-ici-temel-kazisi-ekskavatorler',
-    'Şehir içi temel kazısında çalışan ekskavatörler ve damperli kamyonlar',
-    { featured: true },
+    'santiye-temel-kazisi',
+    'Şehir içinde temel kazısı yapılan şantiye, Hitachi ekskavatörler ve kamyonlar',
+    { width: 1600, height: 1200, featured: true },
   ),
   video('drone-sehir-ici-temel-kazisi', 'Şehir içi temel kazısı, havadan görünüm', {
     width: 960,
@@ -122,12 +123,7 @@ export const gallery: GalleryItem[] = [
     featured: true,
   }),
 
-  // İlk beş öğe (eski öne çıkanlardan santiye-temel-kazisi ve kazi-calismasi artık featured değil: yeni öğeler öne çıksın)
-  photo(
-    'santiye-temel-kazisi',
-    'Şehir içinde temel kazısı yapılan şantiye, Hitachi ekskavatörler ve kamyonlar',
-    { width: 1600, height: 1200 },
-  ),
+  // Diğer öğeler (kazi-calismasi artık featured değil: yer yeni drone videosuna açıldı)
   video('kazi-calismasi', 'Kazı çalışması', { width: 540, height: 960 }),
   photo('derin-kazi-hitachi', 'Derin temel kazısında çalışan Hitachi ekskavatör', {
     width: 1000,

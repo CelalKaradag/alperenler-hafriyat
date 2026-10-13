@@ -45,7 +45,9 @@ export function initStatsCounter() {
     const final = el.dataset.final || format.format(target) + suffix; // HTML'deki gerçek metin (prime adımında saklanır)
     const start = performance.now();
     const step = (now) => {
-      const progress = Math.min(1, (now - start) / DURATION);
+      // rAF zaman damgası, start (performance.now) değerinden birkaç ms ÖNCE olabilir: negatif ilerleme
+      // ("-165" gibi ara değer) göstermemek için 0'a sıkıştırılır
+      const progress = Math.max(0, Math.min(1, (now - start) / DURATION));
       el.textContent = format.format(Math.round(target * easeOut(progress))) + suffix; // son ek (örn. "+") sayılırken de korunur
       if (progress < 1) {
         frames.add(window.requestAnimationFrame(step));
