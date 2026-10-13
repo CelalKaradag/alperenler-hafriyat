@@ -91,7 +91,8 @@ const hasAboutImage = publicFileExists(aboutImage);
             <p class="eyebrow">Hizmetler</p>
             <h2 id="hizmetler-baslik">Neler yapıyoruz?</h2>
           </div>
-          <div class="card-grid">
+          <p class="rail-hint" aria-hidden="true">Kaydırarak tüm hizmetleri görün<span class="rail-hint-arrow">→</span></p>
+          <div class="card-grid card-grid--rail">
             {visibleServices.map((service, i) => (
               <div class="reveal" style={`--d: ${(i % 4) * 0.08}s`}>
                 <ServiceCard service={service} index={i + 1} />

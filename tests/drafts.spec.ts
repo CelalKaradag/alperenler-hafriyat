@@ -188,6 +188,8 @@ for (const width of [360, 390, 1366]) {
     page.on('request', (req) => {
       const url = req.url();
       if (url.startsWith('data:') || url.startsWith('blob:')) return;
+      // Sayfanın altındaki harita şeridi görünür olunca Google haritayı yükler; yorum bölümüyle ilgisi yok
+      if (/^https:\/\/(www\.)?google\.com\/maps/.test(url)) return;
       if (new URL(url).origin !== new URL(page.url() === 'about:blank' ? 'http://127.0.0.1:4322' : page.url()).origin) {
         external.push(url);
       }

@@ -11,6 +11,18 @@
   background: var(--bg);
   border-top: 2px solid var(--accent);
   --focus: var(--accent);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Ana sayfada hero düğmeleri ekrandayken çubuk saklı (aynı düğmeler iki kez görünmesin / üst üste binmesin). JS yoksa hep görünür; klavye odağında görünür. */
+.js .over-hero .call-bar:not(.is-shown):not(:focus-within) {
+  transform: translateY(calc(100% + 4px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-bar {
+    transition: none;
+  }
 }
 
 .call-bar .btn {

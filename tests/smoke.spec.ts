@@ -1458,3 +1458,57 @@ test('referanslar: ana sayfada Biz Kimiz sonrası ve Hakkımızda; 8 kart, sıra
   expect(order[0]).toBeLessThan(order[1]);
   expect(order[1]).toBeLessThan(order[2]);
 });
+
+test.describe('telefon düzeni (mobile.css)', () => {
+  for (const [width, height] of [
+    [360, 740],
+    [390, 844],
+  ] as const) {
+    test(`${width}x${height}: header tek satır, hero butonu ekranda, alt çubuk hero'da saklı, kaydırınca görünür`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await page.waitForTimeout(800);
+      const header = await page.locator('.site-header').boundingBox();
+      expect(header!.height, 'header yüksekliği (Menü alt satıra düşmez)').toBeLessThanOrEqual(73);
+      const btn = await page.locator('.hero .btn-primary').first().boundingBox();
+      expect(btn!.y + btn!.height, 'hero butonu ilk ekranda').toBeLessThanOrEqual(height);
+      // hero düğmeleri ekrandayken çubuk ekranın dışında (saklı)
+      await expect.poll(async () => (await page.locator('.call-bar').boundingBox())!.y).toBeGreaterThanOrEqual(height);
+      await page.evaluate((y) => window.scrollTo(0, y), Math.round(height * 1.5));
+      await expect(page.locator('.call-bar')).toHaveClass(/is-shown/);
+      await expect
+        .poll(async () => {
+          const box = await page.locator('.call-bar').boundingBox();
+          return box!.y + box!.height;
+        })
+        .toBeLessThanOrEqual(height + 0.5);
+    });
+  }
+
+  test('360: hizmet şeridi yatay kaydırılır, ilk kart > 260 px, ipucu görünür, sayfa taşmaz', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto('/');
+    const rail = page.locator('.card-grid--rail');
+    await rail.scrollIntoViewIfNeeded();
+    const info = await rail.evaluate((el) => ({
+      overflowX: getComputedStyle(el).overflowX,
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      firstWidth: el.firstElementChild!.getBoundingClientRect().width,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    expect(info.overflowX).toBe('auto');
+    expect(info.scrollWidth).toBeGreaterThan(info.clientWidth);
+    expect(info.firstWidth).toBeGreaterThan(260);
+    expect(info.pageOverflow).toBeLessThanOrEqual(0);
+    await expect(page.locator('.rail-hint')).toBeVisible();
+  });
+
+  test('768: hizmet şeridi ızgara kalır (overflow visible), ipucu gizli', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 900 });
+    await page.goto('/');
+    const overflowX = await page.locator('.card-grid--rail').evaluate((el) => getComputedStyle(el).overflowX);
+    expect(overflowX).toBe('visible');
+    await expect(page.locator('.rail-hint')).toBeHidden();
+  });
+});
