@@ -37,8 +37,12 @@
 
 /* E-posta: ikonlu; uzun adres mobilde taşmaz */
 .contact-value--mail {
-  overflow-wrap: anywhere;
-  font-size: clamp(1.05rem, 0.9rem + 1.2vw, 1.4rem);
+  /* Telefon numarasından küçük (1.4rem); masaüstünde tek satıra sığar. Sığmazsa YALNIZCA "@" öncesinden
+     kırılır (<wbr>); `anywhere` kullanılmaz ("…gmail.c / om" gibi kelime ortası kırılma olmasın).
+     break-word yalnızca taşma koruması: kırılabilecek başka yer yoksa devreye girer. */
+  overflow-wrap: break-word;
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 
 .contact-value--mail a {

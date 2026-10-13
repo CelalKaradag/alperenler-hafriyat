@@ -2,9 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { showDrafts } from '../data/drafts';
 import { site } from '../data/site';
+import EmailText from '../components/EmailText.astro';
 
 // Firma tarafından doldurulacak alanlar (uydurma bilgi yok). Ticari unvan ve e-posta ONAYLANDI (site.ts); vergi no,
-// barındırma sağlayıcısı ve son güncelleme tarihi hâlâ firmadan beklenir.
+// son güncelleme tarihi hâlâ firmadan beklenir (barındırma sağlayıcısı: Cloudflare, Inc.).
 const TODO = '[firma tarafından doldurulacak]';
 const isDraft = showDrafts;
 ---
@@ -38,7 +39,7 @@ const isDraft = showDrafts;
       </p>
       <p>
         Siteyi barındıran hizmet sağlayıcı, teknik nedenlerle standart sunucu kayıtları tutabilir.
-        Sağlayıcı ve ayrıntılar: <mark class="todo">{TODO}</mark>
+        Sağlayıcı ve ayrıntılar: Cloudflare, Inc.
       </p>
 
       <h2>Teklif sihirbazı</h2>
@@ -96,7 +97,7 @@ const isDraft = showDrafts;
             <div>
               <dt>E-posta</dt>
               <dd class="facts-mail">
-                <a href={`mailto:${site.email}`}>{site.email}</a>
+                <a href={`mailto:${site.email}`}><span class="mail-text"><EmailText email={site.email} /></span></a>
               </dd>
             </div>
           )

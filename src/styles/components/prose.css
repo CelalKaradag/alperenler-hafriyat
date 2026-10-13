@@ -22,7 +22,7 @@
 }
 
 .facts-mail {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word; /* kırılma yalnızca "@" öncesinden (<wbr>), bkz. EmailText.astro */
 }
 
 .facts dt {

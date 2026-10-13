@@ -614,6 +614,75 @@ test('e-posta 360 px: iletişim, ana sayfa footer ve gizlilik sayfasında yatay 
     expect(overflow, `${path} yatay taşma`).toBeLessThanOrEqual(0);
   }
 });
+test('e-posta satır kırılımı: tek satır ya da YALNIZCA "@" öncesinden; ".c / om" gibi kırılma yok (360/390/768/1366)', async ({
+  page,
+}) => {
+  // Bir öğedeki metnin satır başlangıç karakterleri (ilk satır hariç): kırılma "@" öncesinde olmalı
+  const breaks = (selector: string) =>
+    page.evaluate((sel) => {
+      const el = document.querySelector(sel) as Element;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const lines: number[] = [];
+      const starts: string[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        const text = node.textContent ?? '';
+        for (let i = 0; i < text.length; i += 1) {
+          const range = document.createRange();
+          range.setStart(node, i);
+          range.setEnd(node, i + 1);
+          const rect = range.getClientRects()[0];
+          if (!rect) continue;
+          const top = Math.round(rect.top);
+          if (lines.length > 0 && top > lines[lines.length - 1] + 2) starts.push(text[i]);
+          lines.push(top);
+        }
+      }
+      return { starts, lineCount: new Set(lines.map((l) => Math.round(l / 4))).size };
+    }, selector);
+
+  for (const width of [360, 390, 768, 1366]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const [path, selector] of [
+      ['/iletisim/', '.contact-card .mail-text'],
+      ['/', 'footer .mail-text'],
+      ['/gizlilik/', '.facts-mail .mail-text'],
+    ] as const) {
+      await page.goto(path);
+      const result = await breaks(selector);
+      expect(result.starts, `${path} @${width}: satır başı karakterleri`).toEqual(result.starts.map(() => '@'));
+      expect(result.starts.length, `${path} @${width}: en çok bir kırılma (@ öncesi)`).toBeLessThanOrEqual(1);
+    }
+  }
+
+  // İletişim kartında e-posta yazısı telefon numarasından küçük (1.0625rem, 600) ve masaüstünde tek satır
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto('/iletisim/');
+  const sizes = await page.evaluate(() => {
+    const mail = document.querySelector('.contact-value--mail') as Element;
+    const phone = document.querySelector('.contact-card .contact-value:not(.contact-value--mail)') as Element;
+    return {
+      mail: parseFloat(getComputedStyle(mail).fontSize),
+      weight: getComputedStyle(mail).fontWeight,
+      phone: parseFloat(getComputedStyle(phone).fontSize),
+      wrap: getComputedStyle(mail).overflowWrap,
+    };
+  });
+  expect(sizes.mail).toBe(17);
+  expect(sizes.weight).toBe('600');
+  expect(sizes.mail).toBeLessThan(sizes.phone);
+  expect(sizes.wrap, 'overflow-wrap: anywhere bu kartta kullanılmaz').toBe('break-word');
+  expect((await breaks('.contact-card .mail-text')).starts).toEqual([]); // masaüstünde tek satır
+});
+
+test('gizlilik: barındırma sağlayıcısı "Cloudflare, Inc."; vergi no ve son güncelleme yer tutucu kalır', async ({ page }) => {
+  await page.goto('/gizlilik/');
+  await expect(page.locator('main')).toContainText('Sağlayıcı ve ayrıntılar: Cloudflare, Inc.');
+  // Yer tutucular yalnızca vergi no ve son güncelleme (taslak uyarısı showDrafts'a bağlı olabilir; metin her zaman var)
+  await expect(page.locator('.facts div', { hasText: 'Vergi no' })).toContainText('[firma tarafından doldurulacak]');
+  await expect(page.locator('.facts div', { hasText: 'Son güncelleme' })).toContainText('[firma tarafından doldurulacak]');
+  await expect(page.locator('mark.todo')).toHaveCount(2);
+});
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
   await page.goto('/hakkimizda/');
   await expect(page.locator('h1')).toHaveCount(1);

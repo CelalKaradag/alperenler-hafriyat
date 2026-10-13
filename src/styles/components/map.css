@@ -394,7 +394,7 @@
 .map-info-mail {
   display: block;
   margin: 0 0 1.1rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word; /* kırılma yalnızca "@" öncesinden (<wbr>), bkz. EmailText.astro */
 }
 
 .map-info-mail a {

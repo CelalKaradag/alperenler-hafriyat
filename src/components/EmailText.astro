@@ -1,0 +1,14 @@
+---
+// E-posta metni: satır gerekirse YALNIZCA "@" işaretinden önce kırılır ("alperenler.hrf.ltd" ⏎ "@gmail.com");
+// ".c / om" gibi kelime ortası kırılma olmaz. Çevreleyen öğede `overflow-wrap: anywhere` KULLANILMAMALIDIR.
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+const at = email.indexOf('@');
+const local = at >= 0 ? email.slice(0, at) : email;
+const rest = at >= 0 ? email.slice(at) : '';
+---
+
+{local}<wbr />{rest}

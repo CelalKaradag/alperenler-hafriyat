@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { mapsDirectionsUrl, site, whatsappUrl } from '../data/site';
+import EmailText from '../components/EmailText.astro';
 import Icon from '../components/Icon.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import MapBand from '../components/MapBand.astro';
@@ -80,7 +81,7 @@ import { localBusinessSchema } from '../utils/schema';
               <p class="contact-value contact-value--mail">
                 <a href={`mailto:${site.email}`}>
                   <Icon name="mail" />
-                  <span>{site.email}</span>
+                  <span class="mail-text"><EmailText email={site.email} /></span>
                 </a>
               </p>
             </div>
