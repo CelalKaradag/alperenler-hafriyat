@@ -1,0 +1,26 @@
+---
+/**
+ * YALNIZCA TEST FIXTURE'I: ReviewsSection'ı sahte verilerle render eder. Siteye girmez:
+ * `PUBLIC_TEST_FIXTURES=true` yoksa (normal build, deploy) hiçbir sayfa üretilmez (scripts/serve-for-tests.mjs).
+ * Buradaki yorumlar GERÇEK DEĞİLDİR.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReviewsSection from '../../components/ReviewsSection.astro';
+import type { Review } from '../../data/reviews';
+
+export function getStaticPaths() {
+  return import.meta.env.PUBLIC_TEST_FIXTURES === 'true' ? [{ params: { fixture: 'yorumlar' } }] : [];
+}
+
+const fake: Review[] = [
+  { author: 'Test K.', rating: 5, text: 'Sahte test yorumu bir.', date: '2026-01', googleUrl: 'https://example.com/a' },
+  { author: 'Deneme A.', rating: 4, text: 'Sahte test yorumu iki. '.repeat(12) + 'Uzun_kelime_taşma_denemesi_'.repeat(6), date: '2026-02' },
+  { author: 'Örnek B.', rating: 3, text: 'Sahte test yorumu üç.', date: '2026-03' },
+  { author: 'Fixture C.', rating: 5, text: 'Sahte test yorumu dört.', date: '2026-04' },
+];
+---
+
+<BaseLayout title="Yorum fixture (test)" description="Yalnızca test." footerCta={false}>
+  <section class="section section-dark on-dark"><div class="container"><h1>Yorum fixture (test)</h1></div></section>
+  <ReviewsSection reviews={fake} />
+</BaseLayout>

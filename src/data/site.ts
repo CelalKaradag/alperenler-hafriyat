@@ -27,6 +27,10 @@ export interface SiteConfig {
   whatsappNumber: string | null;
   /** E-posta (firma onaylı, kesin): iletişim sayfası, footer (harita kartı), gizlilik sayfası ve JSON-LD'de gösterilir; tanımsızsa hiçbir yerde görünmez */
   email?: string;
+  /** Google'daki tüm yorumlar bağlantısı (İşletme Profili); tanımsızsa "Google'da tüm yorumlar" düğmesi gizli */
+  googleReviewsUrl?: string;
+  /** Google'da yorum yazma bağlantısı; tanımsızsa "Google'da yorum yazın" düğmesi gizli */
+  googleWriteReviewUrl?: string;
   /** Adres tek satırda; 34/2/8 aynen korunur */
   address: string;
   /** Aynı adresin yapısal hâli (JSON-LD için). `address` ile tutarlı tutulmalıdır. */

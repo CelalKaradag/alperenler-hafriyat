@@ -17,10 +17,14 @@ import { existsSync } from 'node:fs';
 
 const base = { ...process.env };
 delete base.PUBLIC_SHOW_DRAFTS;
+delete base.PUBLIC_TEST_FIXTURES;
 
 function build(outDir, drafts) {
   const env = { ...base, ASTRO_OUT_DIR: outDir };
-  if (drafts) env.PUBLIC_SHOW_DRAFTS = 'true';
+  if (drafts) {
+    env.PUBLIC_SHOW_DRAFTS = 'true';
+    env.PUBLIC_TEST_FIXTURES = 'true'; // yalnız test build'inde: src/pages/test-fixtures/ sayfaları üretilir
+  }
   const result = spawnSync('npx', ['astro', 'build'], { stdio: 'inherit', shell: true, env });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }

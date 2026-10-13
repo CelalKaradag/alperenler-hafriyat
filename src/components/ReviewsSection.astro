@@ -1,0 +1,77 @@
+---
+import { formatReviewDate, reviews as siteReviews, type Review } from '../data/reviews';
+import { site } from '../data/site';
+
+interface Props {
+  /** Varsayılan: src/data/reviews.ts (şimdilik boş). Yalnızca test fixture'ı farklı veri verir. */
+  reviews?: Review[];
+  tone?: 'light' | 'paper';
+}
+
+const { reviews = siteReviews, tone = 'paper' } = Astro.props;
+const reviewsUrl = site.googleReviewsUrl;
+const writeUrl = site.googleWriteReviewUrl;
+const STAR = 'M12 2.8l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 16.8 6.6 19.7l1-6.1L3.2 9.3l6.1-.9z';
+---
+
+{
+  /* Liste boşsa HİÇBİR ŞEY render edilmez: bölüm, başlık, boşluk yok. Dış script/iframe/API yok, ağ isteği yok. */
+  reviews.length > 0 && (
+    <section class:list={['section', `section-${tone}`]} aria-labelledby="yorumlar-baslik" data-reviews>
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Yorumlar</p>
+          <h2 id="yorumlar-baslik">Müşterilerimiz ne diyor</h2>
+        </div>
+
+        <ul class="reviews-track" tabindex="0" aria-label="Müşteri yorumları">
+          {reviews.map((review) => (
+            <li class="review-card">
+              <span class="stars" role="img" aria-label={`5 üzerinden ${review.rating}`}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <svg
+                    class:list={['star', n <= review.rating && 'is-on']}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d={STAR} />
+                  </svg>
+                ))}
+              </span>
+              <blockquote class="review-text">
+                <p>{review.text}</p>
+              </blockquote>
+              <p class="review-meta">
+                <span class="review-author">{review.author}</span>
+                <span class="review-date">{formatReviewDate(review.date)}</span>
+              </p>
+              {review.googleUrl && (
+                <a class="review-link" href={review.googleUrl} target="_blank" rel="noopener noreferrer">
+                  Google'da gör<span class="visually-hidden"> (yeni sekmede açılır)</span>
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {
+          (reviewsUrl || writeUrl) && (
+            <div class="btn-row reviews-actions">
+              {reviewsUrl && (
+                <a class="btn btn-dark" href={reviewsUrl} target="_blank" rel="noopener noreferrer">
+                  Google'da tüm yorumlar<span class="visually-hidden"> (yeni sekmede açılır)</span>
+                </a>
+              )}
+              {writeUrl && (
+                <a class="btn btn-outline-dark" href={writeUrl} target="_blank" rel="noopener noreferrer">
+                  Google'da yorum yazın<span class="visually-hidden"> (yeni sekmede açılır)</span>
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </section>
+  )
+}

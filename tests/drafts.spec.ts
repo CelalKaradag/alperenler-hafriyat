@@ -180,3 +180,35 @@ test("JSON-LD'ye taslaklar girmez (rehber, fiyat rehberi); onaylı hizmet/SSS gi
     await expect(page.locator('.draft-badge')).toHaveCount(0);
   }
 });
+// ---- Google yorumları bölümü (yalnızca test fixture'ı; sahte veri siteye girmez) ----
+for (const width of [360, 390, 1366]) {
+  test(`yorum bölümü fixture ${width}px: yıldız metin alternatifi, taşma yok, dış istek yok`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    const external: string[] = [];
+    page.on('request', (req) => {
+      const url = req.url();
+      if (url.startsWith('data:') || url.startsWith('blob:')) return;
+      if (new URL(url).origin !== new URL(page.url() === 'about:blank' ? 'http://127.0.0.1:4322' : page.url()).origin) {
+        external.push(url);
+      }
+    });
+    await page.goto('/test-fixtures/yorumlar/');
+    const section = page.locator('[data-reviews]');
+    await expect(section).toBeVisible();
+    await expect(section.getByRole('heading', { name: 'Müşterilerimiz ne diyor' })).toBeVisible();
+    await expect(section.locator('.review-card')).toHaveCount(4);
+    await expect(section.getByRole('img', { name: '5 üzerinden 5' }).first()).toBeVisible();
+    await expect(section.getByRole('img', { name: '5 üzerinden 4' })).toHaveCount(1);
+    await expect(section.getByRole('img', { name: '5 üzerinden 3' })).toHaveCount(1);
+    // google bağlantıları tanımsız: butonlar gizli
+    await expect(section.locator('.reviews-actions')).toHaveCount(0);
+    // sayfa yatay taşmıyor; kart şerit içinde kaydırılabilir
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, 'yatay taşma').toBeLessThanOrEqual(0);
+    if (width >= 1024) {
+      const xs = await section.locator('.review-card').evaluateAll((els) => els.slice(0, 3).map((e) => Math.round(e.getBoundingClientRect().top)));
+      expect(new Set(xs).size, '3 sütun aynı satırda').toBe(1);
+    }
+    expect(external, `dış istekler:\n${external.join('\n')}`).toEqual([]);
+  });
+}

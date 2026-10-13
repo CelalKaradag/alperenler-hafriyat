@@ -50,15 +50,49 @@ function setup(card, cleanups) {
     }, LOAD_TIMEOUT_MS);
     cleanups.push(() => window.clearTimeout(timer));
 
-    // Geç gelen load da haritayı gösterir (önce "failed" olmuş olsa bile)
+    /*
+     * Dayanıklılık: engellenen / ulaşılamayan bir iframe tarayıcıda bozuk "hata sayfası" gösterir ve yine de
+     * `load` olayı verir (içeriği cross-origin olduğu için okunamaz). Bu yüzden harita yalnızca iframe
+     * yüklendiyse VE aynı adrese yapılan hafif bir ön kontrol (HEAD, no-cors) ağa ulaştıysa "loaded" olur.
+     * Ön kontrol reddedilirse (engel, çevrimdışı, reklam engelleyici) iframe kaldırılır ve "failed" durumuna
+     * düşülür: tasarım arka planı + adres + "Google Maps'te aç" / "Yol tarifi al" kalır.
+     */
+    let frameLoaded = false;
+    let probeOk = typeof fetch === 'function' ? null : true; // null: sürüyor
+    const showIfReady = () => {
+      if (frameLoaded && probeOk === true) {
+        window.clearTimeout(timer);
+        setState('loaded');
+      }
+    };
+    const fail = () => {
+      window.clearTimeout(timer);
+      if (card.dataset.state === 'loaded') return;
+      if (frameEl) {
+        frameEl.remove();
+        frameEl = null;
+      }
+      setState('failed');
+    };
+
+    // Geç gelen load da haritayı gösterir (önce zaman aşımından "failed" olmuş olsa bile)
     frame.addEventListener('load', () => {
-      window.clearTimeout(timer);
-      setState('loaded');
+      frameLoaded = true;
+      showIfReady();
     });
-    frame.addEventListener('error', () => {
-      window.clearTimeout(timer);
-      if (card.dataset.state !== 'loaded') setState('failed');
-    });
+    frame.addEventListener('error', fail);
+
+    if (probeOk === null) {
+      fetch(embed, { method: 'HEAD', mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer' })
+        .then(() => {
+          probeOk = true;
+          showIfReady();
+        })
+        .catch(() => {
+          probeOk = false;
+          fail();
+        });
+    }
 
     frame.src = embed;
     slot.appendChild(frame);

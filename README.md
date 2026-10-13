@@ -118,6 +118,10 @@ Notlar:
 - JSON-LD'ye `geo` eklenir (yalnızca bu durumda).
 Koordinat doğrulanmadan doldurulmamalıdır.
 
+## Müşteri yorumları (Google, statik)
+
+`src/data/reviews.ts` elle girilen yorum listesidir (yazar soyadı kısaltılmış, `rating` 1–5, `text`, `date` YYYY-MM, isteğe bağlı `googleUrl`). **Şimdilik boştur**; yorum uydurulmaz. Liste boşken ana sayfada bölüm hiç render edilmez. Doluyken sayı şeridinden sonra, galeriden önce "Müşterilerimiz ne diyor" bölümü görünür. Google bağlantıları `src/data/site.ts` içindeki `googleReviewsUrl` ve `googleWriteReviewUrl` alanlarıdır; tanımsız olan düğme gizlenir. Dış script/iframe/API ve schema.org Review/AggregateRating işaretlemesi yoktur. `src/pages/test-fixtures/` yalnızca test build'inde (`PUBLIC_TEST_FIXTURES=true`) üretilir, yayına girmez.
+
 ## Footer, yüzen düğmeler, gizlilik sayfası
 
 - Footer sırası: (ana sayfa dışında) "Projeniz için teklif alın" şeridi → tam genişlik harita + yüzen iletişim kartı (iletişim sayfasında harita sayfanın kendi içindedir) → logo + tanıtım / Sayfalar / Hizmetler → telif + "Gizlilik ve Çerezler" → dev soluk kontur "ALPERENLER" (mobilde gizli). Ana sayfada CTA şeridi gizlidir (birleşik iletişim bölümü zaten var).

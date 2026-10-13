@@ -1234,3 +1234,24 @@ test.describe('masaüstü header tek satır', () => {
     expect(((await page.locator('.site-header').boundingBox()) as { height: number }).height).toBeLessThanOrEqual(116.5);
   });
 });
+
+test('yorumlar listesi boşken ana sayfada yorum bölümü hiç yok', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-reviews]')).toHaveCount(0);
+  await expect(page.getByText('Müşterilerimiz ne diyor')).toHaveCount(0);
+});
+
+test('Google Maps engellenirse harita kartı bozuk iframe göstermez; adres ve butonlar kalır', async ({ page }) => {
+  await page.unroute(/^https:\/\/(www\.)?google\.com\/maps/);
+  await page.route(/google\.com\/maps/, (route) => route.abort());
+  await page.goto('/');
+  const card = page.locator('[data-map-card]').first();
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toHaveAttribute('data-state', 'failed', { timeout: 15000 });
+  await expect(card.locator('iframe')).toHaveCount(0);
+  const band = page.locator('.map-info').first();
+  await expect(band).toContainText('Koyunoğlu');
+  await expect(band.getByRole('link', { name: /Yol tarifi al/ })).toBeVisible();
+  await expect(band.getByRole('link', { name: /Google Maps/ })).toBeVisible();
+  await card.click({ position: { x: 10, y: 10 }, trial: true });
+});

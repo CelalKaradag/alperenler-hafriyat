@@ -6,6 +6,7 @@ import ServiceCard from '../components/ServiceCard.astro';
 import StatsStrip from '../components/StatsStrip.astro';
 import TrustStrip from '../components/TrustStrip.astro';
 import GallerySection from '../components/GallerySection.astro';
+import ReviewsSection from '../components/ReviewsSection.astro';
 import HowWeWork from '../components/HowWeWork.astro';
 import PriceWizard from '../components/PriceWizard.astro';
 import TopoArt from '../components/TopoArt.astro';
@@ -105,6 +106,9 @@ const hasAboutImage = publicFileExists(aboutImage);
       </section>
     )
   }
+
+  <!-- Liste (src/data/reviews.ts) boşken hiçbir şey render edilmez -->
+  <ReviewsSection />
 
   <GallerySection />
 
