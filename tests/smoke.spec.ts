@@ -282,7 +282,8 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
 
 test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo grafit kartlı; sütunlar, taşma, renkler', async ({ page }) => {
   for (const [width, isColumns, filoColumns] of [
-    [390, 2, 1],
+    [360, 2, 2],
+    [390, 2, 2],
     [768, 2, 2],
     [1024, 3, 2],
     [1200, 3, 3],
@@ -304,10 +305,17 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     await expect(strip.locator('.stats-group-label')).toHaveText('Filomuz');
     await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(3);
     await expect(strip.locator('.stats-grid--filo .stat--card')).toHaveCount(5);
-    // Kartlar giriş animasyonundan sonra tam görünür (opacity 1)
+    // Kartlar giriş animasyonundan sonra tam görünür: önce JS kurulumu + görünüme giriş (.is-in), sonra son kartın
+    // (en uzun gecikmeli) animasyonu biter (opacity 1, transform yok). Aksi halde ölçüm animasyon sırasında yapılırdı.
+    await expect(strip).toHaveClass(/is-in/);
     await expect
-      .poll(() => strip.locator('.stat--card').last().evaluate((el) => getComputedStyle(el).opacity))
-      .toBe('1');
+      .poll(() =>
+        strip
+          .locator('.stat--card')
+          .last()
+          .evaluate((el) => `${getComputedStyle(el).opacity}|${getComputedStyle(el).transform}`),
+      )
+      .toBe('1|none');
 
     const css = await strip.evaluate((el) => {
       const q = (selector: string) => el.querySelector(selector) as Element;
@@ -361,24 +369,30 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     expect(css.clip, 'üst/alt kenar eğimli (clip-path)').toContain('polygon');
     expect(css.valueColor, 'sayı grafit').toBe('rgb(20, 22, 26)');
     expect(css.labelColor, 'etiket grafit').toBe('rgb(20, 22, 26)');
-    expect(css.isValueSize, 'üst grup sayısı ≥ 3rem').toBeGreaterThanOrEqual(48);
+    const mobile = width < 768; // < 48em: mobil ince ayar (dikey filo kartı, küçük rozet/sayı)
+    if (mobile) {
+      expect(css.isValueSize, 'mobil üst grup sayısı clamp(2.25rem, 10vw, 3rem)').toBeGreaterThanOrEqual(36);
+      expect(css.isValueSize).toBeLessThanOrEqual(48);
+    } else {
+      expect(css.isValueSize, 'üst grup sayısı ≥ 3rem').toBeGreaterThanOrEqual(48);
+    }
     expect(css.isLabelSize, 'etiket 1.0625rem').toBeCloseTo(17, 0);
-    // Rozet: 72 px grafit daire, içinde 36 px sarı ikon
-    expect(Math.round(css.badgeW)).toBe(72);
-    expect(Math.round(css.badgeH)).toBe(72);
+    // Rozet: masaüstü 72 px (ikon 36 px); mobil 60 px (ikon 30 px); grafit daire, sarı ikon
+    expect(Math.round(css.badgeW)).toBe(mobile ? 60 : 72);
+    expect(Math.round(css.badgeH)).toBe(mobile ? 60 : 72);
     expect(css.badgeBg).toBe('rgb(20, 22, 26)');
     expect(css.badgeIconColor).toBe('rgb(245, 180, 0)');
-    expect(Math.round(css.badgeIconW)).toBe(36);
-    // Filo kartı: grafit, radius 14 px, gölge; 56 px sarı ikon; sayı 2.5rem kum; etiket .9375rem
+    expect(Math.round(css.badgeIconW)).toBe(mobile ? 30 : 36);
+    // Filo kartı: grafit, radius 14 px, gölge; sarı ikon (masaüstü 56 px, mobil 40 px); sayı kum
+    // (masaüstü 2.5rem, mobil 2rem); etiket .9375rem
     expect(css.cardBg).toBe('rgb(20, 22, 26)');
     expect(css.cardRadius).toBe('14px');
     expect(css.cardShadow).not.toBe('none');
     expect(css.cardIconColor).toBe('rgb(245, 180, 0)');
-    expect(Math.round(css.cardIconW)).toBe(56);
+    expect(Math.round(css.cardIconW)).toBe(mobile ? 40 : 56);
     expect(css.cardValueColor).toBe('rgb(239, 235, 228)');
-    expect(css.cardValueSize).toBe(40);
-    expect(css.cardLabelSize).toBeCloseTo(15, 0);
-    // Dikey ayraç yalnızca masaüstünde (≥ 64em)
+    expect(css.cardValueSize).toBe(mobile ? 32 : 40);
+    expect(css.cardLabelSize).toBeCloseTo(15, 0);    // Dikey ayraç yalnızca masaüstünde (≥ 64em)
     if (width >= 1024) {
       expect(css.dividerContent).not.toBe('none');
       expect(css.dividerWidth).toBe('1px');
@@ -417,6 +431,37 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
       const lastRow = boxes.filter((b) => b.top === lastTop);
       const middle = (Math.min(...lastRow.map((b) => b.left)) + Math.max(...lastRow.map((b) => b.right))) / 2;
       expect(Math.abs(middle - width / 2), `${width}px: filo son satır ortalı`).toBeLessThanOrEqual(2);
+    }
+    if (mobile) {
+      // Üst grup: yan yana iki sayı birbirine değmez (≥ 16 px; sütun boşluğu ≥ 1.25rem)
+      const values = await strip.locator('.stats-grid--is .stat-value').evaluateAll((nodes) =>
+        nodes.map((n) => {
+          const r = n.getBoundingClientRect();
+          return { top: Math.round(r.top), left: r.left, right: r.right };
+        }),
+      );
+      expect(values[1].top, 'ilk iki sayı aynı satırda').toBe(values[0].top);
+      expect(values[1].left - values[0].right, `${width}px: 1.653 ile 1.500 arası boşluk`).toBeGreaterThanOrEqual(16);
+      // Filo: dikey kart (ikon üstte, sayı altında), metin ortalı; 5 kart aynı genişlikte, son kart ortalı
+      const cards = await strip.locator('.stats-grid--filo .stat--card').evaluateAll((nodes) =>
+        nodes.map((n) => {
+          const r = n.getBoundingClientRect();
+          const icon = (n.querySelector('.stat-icon') as Element).getBoundingClientRect();
+          const value = (n.querySelector('.stat-value') as Element).getBoundingClientRect();
+          return {
+            width: Math.round(r.width),
+            iconAboveValue: icon.bottom <= value.top + 1,
+            align: getComputedStyle(n).textAlign,
+            clipped: n.scrollWidth > n.clientWidth + 1,
+          };
+        }),
+      );
+      expect(new Set(cards.map((c) => c.width)).size, `${width}px: kart genişlikleri eşit: ${cards.map((c) => c.width).join(', ')}`).toBe(1);
+      for (const card of cards) {
+        expect(card.iconAboveValue, 'ikon sayının üstünde (dikey kart)').toBe(true);
+        expect(card.align).toBe('center');
+        expect(card.clipped, 'kart içeriği taşmaz').toBe(false);
+      }
     }
     // Gruplar alt alta
     expect(Math.min(...filoTops)).toBeGreaterThan(Math.max(...isTops));

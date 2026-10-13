@@ -257,6 +257,62 @@
     min-width: 0;
   }
 }
+/* ---- MOBİL ince ayar (< 48em); masaüstü kuralları değişmez ---- */
+@media (max-width: 47.99em) {
+  /* Üst grup: sayılar biraz küçük; iki sütun arasında en az 1.25 rem boşluk ("1.653" ile "1.500" değmez) */
+  .stats-grid--is {
+    column-gap: max(1.25rem, 4vw);
+  }
+
+  .stats-grid--is .stat-value {
+    font-size: clamp(2.25rem, 10vw, 3rem);
+  }
+
+  /* Rozet 60 px, içinde 30 px sarı ikon */
+  .stat-badge {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+
+  .stat-badge .stat-icon {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  /* Filo: 2 sütun DİKEY kartlar (üstte 40 px ikon, altında sayı, etiket, varsa not); 5 kart → 2 + 2 + 1,
+     tek kalan son kart ortalı ve diğerleriyle aynı genişlikte (flex + justify-content:center) */
+  .stats-grid--filo {
+    --g: 1rem;
+  }
+
+  .stat--card {
+    flex: 0 0 calc((100% - var(--g)) / 2);
+    min-width: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat--card .stat-icon {
+    width: 2.5rem; /* 40 px */
+    height: 2.5rem;
+  }
+
+  .stat--card .stat-text {
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .stat--card .stat-value {
+    font-size: 2rem;
+  }
+
+  .stat--card .stat-label {
+    overflow-wrap: normal; /* uzun etiket ("Paletli ekskavatör") kelime arasından iki satıra iner */
+  }
+}
 /* Kartlar görünüme girince sırayla (stagger 80 ms, 400 ms) hafif yukarı kayarak belirir.
    Gizli başlangıç durumunu yalnızca JS "kurar" (.is-armed); JS yoksa / hareket azaltmada kartlar hep görünür. */
 @media (prefers-reduced-motion: no-preference) {
