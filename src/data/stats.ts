@@ -6,7 +6,7 @@
  * öğeler listedeki sırayla gösterilir. Masaüstünde üst grup 3, alt grup öğe sayısı kadar sütun; tablet/mobilde
  * her grup 2 sütun (tek kalan son öğe ortalanır).
  *
- * Firma onayı (kesin): Tamamlanan iş 1653, Mutlu müşteri 1500, 7 paletli ekskavatör, 2 JCB, 7 kamyon,
+ * Firma onayı (kesin): Tamamlanan iş 1653, Mutlu müşteri 1500, 7 paletli ekskavatör, 2 mini ekskavatör (3 ton), 2 JCB, 7 kamyon,
  * 2 lowbed tır; Malatya'nın tüm ilçelerine hizmet (ilçe sayısı regions.ts'teki ONAYLI ilçelerden hesaplanır,
  * elle yazılmaz). Başka rakam/etiket UYDURULMAZ. Marka/model/yıl yazılmaz.
  *
@@ -27,6 +27,7 @@ export type StatIcon = Extract<
   | 'check'
   | 'machine'
   | 'fleetExcavator'
+  | 'fleetMiniExcavator'
   | 'fleetBackhoe'
   | 'fleetDumpTruck'
   | 'fleetLowbed'
@@ -51,17 +52,23 @@ export interface Stat {
 export const formatStatValue = (value: string): string =>
   /^\d+$/.test(value) ? new Intl.NumberFormat('tr-TR').format(Number(value)) : value;
 
-/** Ekskavatör ton aralığı: machines.ts'teki filo verisinden (en küçük–en büyük ton) türetilir; elle yazılmaz */
-const excavatorTons =
-  machines
-    .find((machine) => machine.slug === 'ekskavator-kiralama')
-    ?.fleet?.rows.map((row) => row.tons)
-    .filter((tons): tons is number => typeof tons === 'number') ?? [];
+/** Bir makinenin filo satırları (machines.ts; müşteri onaylı veri). Sayılar ve ton notları buradan türetilir. */
+const fleetRows = (slug: string) => machines.find((machine) => machine.slug === slug)?.fleet?.rows ?? [];
+const tonsOf = (rows: ReturnType<typeof fleetRows>) =>
+  rows.map((row) => row.tons).filter((tons): tons is number => typeof tons === 'number');
+
+/** Ekskavatör ton aralığı: en küçük–en büyük ton ("22–35 ton"); elle yazılmaz */
+const excavatorTons = tonsOf(fleetRows('ekskavator-kiralama'));
 const excavatorTonRange =
   excavatorTons.length > 0
     ? `${Math.min(...excavatorTons)}–${Math.max(...excavatorTons)} ton`
     : undefined;
 
+/** Mini ekskavatör: adet (satırların toplamı) ve ton notu ("3 ton") */
+const miniRows = fleetRows('mini-ekskavator-kiralama');
+const miniCount = miniRows.reduce((sum, row) => sum + row.count, 0);
+const miniTons = tonsOf(miniRows);
+const miniNote = miniTons.length > 0 ? `${Math.max(...miniTons)} ton` : undefined;
 /** Hizmet verilen (onaylı) ilçe sayısı: regions.ts'ten hesaplanır */
 const approvedRegionCount = regions.filter((region) => region.onaylandi).length;
 
@@ -74,6 +81,17 @@ export const stats: Stat[] = [
     : []),
   // Alt grup (filo)
   { value: '7', label: 'Paletli ekskavatör', note: excavatorTonRange, icon: 'fleetExcavator', group: 'filo' },
+  ...(miniCount > 0
+    ? [
+        {
+          value: String(miniCount),
+          label: 'Mini ekskavatör',
+          note: miniNote,
+          icon: 'fleetMiniExcavator' as const,
+          group: 'filo' as const,
+        },
+      ]
+    : []),
   { value: '2', label: 'JCB', icon: 'fleetBackhoe', group: 'filo' },
   { value: '7', label: 'Kamyon', icon: 'fleetDumpTruck', group: 'filo' },
   { value: '2', label: 'Lowbed tır', icon: 'fleetLowbed', group: 'filo' },

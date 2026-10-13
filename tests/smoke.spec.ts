@@ -58,13 +58,12 @@ test('tel: ve wa.me bağlantıları doğru numarayı içeriyor', async ({ page }
 });
 
 test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async ({ page, request }) => {
-  // Not: kalan taslaklar (fiyat rehberi, rehber yazıları, mini ekskavatör) onaylanınca burası güncellenmelidir.
+  // Not: kalan taslaklar (fiyat rehberi, rehber yazıları) onaylanınca burası güncellenmelidir.
   // Onaylanmamış (onaylandi:false) içerik normal build'de üretilmez.
   for (const path of [
     '/hafriyat-fiyatlari/',
     '/rehber/',
     '/rehber/temel-kazisindan-once-bilinmesi-gerekenler/',
-    '/makine-kiralama/mini-ekskavator-kiralama/', // firmada yok: kaldırıldı
   ]) {
     const response = await request.get(path);
     expect(response.status(), `${path} üretilmemeli`).toBe(404);
@@ -90,12 +89,13 @@ const SERVICE_SLUGS = [
 const MACHINE_SLUGS = [
   'kiralik-kepce-jcb',
   'ekskavator-kiralama',
+  'mini-ekskavator-kiralama',
   'kiricili-ekskavator',
   'hafriyat-kamyonu-kiralama',
   'lowbed-ile-is-makinesi-tasima',
 ];
 
-test("firma onaylı sayfalar normal build'de var: bölgeler, 8 hizmet, 5 makine (lowbed dahil)", async ({ request }) => {
+test("firma onaylı sayfalar normal build'de var: bölgeler, 8 hizmet, 6 makine (mini ekskavatör ve lowbed dahil)", async ({ request }) => {
   const present = [
     '/bolgeler/',
     ...[
@@ -113,13 +113,13 @@ test("firma onaylı sayfalar normal build'de var: bölgeler, 8 hizmet, 5 makine 
   }
 });
 
-test('hizmetler sayfasında 8 kart; makine listesinde 5 kart; onaylı sayfalarda TASLAK rozeti yok', async ({ page }) => {
+test('hizmetler sayfasında 8 kart; makine listesinde 6 kart; onaylı sayfalarda TASLAK rozeti yok', async ({ page }) => {
   await page.goto('/hizmetler/');
   // (sayfada ayrıca makine kartları da var: yalnızca /hizmetler/<slug>/ kartları sayılır)
   await expect(page.locator('main .service-card a[href^="/hizmetler/"]')).toHaveCount(8);
   await expect(page.locator('.draft-badge')).toHaveCount(0);
   await page.goto('/makine-kiralama/');
-  await expect(page.locator('main .service-card')).toHaveCount(5);
+  await expect(page.locator('main .service-card')).toHaveCount(6);
   await expect(page.locator('.draft-badge')).toHaveCount(0);
   // JSON-LD: onaylı hizmet sayfasında Service var
   await page.goto('/hizmetler/hafriyat-ve-temel-kazisi/');
@@ -196,6 +196,40 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
   expect(box.width / box.height).toBeCloseTo(1.5, 1);
 });
 
+test('mini ekskavatör sayfası: 200, "2 adet 3 tonluk mini ekskavatör", ayrı tablo, bağlantılar, fotoğraf yerine ikon', async ({ page }) => {
+  const response = await page.goto('/makine-kiralama/mini-ekskavator-kiralama/');
+  expect(response?.status()).toBe(200);
+  await expect(page).toHaveTitle(/Mini Ekskavatör Kiralama Malatya/);
+  await expect(page.locator('h1')).toHaveText('Mini Ekskavatör Kiralama');
+  await expect(page.locator('main')).toContainText('2 adet 3 tonluk mini ekskavatör');
+  await expect(page.locator('.draft-badge')).toHaveCount(0);
+  // Kendi küçük filo tablosu: 3 ton × 2, toplam 2
+  const fleet = page.locator('[data-fleet]');
+  await expect(fleet.locator('tbody tr')).toHaveCount(1);
+  await expect(fleet.locator('tbody tr').first()).toContainText('3 ton');
+  await expect(fleet.locator('tbody tr td')).toHaveText('2');
+  await expect(fleet.locator('tfoot td')).toHaveText('2');
+  // İlgili hizmet bağlantıları
+  await expect(page.locator('main a[href="/hizmetler/altyapi-ve-kanalizasyon-kazisi/"]').first()).toBeVisible();
+  await expect(page.locator('main a[href="/hizmetler/hafriyat-ve-temel-kazisi/"]').first()).toBeVisible();
+  // Galeride mini ekskavatör fotoğrafı yok: başka makinenin fotoğrafı kullanılmaz (sayfa başlığında görsel yok)
+  await expect(page.locator('.page-head-media')).toHaveCount(0);
+
+  // Ekskavatör sayfası: paletli tablo AYNI (3 satır, toplam 7; mini karışmaz) + "Daha küçük işler için" bağlantısı
+  await page.goto('/makine-kiralama/ekskavator-kiralama/');
+  await expect(page.locator('[data-fleet] tbody tr')).toHaveCount(3);
+  await expect(page.locator('[data-fleet] tfoot td')).toHaveText('7');
+  await expect(page.locator('[data-fleet]')).not.toContainText('mini');
+  const smaller = page.locator('.smaller-jobs a');
+  await expect(page.locator('.smaller-jobs')).toContainText('Daha küçük işler için');
+  await expect(smaller).toHaveAttribute('href', '/makine-kiralama/mini-ekskavator-kiralama/');
+
+  // Makine listesinde mini ekskavatör kartı: fotoğraf yok (ikon)
+  await page.goto('/makine-kiralama/');
+  const card = page.locator('main .service-card', { hasText: 'Mini Ekskavatör Kiralama' });
+  await expect(card).toHaveCount(1);
+  await expect(card.locator('.service-card-media')).toHaveCount(0);
+});
 test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sayı şeridi 7-2-7-2-13', async ({ page }) => {
   await page.goto('/makine-kiralama/ekskavator-kiralama/');
   const fleet = page.locator('[data-fleet]');
@@ -225,12 +259,13 @@ test('filo bilgisi: ekskavatör tablosu (22/30/35 ton, toplam 7), JCB 2 adet, sa
   await page.goto('/');
   await page.locator('[data-stats]').scrollIntoViewIfNeeded(); // sayaç görünüme girince 0'dan sayar; bitince son sayı
   const items = page.locator('.stats .stat');
-  await expect(items).toHaveCount(7);
+  await expect(items).toHaveCount(8);
   const expected = [
     ['1.653', 'Tamamlanan iş'],
     ['1.500', 'Mutlu müşteri'],
     [String(regionCount), 'İlçede hizmet'],
     ['7', 'Paletli ekskavatör'],
+    ['2', 'Mini ekskavatör'],
     ['2', 'JCB'],
     ['7', 'Kamyon'],
     ['2', 'Lowbed tır'],
@@ -250,14 +285,15 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     [390, 2, 1],
     [768, 2, 2],
     [1024, 3, 2],
-    [1366, 3, 4],
+    [1200, 3, 3],
+    [1366, 3, 5],
   ] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     const strip = page.locator('[data-stats]');
     await strip.scrollIntoViewIfNeeded();
-    await expect(strip.locator('.stat')).toHaveCount(7);
-    await expect(strip.locator('.stat-icon')).toHaveCount(7);
+    await expect(strip.locator('.stat')).toHaveCount(8);
+    await expect(strip.locator('.stat-icon')).toHaveCount(8);
 
     // Başlık: eyebrow "RAKAMLARLA" + h2 "Alperenler Hafriyat"
     await expect(strip.locator('.stats-eyebrow')).toHaveText('Rakamlarla');
@@ -267,7 +303,7 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     await expect(strip.locator('.stats-grid--filo')).toBeVisible();
     await expect(strip.locator('.stats-group-label')).toHaveText('Filomuz');
     await expect(strip.locator('.stats-grid--is .stat')).toHaveCount(3);
-    await expect(strip.locator('.stats-grid--filo .stat--card')).toHaveCount(4);
+    await expect(strip.locator('.stats-grid--filo .stat--card')).toHaveCount(5);
     // Kartlar giriş animasyonundan sonra tam görünür (opacity 1)
     await expect
       .poll(() => strip.locator('.stat--card').last().evaluate((el) => getComputedStyle(el).opacity))
@@ -294,7 +330,11 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
         isValueSize: parseFloat(style('.stats-grid--is .stat-value').fontSize),
         isLabelSize: parseFloat(style('.stats-grid--is .stat-label').fontSize),
         isColumns: tracks('.stats-grid--is'),
-        filoColumns: tracks('.stats-grid--filo'),
+        // flex düzeni: ilk satırdaki kart sayısı = sütun sayısı
+        filoColumns: (() => {
+          const tops = Array.from(el.querySelectorAll('.stats-grid--filo .stat')).map((n) => Math.round(n.getBoundingClientRect().top));
+          return tops.filter((top) => top === Math.min(...tops)).length;
+        })(),
         badgeW: badge.width,
         badgeH: badge.height,
         badgeBg: style('.stat-badge').backgroundColor,
@@ -359,26 +399,43 @@ test('sayı şeridi: eğimli sarı bant + başlık, üst grup rozetli, filo graf
     const filoTops = await topsOf('.stats-grid--filo .stat');
     const rows = (tops: number[]) => new Set(tops).size;
     expect(rows(isTops), `${width}px üst grup satır: ${isTops.join(', ')}`).toBe(width >= 1024 ? 1 : 2);
-    expect(rows(filoTops), `${width}px filo satır: ${filoTops.join(', ')}`).toBe(4 / filoColumns);
+    expect(rows(filoTops), `${width}px filo satır: ${filoTops.join(', ')}`).toBe(Math.ceil(5 / filoColumns));
     if (width < 1024) {
       // üst grupta tek kalan öğe ortalı
       const last = (await strip.locator('.stats-grid--is .stat').last().boundingBox()) as { x: number; width: number };
       expect(Math.abs(last.x + last.width / 2 - width / 2), 'tek kalan öğe ortalı').toBeLessThanOrEqual(2);
+    }
+    // Filo kartlarında son satırda kalanlar ortalı (2 + 2 + 1 / 3 + 2)
+    if (filoColumns > 1 && filoColumns < 5) {
+      const boxes = (await strip.locator('.stats-grid--filo .stat').evaluateAll((nodes) =>
+        nodes.map((n) => {
+          const r = n.getBoundingClientRect();
+          return { top: Math.round(r.top), left: r.left, right: r.right };
+        }),
+      ));
+      const lastTop = boxes[boxes.length - 1].top;
+      const lastRow = boxes.filter((b) => b.top === lastTop);
+      const middle = (Math.min(...lastRow.map((b) => b.left)) + Math.max(...lastRow.map((b) => b.right))) / 2;
+      expect(Math.abs(middle - width / 2), `${width}px: filo son satır ortalı`).toBeLessThanOrEqual(2);
     }
     // Gruplar alt alta
     expect(Math.min(...filoTops)).toBeGreaterThan(Math.max(...isTops));
   }
 });
 
-test('sayı şeridi: "22–35 ton" notu yalnızca ekskavatör kartında (machines.ts filo verisinden)', async ({ page }) => {
+test('sayı şeridi: "22–35 ton" notu ekskavatör kartında, "3 ton" notu yalnız mini ekskavatör kartında (machines.ts filo verisinden)', async ({ page }) => {
   await page.goto('/');
   const notes = page.locator('[data-stats] .stat-note');
-  await expect(notes).toHaveCount(1);
-  await expect(notes).toHaveText('22–35 ton');
+  // Not satırı iki kartta: paletli ekskavatör ("22–35 ton") ve mini ekskavatör ("3 ton"); diğerlerinde yok
+  await expect(notes).toHaveCount(2);
+  await expect(notes.nth(0)).toHaveText('22–35 ton');
+  await expect(notes.nth(1)).toHaveText('3 ton');
+  await expect(page.locator('[data-stats] .stat--card', { hasText: 'Mini ekskavatör' }).locator('.stat-note')).toHaveText('3 ton');
+  await expect(page.locator('[data-stats] .stat--card', { hasText: 'JCB' }).locator('.stat-note')).toHaveCount(0);
   await expect(page.locator('[data-stats] .stat--card').first()).toContainText('Paletli ekskavatör');
   await expect(page.locator('[data-stats] .stat--card').first().locator('.stat-note')).toHaveCount(1);
   // not rengi kum, opacity .75
-  const note = await notes.evaluate((el) => ({
+  const note = await notes.first().evaluate((el) => ({
     color: getComputedStyle(el).color,
     opacity: getComputedStyle(el).opacity,
   }));
@@ -395,11 +452,11 @@ test('sayı şeridi: hareket azaltmada animasyon yok, son sayılar hemen görün
   const values = await page.locator('[data-stats] .stat-value').evaluateAll((nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  expect(values).toHaveLength(7);
+  expect(values).toHaveLength(8);
   expect(values[0]).toBe('1.653');
   expect(values[1]).toBe('1.500');
   expect(Number(values[2])).toBeGreaterThan(0); // ilçe sayısı
-  expect(values.slice(3)).toEqual(['7', '2', '7', '2']);
+  expect(values.slice(3)).toEqual(['7', '2', '2', '7', '2']);
   // Hareket azaltmada kartlar gizlenip kaydırılmaz: ilk okumada tam görünür
   const cardStates = await page.locator('[data-stats] .stat--card').evaluateAll((nodes) =>
     nodes.map((n) => ({ opacity: getComputedStyle(n).opacity, transform: getComputedStyle(n).transform })),
@@ -440,7 +497,7 @@ test('onaylı (normal build) sayfalarda "13 ton" geçmez', async ({ page, reques
   expect(problems, problems.join('\n')).toEqual([]);
 });
 
-test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerde geçmez', async ({ page, request }) => {
+test('SSS: bölge cevabı tüm ilçeleri listeler', async ({ page }) => {
   await page.goto('/');
   const faq = page.locator('.faq-item', { hasText: 'Hangi bölgelere hizmet veriyorsunuz?' });
   await faq.locator('summary').click();
@@ -449,10 +506,6 @@ test('SSS: bölge cevabı tüm ilçeleri listeler; mini ekskavatör hiçbir yerd
   await expect(faq).toContainText('Yazıhan');
   await expect(faq).toContainText('Bulunduğunuz yeri yazın veya arayın.');
 
-  for (const path of ['/', '/hizmetler/', '/makine-kiralama/', '/hizmetler/operatorlu-is-makinesi-kiralama/']) {
-    const html = await (await request.get(path)).text();
-    expect(html.toLowerCase(), `${path}: mini ekskavatör`).not.toContain('mini ekskavatör');
-  }
 });
 
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {

@@ -173,12 +173,10 @@ test("JSON-LD'ye taslaklar girmez (rehber, fiyat rehberi); onaylı hizmet/SSS gi
   await page.goto('/hafriyat-fiyatlari/');
   expect(await ld()).not.toContain('"FAQPage"');
 
-  // Onaylı makineler (kırıcılı ekskavatör, lowbed dahil) rozetsizdir; mini ekskavatör yok
+  // Onaylı makineler (kırıcılı ekskavatör, lowbed dahil) rozetsizdir
   for (const slug of ['kiricili-ekskavator', 'lowbed-ile-is-makinesi-tasima']) {
     const response = await page.goto(`/makine-kiralama/${slug}/`);
     expect(response?.status(), slug).toBe(200);
     await expect(page.locator('.draft-badge')).toHaveCount(0);
   }
-  const mini = await page.goto('/makine-kiralama/mini-ekskavator-kiralama/');
-  expect(mini?.status()).toBe(404);
 });

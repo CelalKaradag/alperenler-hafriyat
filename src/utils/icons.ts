@@ -31,6 +31,9 @@ export const iconPaths = {
   /** paletli ekskavatör: palet, kabin, bom + kol + kova */
   fleetExcavator:
     'M2.5 17.5h10a1.75 1.75 0 0 1 0 3.5h-10a1.75 1.75 0 0 1 0-3.5zM4 17.5V12h4.5l1.5 2.5v3M10 13l4.5-7 5 5.5M19.5 11.5l1.5 3h-3.5z',
+  /** mini ekskavatör: kısa palet, küçük kabin, kısa kol + küçük kova, önde dozer bıçağı (kompakt makine) */
+  fleetMiniExcavator:
+    'M4 18.5h10.5a1.5 1.5 0 0 1 0 3H4a1.5 1.5 0 0 1 0-3zM5.5 18.5V14.5h4l1.5 1.5v2.5M10 14.5l3-4.5 3.5 2.5M16.5 12.5l1.5 2.2h-2.8M16 20h3.5M19.5 16.5V22',
   /** JCB / kazıcı yükleyici: önde büyük yükleme kepçesi + yükleyici kolu, arkada kazıcı kol, büyük arka teker, küçük ön teker, kabin */
   fleetBackhoe:
     'M10 17a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM18.5 18a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM6 14V6.5h4.5l1.5 4.5h3.5l1 3M4 14h11M10 17h4.5M15.5 12.5l3.5 2.5M18.5 13.5h4l-.5 4.5h-3zM6 9.5L3.5 5 1.5 9l1.5 1.5',

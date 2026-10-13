@@ -180,14 +180,20 @@
   }
 }
 
-/* ---- Filo: grafit KART, solda 56 px sarı ikon, sağda sayı + etiket (+ not) ---- */
+/* ---- Filo: grafit KART, solda 56 px sarı ikon, sağda sayı + etiket (+ not) ----
+   Flex + justify-content:center: son satırda kalan kartlar ORTALI durur (3 + 2, 2 + 2 + 1 ...).
+   Mobil 1 sütun · tablet 2 · 72em 3 (+2 ortalı) · 80em ve üstü tek satırda hepsi (5 kart). */
 .stats-grid--filo {
-  grid-template-columns: 1fr; /* mobil: tek sütun (yatay kartlar dar ekranda 2×2 sığmaz) */
-  gap: 1rem;
+  --g: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--g);
   text-align: left;
 }
 
 .stat--card {
+  flex: 1 1 100%; /* mobil: tek sütun */
   flex-direction: row;
   align-items: center;
   gap: 1rem;
@@ -229,23 +235,28 @@
   opacity: 0.75;
 }
 
-.stats-grid--filo .stat:last-child:nth-child(odd) {
-  grid-column: auto;
-}
-
 @media (min-width: 36em) {
-  .stats-grid--filo {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .stat--card {
+    flex: 0 0 calc((100% - var(--g)) / 2);
   }
 }
 
 @media (min-width: 72em) {
   .stats-grid--filo {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem;
+    --g: 1.5rem;
+  }
+
+  .stat--card {
+    flex: 0 0 calc((100% - 2 * var(--g)) / 3);
   }
 }
 
+@media (min-width: 80em) {
+  .stat--card {
+    flex: 1 1 0; /* hepsi tek satırda, eşit genişlikte */
+    min-width: 0;
+  }
+}
 /* Kartlar görünüme girince sırayla (stagger 80 ms, 400 ms) hafif yukarı kayarak belirir.
    Gizli başlangıç durumunu yalnızca JS "kurar" (.is-armed); JS yoksa / hareket azaltmada kartlar hep görünür. */
 @media (prefers-reduced-motion: no-preference) {

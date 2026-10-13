@@ -6,8 +6,9 @@
  * Normal yayın çıktısında sayfa, menü/liste bağlantısı ve sitemap girdisi üretilmez; JSON-LD’ye girmez.
  *
  * Firma onayı (hepsi onaylı): kepçe/JCB, ekskavatör, kırıcılı ekskavatör, hafriyat kamyonu, lowbed ile taşıma.
- * Mini ekskavatör firmada yok: kaldırıldı.
- * FİLO (müşteri onayı, kesin): 7 paletli ekskavatör (22 ton × 3, 30 ton × 2, 35 ton × 2), 2 JCB, 7 kamyon,
+ * Mini ekskavatör: müşteri onayı ile VAR (2 adet, 3 ton; marka/model/yıl bilinmiyor, yazılmaz). Galeride mini
+ * ekskavatör fotoğrafı yok: image verilmez (ikon kullanılır); başka makinenin fotoğrafı mini diye gösterilmez.
+ * FİLO (müşteri onayı, kesin): 7 paletli ekskavatör (22 ton × 3, 30 ton × 2, 35 ton × 2), 2 mini ekskavatör (3 ton), 2 JCB, 7 kamyon,
  * 2 lowbed tır; firmada hidrolik kırıcı var (adet ve hangi makineye takıldığı BİLİNMİYOR: yazılmaz).
  * Marka/model/yıl, kapasite, güzergâh, fiyat, süre, "en iyi" ifadesi YAZILMAZ.
  */
@@ -29,10 +30,12 @@ export interface Machine {
   /** İlgili hizmet slug’ları (services.ts) */
   relatedServices: string[];
   icon: IconName;
-  /** Galeri görseli (JPG; aynı adlı .webp varsa <picture> ile önce o) */
-  image: string;
+  /** Galeri görseli (JPG; aynı adlı .webp varsa <picture> ile önce o). Uygun fotoğraf yoksa verilmez (ikon kullanılır) */
+  image?: string;
   /** Filo tablosu (müşteri onaylı adetler); yalnızca doğrulanmış makineler için */
   fleet?: { title: string; rows: Array<{ label: string; count: number; tons?: number }> };
+  /** Bu makine sayfasında "Daha küçük işler için: ..." bağlantısı verilecek makinenin slug'ı */
+  smallerJobsSlug?: string;
   onaylandi: boolean;
 }
 
@@ -110,9 +113,37 @@ export const machines: Machine[] = [
       'Arazi düzleme ve yol açma gibi büyük hacimli işlerde',
     ],
     quoteNeeds: ['Kazı derinliği ve alanı (yaklaşık)'],
+    smallerJobsSlug: 'mini-ekskavator-kiralama',
     relatedServices: [S.hafriyat, S.yikim, S.altyapi, S.arazi, S.makine],
     icon: 'machine',
     image: '/images/galeri/santiye-temel-kazisi.jpg',
+    onaylandi: true,
+  },
+  {
+    slug: 'mini-ekskavator-kiralama',
+    title: 'Mini Ekskavatör Kiralama',
+    seoName: 'Mini Ekskavatör Kiralama',
+    summary:
+      "Dar alanlarda ve küçük ölçekli kazılarda mini ekskavatör; operatörlü kiralama Malatya’da iş ve sahaya göre görüşülür.",
+    detail: [
+      'Mini ekskavatör, normal ekskavatörün küçük boyutlu hâlidir; dar sokaklarda, bina aralarında, bahçe ve avlularda, büyük makinenin giremediği sahalarda çalışabilir. Daha kompakt olduğu için küçük ölçekli kazı ve dolgu işlerinde sık tercih edilir.',
+      "Malatya’da altyapı hatlarının açılması, bahçe ve avlu düzenlemeleri ve küçük ölçekli temel kazılarında mini ekskavatör tercih edilebilir. Hangi makinenin uygun olacağı sahanın giriş genişliğine, zemine ve işin hacmine bağlıdır; bu yüzden iş önce konuşulur.",
+      'Filomuzda 2 adet 3 tonluk mini ekskavatör bulunur.',
+    ],
+    // Filo verisi (müşteri onaylı): sayı şeridindeki "2 · Mini ekskavatör" ve "3 ton" notu buradan türetilir
+    fleet: {
+      title: 'Mini ekskavatör filomuz',
+      rows: [{ label: '3 ton mini ekskavatör', count: 2, tons: 3 }],
+    },
+    uses: [
+      'Dar sokak ve bina arası hat kazılarında',
+      'Bahçe ve avlu gibi kapalı alanlarda kazı ve dolgu işlerinde',
+      'Küçük ölçekli temel ve hendek kazılarında',
+      'Büyük makinenin giremediği sahalarda',
+    ],
+    quoteNeeds: ['Sahaya giriş genişliği (kapı, sokak) ve ulaşım durumu'],
+    relatedServices: [S.altyapi, S.hafriyat, S.makine],
+    icon: 'fleetMiniExcavator',
     onaylandi: true,
   },
   {

@@ -37,6 +37,11 @@ const relatedServices = machine
 const waLink = machine ? whatsappLink(whatsappServiceMessage(machine.title)) : null;
 const headImage = machine && publicFileExists(machine.image) ? machine.image : null;
 const headSize = headImage ? imageSize(headImage) : null;
+// "Daha küçük işler için" bağlantısı (örn. ekskavatör → mini ekskavatör); hedef makine görünür değilse verilmez
+const smallerMachine =
+  machine && machine.smallerJobsSlug
+    ? (visibleMachines.find((item) => item.slug === machine.smallerJobsSlug) ?? null)
+    : null;
 
 // Taslak sayfalar noindex (site yayına çıksa bile onaylanana kadar)
 const anyApproved = visibleMachines.some((item) => item.onaylandi);
@@ -140,6 +145,17 @@ const description = machine
                       </tfoot>
                     </table>
                   </>
+                )
+              }
+
+              {
+                smallerMachine && (
+                  <p class="smaller-jobs">
+                    Daha küçük işler için:{' '}
+                    <a class="text-link" href={`/makine-kiralama/${smallerMachine.slug}/`}>
+                      {smallerMachine.title}<span class="arrow" aria-hidden="true">→</span>
+                    </a>
+                  </p>
                 )
               }
 
