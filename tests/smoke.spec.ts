@@ -582,7 +582,7 @@ test('e-posta: iletişim sayfasında ve footer harita kartında mailto var; JSON
     await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
   ).join('\n');
   expect(ld).toContain(`"email":"${EMAIL}"`);
-  expect(ld).toContain('"legalName":"Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti."');
+  expect(ld).toContain('"legalName":"Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti."');
 
   // Footer (harita/iletişim kartı) ana sayfada
   await page.goto('/');
@@ -591,13 +591,13 @@ test('e-posta: iletişim sayfasında ve footer harita kartında mailto var; JSON
     await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
   ).join('\n');
   expect(homeLd).toContain(`"email":"${EMAIL}"`);
-  await expect(page.locator('footer')).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
+  await expect(page.locator('footer')).toContainText('Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti.');
 
   // Gizlilik: ticari unvan + KVKK veri sorumlusu ünvanla, e-posta eklenmiş (yer tutucu kalmadı)
   await page.goto('/gizlilik/');
   const facts = page.locator('.facts');
-  await expect(facts.locator('div', { hasText: 'Ticari unvan' })).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
-  await expect(facts.locator('div', { hasText: 'KVKK veri sorumlusu' })).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
+  await expect(facts.locator('div', { hasText: 'Ticari unvan' })).toContainText('Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti.');
+  await expect(facts.locator('div', { hasText: 'KVKK veri sorumlusu' })).toContainText('Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti.');
   await expect(facts.locator(mailto)).toBeVisible();
 });
 
@@ -675,13 +675,59 @@ test('e-posta satır kırılımı: tek satır ya da YALNIZCA "@" öncesinden; ".
   expect((await breaks('.contact-card .mail-text')).starts).toEqual([]); // masaüstünde tek satır
 });
 
-test('gizlilik: barındırma sağlayıcısı "Cloudflare, Inc."; vergi no ve son güncelleme yer tutucu kalır', async ({ page }) => {
+test('gizlilik: barındırma sağlayıcısı "Cloudflare, Inc."; yalnızca son güncelleme yer tutucu kalır', async ({ page }) => {
   await page.goto('/gizlilik/');
   await expect(page.locator('main')).toContainText('Sağlayıcı ve ayrıntılar: Cloudflare, Inc.');
-  // Yer tutucular yalnızca vergi no ve son güncelleme (taslak uyarısı showDrafts'a bağlı olabilir; metin her zaman var)
-  await expect(page.locator('.facts div', { hasText: 'Vergi no' })).toContainText('[firma tarafından doldurulacak]');
+  // Yer tutucu yalnızca son güncelleme (taslak uyarısı showDrafts'a bağlı olabilir; metin her zaman var)
   await expect(page.locator('.facts div', { hasText: 'Son güncelleme' })).toContainText('[firma tarafından doldurulacak]');
-  await expect(page.locator('mark.todo')).toHaveCount(2);
+  await expect(page.locator('mark.todo')).toHaveCount(1);
+});
+test('resmi bilgiler: footer (ünvan, MERSİS, sicil, V.D.), gizlilik (vergi no dolu), JSON-LD legalName/taxID/MERSİS; 360 px taşma yok', async ({
+  page,
+}) => {
+  const TITLE = 'Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti.';
+  await page.goto('/');
+  const bottom = page.locator('footer .footer-bottom');
+  await expect(bottom).toContainText(`© ${new Date().getFullYear()} ${TITLE}`);
+  const ids = page.locator('footer .footer-ids');
+  await expect(ids).toContainText('MERSİS No: 0057060231800001 · Ticaret Sicil No: 27135 · Beydağı V.D. 0570602318');
+  // kısa ad başlık ve metinlerde aynı kalır
+  await expect(page).toHaveTitle(/Alperenler Hafriyat \| Malatya Yeşilyurt/);
+  const ld = (
+    await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
+  ).join('\n');
+  expect(ld).toContain(`"legalName":"${TITLE}"`);
+  expect(ld).toContain('"taxID":"0570602318"');
+  expect(ld).toContain('"@type":"PropertyValue"');
+  expect(ld).toContain('"propertyID":"MERSİS"');
+  expect(ld).toContain('"value":"0057060231800001"');
+
+  await page.goto('/gizlilik/');
+  const facts = page.locator('.facts');
+  await expect(facts.locator('div', { hasText: 'Ticari unvan' })).toContainText(TITLE);
+  await expect(facts.locator('div', { hasText: 'KVKK veri sorumlusu' })).toContainText(TITLE);
+  await expect(facts.locator('div', { hasText: 'Vergi no' })).toContainText('Beydağı V.D. – 0570602318');
+  await expect(facts.locator('div', { hasText: 'MERSİS No' })).toContainText('0057060231800001');
+  await expect(facts.locator('div', { hasText: 'Ticaret Sicil No' })).toContainText('27135');
+  // yalnızca "son güncelleme" yer tutucu kalır
+  await expect(page.locator('mark.todo')).toHaveCount(1);
+  await expect(facts.locator('div', { hasText: 'Son güncelleme' }).locator('mark.todo')).toHaveCount(1);
+
+  // 360 px: footer alt satırları ve gizlilik sayfasında taşma yok; kayıt satırı "·" ayraçlarında kırılır
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const path of ['/', '/gizlilik/']) {
+    await page.goto(path);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow, `${path} 360px yatay taşma`).toBeLessThanOrEqual(0);
+  }
+  await page.goto('/');
+  const idsBox = (await page.locator('footer .footer-ids p').boundingBox()) as { x: number; width: number };
+  expect(idsBox.x + idsBox.width, 'kayıt bilgileri satırı ekran içinde').toBeLessThanOrEqual(360 + 0.5);
+  const itemBoxes = await page
+    .locator('footer .footer-ids span')
+    .evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().right));
+  for (const right of itemBoxes) expect(right, 'kayıt öğesi ekran içinde').toBeLessThanOrEqual(360 + 0.5);
 });
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
   await page.goto('/hakkimizda/');

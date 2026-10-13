@@ -116,6 +116,14 @@ const hasServices = visibleServices.length > 0;
     <a href="/gizlilik/">Gizlilik ve Çerezler</a>
   </div>
 
+  {/* Resmi kayıt bilgileri (firma kaşesinden): küçük, soluk satır; dar ekranda "·" ayraçlarından alt satıra kırılır */}
+  <div class="container footer-ids">
+    <p>
+      <span>MERSİS No: {site.mersisNo}</span> · <span>Ticaret Sicil No: {site.tradeRegistryNo}</span> ·{' '}
+      <span>{site.taxOffice} V.D. {site.taxId}</span>
+    </p>
+  </div>
+
   <!-- Dev, çok soluk logo işareti (dekor): sağ altta bölümün dışına taşar -->
   <LogoMark class="footer-mark" />
 </footer>

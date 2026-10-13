@@ -8,8 +8,16 @@ export interface SiteConfig {
   name: string;
   /** Resmî/tam firma adı */
   legalName: string;
-  /** Tam ticari ünvan (firma onaylı): footer telif satırı, gizlilik sayfası ve JSON-LD legalName'de kullanılır */
+  /** Resmi ticari ünvan (firma kaşesinden, kesin): footer telif satırı, gizlilik sayfası ve JSON-LD legalName'de kullanılır */
   registeredName: string;
+  /** Vergi dairesi (firma kaşesinden, kesin) */
+  taxOffice: string;
+  /** Vergi no (firma kaşesinden, kesin; 10 hane, boşluksuz) */
+  taxId: string;
+  /** MERSİS no (firma kaşesinden, kesin) */
+  mersisNo: string;
+  /** Ticaret sicil no (firma kaşesinden, kesin) */
+  tradeRegistryNo: string;
   /** Telefon: görünen biçim ve tel: bağlantısı */
   phone: { display: string; href: string };
   /**
@@ -54,7 +62,12 @@ export interface SiteConfig {
 export const site: SiteConfig = {
   name: 'Alperenler Hafriyat',
   legalName: 'Alperenler Hafriyat İnşaat',
-  registeredName: 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.', // ticari ünvan: firma tarafından ONAYLANDI
+  // Kısa ad (legalName) başlık ve metinlerde aynen kalır; aşağıdakiler firma kaşesindeki RESMİ bilgilerdir.
+  registeredName: 'Alperenler Hafriyat İnşaat Taah. Pet. Tar. İth. İhr. San. ve Tic. Ltd. Şti.',
+  taxOffice: 'Beydağı',
+  taxId: '0570602318',
+  mersisNo: '0057060231800001',
+  tradeRegistryNo: '27135',
   email: 'alperenler.hrf.ltd@gmail.com',
   phone: { display: '0539 252 70 58', href: 'tel:+905392527058' },
   whatsappNumber: '905392527058',
