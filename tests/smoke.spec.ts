@@ -566,6 +566,54 @@ test('SSS: bölge cevabı tüm ilçeleri listeler', async ({ page }) => {
 
 });
 
+const EMAIL = 'alperenler.hrf.ltd@gmail.com';
+
+test('e-posta: iletişim sayfasında ve footer harita kartında mailto var; JSON-LD email doğru; unvan gizlilikte', async ({
+  page,
+}) => {
+  const mailto = `a[href="mailto:${EMAIL}"]`;
+  // İletişim sayfası: ikonlu e-posta kartı
+  await page.goto('/iletisim/');
+  const contact = page.locator(`.contact-card ${mailto}`);
+  await expect(contact).toBeVisible();
+  await expect(contact.locator('svg.icon')).toHaveCount(1);
+  await expect(contact).toContainText(EMAIL);
+  const ld = (
+    await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
+  ).join('\n');
+  expect(ld).toContain(`"email":"${EMAIL}"`);
+  expect(ld).toContain('"legalName":"Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti."');
+
+  // Footer (harita/iletişim kartı) ana sayfada
+  await page.goto('/');
+  await expect(page.locator(`footer ${mailto}`)).toHaveCount(1);
+  const homeLd = (
+    await page.locator('script[type="application/ld+json"]').evaluateAll((n) => n.map((x) => x.textContent ?? ''))
+  ).join('\n');
+  expect(homeLd).toContain(`"email":"${EMAIL}"`);
+  await expect(page.locator('footer')).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
+
+  // Gizlilik: ticari unvan + KVKK veri sorumlusu ünvanla, e-posta eklenmiş (yer tutucu kalmadı)
+  await page.goto('/gizlilik/');
+  const facts = page.locator('.facts');
+  await expect(facts.locator('div', { hasText: 'Ticari unvan' })).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
+  await expect(facts.locator('div', { hasText: 'KVKK veri sorumlusu' })).toContainText('Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.');
+  await expect(facts.locator(mailto)).toBeVisible();
+});
+
+test('e-posta 360 px: iletişim, ana sayfa footer ve gizlilik sayfasında yatay taşma yok', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const path of ['/iletisim/', '/', '/gizlilik/']) {
+    await page.goto(path);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const mail = page.locator(`a[href="mailto:${EMAIL}"]`).first();
+    await expect(mail).toBeVisible();
+    const box = (await mail.boundingBox()) as { x: number; width: number };
+    expect(box.x + box.width, `${path}: e-posta bağlantısı ekran içinde`).toBeLessThanOrEqual(360 + 0.5);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow, `${path} yatay taşma`).toBeLessThanOrEqual(0);
+  }
+});
 test('hakkımızda: fotoğraf şeridi lightbox açar', async ({ page }) => {
   await page.goto('/hakkimizda/');
   await expect(page.locator('h1')).toHaveCount(1);

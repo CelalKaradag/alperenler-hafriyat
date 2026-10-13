@@ -81,7 +81,7 @@ Notlar:
 - Yollar `/` ile başlar ve `public/` klasörüne göredir. Dosya adlarında Türkçe karakter ve boşluk kullanmayın.
 - Videolar otomatik yüklenmez (`preload="none"`); ziyaretçi oynat tuşuna basınca iner. Dosyaları küçük tutun.
 - `stats.ts` (rakam şeridi), `gallery.ts` ve `services.ts` boşken ilgili bölümler ana sayfada görünmez. Rakamlar yalnızca firma tarafından doğrulandıktan sonra eklenmelidir.
-- `site.ts` içindeki `email` alanı tanımlanmadıkça e-posta hiçbir yerde görünmez.
+- E-posta `alperenler.hrf.ltd@gmail.com` (firma onaylı) `site.ts` içindeki `email` alanındadır: iletişim sayfasında (ikonlu kart), footer harita/iletişim kartında, gizlilik sayfasında ve JSON-LD `email`'de görünür; alan boşaltılırsa hiçbir yerde görünmez. Teklif sihirbazı WhatsApp akışıdır, e-posta yalnızca alternatif iletişimdir.
 
 ## Teklif sihirbazı
 
@@ -126,7 +126,7 @@ Koordinat doğrulanmadan doldurulmamalıdır.
 - `/gizlilik/` sayfası **taslaktır** ve `noindex` kalır (site `indexable: true` olsa bile). Sayfada yalnızca sitenin gerçekte yaptıkları anlatılır; dev'de üstte "Hukuki metin taslağı – firma/uzman onaylamalı" uyarısı çıkar.
 
 ### Yayın öncesi kontrol: gizlilik sayfası
-Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce doldurulmalı veya kaldırılmalıdır: barındırma sağlayıcısı, ticari unvan, vergi no, KVKK veri sorumlusu, son güncelleme tarihi. Metin firma/hukuk uzmanı tarafından onaylanmalıdır.
+Sayfadaki `[firma tarafından doldurulacak]` yer tutucuları yayından önce doldurulmalı veya kaldırılmalıdır: barındırma sağlayıcısı, vergi no, son güncelleme tarihi (ticari unvan ve KVKK veri sorumlusu için ünvan `site.registeredName` ile, e-posta `site.email` ile dolduruldu). Metin firma/hukuk uzmanı tarafından onaylanmalıdır.
 
 ## Logo, favicon, paylaşım görseli
 
@@ -283,7 +283,7 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 4. **`public/_headers`:** `X-Robots-Tag: noindex, nofollow` satırlarını kaldırın (ve `SITE_URL`'i gerçek alan adına ayarlayın).
 5. **`src/data/site.ts` → `publish.indexable: true`:** sitemap ve `robots.txt` bu ayarla açılır, sayfalar `index` olur (gizlilik sayfası `noindex` kalır).
 6. **Onaylanan içerikler:** firmanın doğruladığı hizmet, SSS, makine, güven şeridi maddeleri ve fiyat rehberi için `onaylandi: true` yapın; doğrulanmayanlar `false` kalsın.
-7. **Gizlilik sayfası:** `[firma tarafından doldurulacak]` yer tutucularını (barındırma sağlayıcısı, ticari unvan, vergi no, KVKK veri sorumlusu, tarih) doldurun; metin hukuki onaydan geçsin.
+7. **Gizlilik sayfası:** `[firma tarafından doldurulacak]` yer tutucularını (barındırma sağlayıcısı, vergi no, tarih) doldurun; ticari unvan ve KVKK veri sorumlusu ünvanla, e-posta `site.email` ile doldurulmuştur; metin hukuki onaydan geçsin.
 8. **Google Search Console:** mülkü ekleyin, `sitemap.xml`'i gönderin.
 9. **Google İşletme Profili:** profili doğrulayın; bağlantıyı `site.ts` içindeki `mapsPlaceUrl`'e, doğrulanmış koordinatı `mapCoords`'a yazın.
 10. **Son kontrol:** `npm run build && npm run preview` ile gözden geçirin; sayfa kaynağında `noindex` kalmadığını, `/robots.txt` ve `/sitemap.xml` çıktısını ve Lighthouse sonucunu doğrulayın.
@@ -291,7 +291,7 @@ Testler (iki build: normal ve `PUBLIC_SHOW_DRAFTS=true`) şunları kontrol eder;
 ## Henüz doğrulanmamış / eksik içerik
 
 - Hizmet listesi ve hizmet bölgeleri
-- E-posta, çalışma saatleri, deneyim yılı, makine sayısı
+- Çalışma saatleri (e-posta ve ticari unvan onaylandı)
 - ~~Logo~~ (eklendi; logo dosyaları `public/images/logo/` altında)
 - Gerçek fotoğraflar (açılış alanındaki SVG yalnızca dekoratiftir, gerçek proje/makine değildir)
 - Alan adı

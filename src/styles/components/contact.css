@@ -35,6 +35,27 @@
   text-decoration: none;
 }
 
+/* E-posta: ikonlu; uzun adres mobilde taşmaz */
+.contact-value--mail {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.05rem, 0.9rem + 1.2vw, 1.4rem);
+}
+
+.contact-value--mail a {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+}
+
+.contact-value--mail .icon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.1em;
+  color: var(--text-muted);
+}
+
 .not-found {
   min-height: 50vh;
   min-height: 50svh; /* iOS adres çubuğu açılıp kapanınca zıplamasın */

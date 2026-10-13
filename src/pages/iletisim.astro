@@ -10,7 +10,7 @@ import { localBusinessSchema } from '../utils/schema';
 
 <BaseLayout
   title={`İletişim | ${site.name}`}
-  description={`${site.legalName} telefon ve adres bilgileri: ${site.phone.display}, ${site.address}.`}
+  description={`${site.legalName} telefon, e-posta ve adres bilgileri: ${site.phone.display}, ${site.email ?? ''} ${site.address}.`}
   footerMap={false}
 >
   <JsonLd slot="head" data={localBusinessSchema(Astro.site)} />
@@ -72,6 +72,20 @@ import { localBusinessSchema } from '../utils/schema';
             <span class="copy-status" role="status" aria-live="polite" data-copy-status></span>
           </div>
         </div>
+
+        {
+          site.email && (
+            <div class="contact-card">
+              <h2>E-posta</h2>
+              <p class="contact-value contact-value--mail">
+                <a href={`mailto:${site.email}`}>
+                  <Icon name="mail" />
+                  <span>{site.email}</span>
+                </a>
+              </p>
+            </div>
+          )
+        }
 
         <div class="contact-card">
           <h2>Adres</h2>

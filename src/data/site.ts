@@ -8,7 +8,7 @@ export interface SiteConfig {
   name: string;
   /** Resmî/tam firma adı */
   legalName: string;
-  /** Logoda yazan tam ticari ünvan: yalnızca footer telif satırında ve JSON-LD legalName'de kullanılır */
+  /** Tam ticari ünvan (firma onaylı): footer telif satırı, gizlilik sayfası ve JSON-LD legalName'de kullanılır */
   registeredName: string;
   /** Telefon: görünen biçim ve tel: bağlantısı */
   phone: { display: string; href: string };
@@ -17,7 +17,7 @@ export interface SiteConfig {
    * null iken WhatsApp butonları hiçbir yerde gösterilmez.
    */
   whatsappNumber: string | null;
-  /** E-posta: tanımlı değilse hiçbir yerde gösterilmez (şu an doğrulanmış adres yok) */
+  /** E-posta (firma onaylı, kesin): iletişim sayfası, footer (harita kartı), gizlilik sayfası ve JSON-LD'de gösterilir; tanımsızsa hiçbir yerde görünmez */
   email?: string;
   /** Adres tek satırda; 34/2/8 aynen korunur */
   address: string;
@@ -54,7 +54,8 @@ export interface SiteConfig {
 export const site: SiteConfig = {
   name: 'Alperenler Hafriyat',
   legalName: 'Alperenler Hafriyat İnşaat',
-  registeredName: 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.',
+  registeredName: 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti.', // ticari ünvan: firma tarafından ONAYLANDI
+  email: 'alperenler.hrf.ltd@gmail.com',
   phone: { display: '0539 252 70 58', href: 'tel:+905392527058' },
   whatsappNumber: '905392527058',
   address: 'Koyunoğlu Mh. Erikli Sk. No:34/2/8, Yeşilyurt / Malatya',

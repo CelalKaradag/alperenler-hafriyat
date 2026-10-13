@@ -390,6 +390,37 @@
   }
 }
 
+/* E-posta: telefon/WhatsApp'ın altında; uzun adres mobilde taşmaz */
+.map-info-mail {
+  display: block;
+  margin: 0 0 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.map-info-mail a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.map-info-mail .icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--accent);
+}
+
+@media (pointer: coarse) {
+  .map-info-mail {
+    margin-bottom: 0.4rem;
+  }
+
+  .map-info-mail a {
+    min-height: 2.75rem; /* dokunma hedefi ≥ 44 px */
+  }
+}
+
 .map-info-actions {
   display: flex;
   flex-direction: column;

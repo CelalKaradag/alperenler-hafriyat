@@ -1,5 +1,6 @@
 ---
 import { mapsDirectionsUrl, mapsUrl, site, whatsappUrl } from '../data/site';
+import Icon from './Icon.astro';
 import MapCard from './MapCard.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
 ---
@@ -24,6 +25,16 @@ import WhatsAppButton from './WhatsAppButton.astro';
           whatsappUrl && (
             <p class="map-info-wa">
               <WhatsAppButton href={whatsappUrl} />
+            </p>
+          )
+        }
+        {
+          site.email && (
+            <p class="map-info-mail">
+              <a href={`mailto:${site.email}`}>
+                <Icon name="mail" />
+                <span>{site.email}</span>
+              </a>
             </p>
           )
         }

@@ -27,6 +27,7 @@ export const iconPaths = {
   users:
     'M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20M10 11.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M14.8 5.3a3.2 3.2 0 0 1 0 6',
   check: 'M5 12.5l4.5 4.5L19 7',
+  mail: 'M3.5 6h17v12h-17zM3.5 7l8.5 6.5L20.5 7',
   // rakam şeridi (filo) ikonları: tek çizgi stili, 24×24, yuvarlak uç; elle çizildi
   /** paletli ekskavatör: palet, kabin, bom + kol + kova */
   fleetExcavator:

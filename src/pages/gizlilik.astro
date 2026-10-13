@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { showDrafts } from '../data/drafts';
 import { site } from '../data/site';
 
-// Firma tarafından doldurulacak alanlar (uydurma bilgi yok)
+// Firma tarafından doldurulacak alanlar (uydurma bilgi yok). Ticari unvan ve e-posta ONAYLANDI (site.ts); vergi no,
+// barındırma sağlayıcısı ve son güncelleme tarihi hâlâ firmadan beklenir.
 const TODO = '[firma tarafından doldurulacak]';
 const isDraft = showDrafts;
 ---
@@ -76,7 +77,7 @@ const isDraft = showDrafts;
         </div>
         <div>
           <dt>Ticari unvan</dt>
-          <dd><mark class="todo">{TODO}</mark></dd>
+          <dd>{site.registeredName}</dd>
         </div>
         <div>
           <dt>Vergi no</dt>
@@ -84,12 +85,22 @@ const isDraft = showDrafts;
         </div>
         <div>
           <dt>KVKK veri sorumlusu</dt>
-          <dd><mark class="todo">{TODO}</mark></dd>
+          <dd>{site.registeredName}</dd>
         </div>
         <div>
           <dt>Adres</dt>
           <dd>{site.address}</dd>
         </div>
+        {
+          site.email && (
+            <div>
+              <dt>E-posta</dt>
+              <dd class="facts-mail">
+                <a href={`mailto:${site.email}`}>{site.email}</a>
+              </dd>
+            </div>
+          )
+        }
         <div>
           <dt>Telefon</dt>
           <dd><a href={site.phone.href}>{site.phone.display}</a></dd>
