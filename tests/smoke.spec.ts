@@ -186,7 +186,10 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
   await expect
     .poll(() => logo.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0);
-  await expect(logo).toHaveAttribute('alt', 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu');
+  // Header'da logo dekoratif (bağlantının adı aria-label'da); footer'daki logo alt metnini korur
+  await expect(logo).toHaveAttribute('alt', '');
+  await expect(page.locator('.site-header .brand')).toHaveAccessibleName(/Alperenler\s*Hafriyat\s*– Ana Sayfa/i);
+  await expect(page.locator('.site-footer .brand-logo img')).toHaveAttribute('alt', 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu');
   await expect(logo).toHaveAttribute('decoding', 'async');
   await expect(logo).toHaveAttribute('loading', 'eager');
   // Görsele dokunulmaz: kırpma/filtre/mask/cover yok, oran 3:2
@@ -1075,7 +1078,6 @@ test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kay
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto('/');
   const wa = page.locator('.wa-float');
-  await expect(wa).toHaveAttribute('aria-label', 'WhatsApp ile teklif için yazın');
   await expect(wa).toHaveAttribute('href', new RegExp(`^${WA_BASE.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`));
 
   // Hero görünürken gizli; aşağı inince belirir, 600 px sonrası yalnızca ikon
@@ -1083,6 +1085,8 @@ test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kay
   // sabit 1600 px uzun ana sayfada yarıyı geçmez, bu yüzden toplam yüksekliğin %60'ına kaydırılır.
   await page.evaluate(() => window.scrollTo(0, (document.scrollingElement as Element).scrollHeight * 0.6));
   await expect(wa).toBeVisible();
+  // Erişilebilir ad görünen yazıdan gelir (WCAG 2.5.3); gizliyken (hero'da) ad okunmaz
+  await expect(wa).toHaveAccessibleName(/WhatsApp\s*Teklif için yazın/);
   await expect(wa).toHaveClass(/is-compact/);
   await expect.poll(async () => Math.round(((await wa.boundingBox()) as { width: number }).width)).toBeLessThanOrEqual(60);
   await expect(page.locator('.to-top')).toBeVisible();
@@ -1116,6 +1120,41 @@ test('telefonda yüzen WhatsApp: alt çubuk yok, hero sonrası belirir, ilk anda
 
   await page.goto('/iletisim/');
   await expect(page.locator('.wa-float')).toHaveClass(/is-shown/);
+});
+
+test('telefon header: sarı "Ara" ikonu + menü ikonu (☰/✕); 360 ve 390 px tek satır; menü açıkken Ara ikonu gizli', async ({
+  page,
+}) => {
+  for (const [width, height] of [
+    [360, 740],
+    [390, 844],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/iletisim/');
+    const call = page.locator('.header-call-icon');
+    await expect(call).toBeVisible();
+    await expect(call).toHaveAttribute('href', PHONE_HREF);
+    await expect(call).toHaveAccessibleName(/Hemen arayın/);
+    const callBox = (await call.boundingBox()) as { x: number; width: number; height: number };
+    expect(callBox.width).toBeGreaterThanOrEqual(44);
+    expect(callBox.height).toBeGreaterThanOrEqual(44);
+    const toggle = page.locator('.nav-toggle');
+    const toggleBox = (await toggle.boundingBox()) as { x: number; width: number; height: number };
+    expect(toggleBox.width).toBeGreaterThanOrEqual(44);
+    expect(callBox.x + callBox.width, 'Ara ikonu menü düğmesinin solunda').toBeLessThan(toggleBox.x);
+    expect(toggleBox.x + toggleBox.width, "menü düğmesi sağ kenar boşluğunu yemez").toBeLessThanOrEqual(width - 12);
+    const header = (await page.locator('.site-header').boundingBox()) as { height: number };
+    expect(header.height, `${width}: header tek satır`).toBeLessThanOrEqual(73);
+    await expect(toggle).toHaveAccessibleName('Menü');
+    await toggle.click();
+    await expect(toggle).toHaveAccessibleName('Kapat');
+    await expect(call).toBeHidden(); // menünün içinde büyük "Hemen Ara" var
+    await page.keyboard.press('Escape');
+    await expect(call).toBeVisible();
+  }
+  // Tablet/masaüstünde ikon yok (orada "Hemen Ara" düğmesi var)
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await expect(page.locator('.header-call-icon')).toBeHidden();
 });
 
 test.describe('masaüstü header tek satır', () => {

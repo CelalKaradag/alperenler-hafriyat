@@ -15,12 +15,19 @@ const isCurrent = (href: string) => {
 <header class="site-header on-dark" transition:persist="site-header">
   <a class="skip-link" href="#icerik">İçeriğe geç</a>
   <div class="container header-inner">
-    <a class="brand" href="/" aria-label={`${site.name} – Ana Sayfa`}>
-      <BrandLogo class="brand-logo--header" loading="eager" sizes="(min-width: 48em) 81px, 63px" />
+    <a class="brand" href="/">
+      {/* Bağlantının adı görünen yazıdan gelir ("Alperenler Hafriyat – Ana Sayfa"); logo burada dekoratif (alt="") */}
+      <BrandLogo class="brand-logo--header" loading="eager" sizes="(min-width: 48em) 81px, 63px" alt="" />
       <span class="brand-text">
-        <span class="brand-top">ALPERENLER</span>
-        <span class="brand-bottom">HAFRİYAT</span>
+        <span class="brand-top">Alperenler</span>
+        <span class="brand-bottom">Hafriyat</span>
       </span>
+      <span class="visually-hidden"> – Ana Sayfa</span>
+    </a>
+
+    {/* Telefonda (< 48em): logonun sağında sarı "Ara" ikonu; menü açıkken gizli (menüde büyük "Hemen Ara" var) */}
+    <a class="header-call-icon" href={site.phone.href} aria-label={`Hemen arayın: ${site.phone.display}`}>
+      <Icon name="phone" />
     </a>
 
     <button
@@ -30,6 +37,7 @@ const isCurrent = (href: string) => {
       aria-controls="site-nav"
       hidden
     >
+      <span class="nav-toggle-bars" aria-hidden="true"></span>
       <span class="nav-toggle-label">Menü</span>
     </button>
 

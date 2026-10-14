@@ -8,9 +8,17 @@ interface Props {
   loading?: 'eager' | 'lazy';
   /** Görüntülenen genişliğe göre `sizes` */
   sizes?: string;
+  /** Alternatif metin; logo zaten adlandırılmış bir bağlantının içindeyse "" (dekoratif) verilir */
+  alt?: string;
 }
 
-const { class: className, card = true, loading = 'lazy', sizes = '240px' } = Astro.props;
+const {
+  class: className,
+  card = true,
+  loading = 'lazy',
+  sizes = '240px',
+  alt = 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu',
+} = Astro.props;
 
 const base = '/images/logo/alperenler-logo';
 const set = (ext: 'webp' | 'jpg') =>
@@ -26,7 +34,7 @@ const set = (ext: 'webp' | 'jpg') =>
       sizes={sizes}
       width="720"
       height="480"
-      alt="Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu"
+      alt={alt}
       loading={loading}
       decoding="async"
     />

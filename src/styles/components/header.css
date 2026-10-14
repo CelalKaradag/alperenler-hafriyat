@@ -91,6 +91,12 @@
   }
 }
 
+.brand-text {
+  /* Yazı HTML'de normal harfle (erişilebilir ad "Alperenler Hafriyat" ile eşleşsin), görünümü büyük harf;
+     lang="tr" sayesinde "Hafriyat" → "HAFRİYAT" doğru yazılır */
+  text-transform: uppercase;
+}
+
 .brand-top {
   font-family: var(--font-display);
   font-stretch: 118%;

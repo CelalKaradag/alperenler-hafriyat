@@ -6,13 +6,14 @@ interface Props {
   class?: string;
   /** WhatsApp ikonu (varsayılan: var) */
   icon?: boolean;
-  /** Erişilebilir ad (varsayılan: "WhatsApp ile yazın") */
-  label?: string;
+  /** Erişilebilir ad (varsayılan: "WhatsApp ile yazın"). false: aria-label yok, ad görünen yazıdan gelir
+      (görünen yazı uzunsa WCAG 2.5.3 "ad, görünen yazıyı içersin" kuralı için) */
+  label?: string | false;
 }
 
 const { href, class: className, icon = true, label = 'WhatsApp ile yazın' } = Astro.props;
 ---
 
-<a class={className} href={href} target="_blank" rel="noopener" aria-label={label}>
+<a class={className} href={href} target="_blank" rel="noopener" aria-label={label || undefined}>
   {icon && <WhatsAppIcon />}<slot>WhatsApp</slot>
 </a>
