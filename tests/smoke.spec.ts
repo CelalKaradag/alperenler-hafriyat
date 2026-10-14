@@ -18,6 +18,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('tüm sayfalar: 200, konsolda hata yok, tek H1', async ({ page }) => {
+  test.setTimeout(120_000); // tüm sayfaları dolaşır; yavaş makinede 45 sn sınırına yaklaşıyordu
   const errors = watchErrors(page);
   const pages = await crawl(page);
   expect(pages.length).toBeGreaterThan(3);
