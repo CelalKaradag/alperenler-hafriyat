@@ -63,8 +63,27 @@ const photoSize = hasPhoto ? imageSize(photo) : null;
   </section>
 
   <section class="section section-light about-intro-section">
-    <div class="container">
+    <div class="container about-intro-grid">
       <p class="about-intro">{intro}</p>
+      {/* Künye: yalnızca firmanın verdiği bilgiler (rakam/istatistik yok) */}
+      <dl class="about-facts" aria-label="Künye">
+        <div>
+          <dt>Kuruluş</dt>
+          <dd>{site.foundedYear}</dd>
+        </div>
+        <div>
+          <dt>Merkez</dt>
+          <dd>Yeşilyurt / Malatya</dd>
+        </div>
+        <div>
+          <dt>Çalışma alanı</dt>
+          <dd>Malatya merkez, ilçeler ve şehir dışı</dd>
+        </div>
+        <div>
+          <dt>Uzmanlık</dt>
+          <dd>Hafriyat, kazı, altyapı, taş duvar ve iş makinesi kiralama</dd>
+        </div>
+      </dl>
     </div>
   </section>
 

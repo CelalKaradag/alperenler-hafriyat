@@ -1563,3 +1563,58 @@ test.describe('telefon düzeni (mobile.css)', () => {
     await expect(page.locator('.rail-hint')).toBeHidden();
   });
 });
+
+test('hakkımızda künye kartı: sıra, 2008, rakam/istatistik yok; 1366 px metnin sağında, 390 px altında; taşma yok', async ({ page }) => {
+  for (const [width, wide] of [
+    [1366, true],
+    [390, false],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/hakkimizda/');
+    const facts = page.locator('.about-facts');
+    await expect(facts).toBeVisible();
+    expect(await facts.locator('dt').allTextContents()).toEqual(['Kuruluş', 'Merkez', 'Çalışma alanı', 'Uzmanlık']);
+    await expect(facts.locator('dd').first()).toHaveText('2008');
+    const text = (await facts.innerText()).toLowerCase();
+    for (const word of ['müşteri', 'tamamlanan', 'iş sayısı', 'proje sayısı']) {
+      expect(text, `künyede "${word}" olmamalı`).not.toContain(word);
+    }
+    // künyede rakam olarak yalnızca kuruluş yılı bulunur
+    expect(text.match(/\d+/g)).toEqual(['2008']);
+    const intro = (await page.locator('.about-intro').boundingBox()) as { x: number; y: number; width: number; height: number };
+    const card = (await facts.boundingBox()) as { x: number; y: number; width: number; height: number };
+    if (wide) {
+      expect(card.x, 'kart metnin sağında').toBeGreaterThanOrEqual(intro.x + intro.width - 1);
+      expect(Math.abs(card.y - intro.y), 'aynı satırda (üstler hizalı)').toBeLessThanOrEqual(8);
+    } else {
+      expect(card.y, 'kart metnin altında').toBeGreaterThanOrEqual(intro.y + intro.height - 1);
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
+  }
+});
+
+test('makine kiralama ızgarası: 1366 px 3+3, 768 px 2 sütun', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await page.goto('/makine-kiralama/');
+  const cards = page.locator('main .card-grid > *');
+  await expect(cards).toHaveCount(6);
+  const boxes = (await cards.evaluateAll((nodes) =>
+    nodes.map((n) => {
+      const r = n.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y + window.scrollY) };
+    }),
+  )) as { x: number; y: number }[];
+  expect(new Set(boxes.slice(0, 3).map((b) => b.y)).size, 'ilk 3 kart aynı satırda').toBe(1);
+  expect(new Set(boxes.slice(3).map((b) => b.y)).size, 'son 3 kart aynı satırda').toBe(1);
+  expect(boxes[3].y, '4. kart alt satırda').toBeGreaterThan(boxes[0].y);
+  expect(boxes[3].x, '4. kart 1. kartla aynı x').toBe(boxes[0].x);
+  expect(boxes[2].x, '3 sütun: 3. kart 3. sütunda').toBeGreaterThan(boxes[1].x);
+
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto('/makine-kiralama/');
+  const cols = await page
+    .locator('main .card-grid')
+    .evaluate((el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length);
+  expect(cols).toBe(2);
+});

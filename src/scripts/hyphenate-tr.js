@@ -9,7 +9,7 @@
  * Kurallar (her hecede tek ünlü): iki ünlü arasında 1 ünsüz → ünsüzden önce (ha-fri-yat), 2 ünsüz → aralarından
  * (haf-ri-yat), 3+ ünsüz → son ünsüzden önce (kont-rol, Türk-çe). Kelime başında en az 2, sonunda en az 3 harf kalır.
  */
-const SELECTOR = '.about-intro, .about-copy > p, .prose p, .about-goal-text, .pillar p';
+const SELECTOR = '.about-intro, .about-copy > p, .prose p, .pillar p';
 const VOWELS = new Set('aeıioöuüâîûAEIİOÖUÜÂÎÛ');
 const SHY = '­';
 const MIN_WORD = 7;

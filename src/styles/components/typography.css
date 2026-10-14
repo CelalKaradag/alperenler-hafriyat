@@ -18,16 +18,78 @@
 }
 
 /* 2) Uzun metin paragrafları iki yana yaslı (sağ ve sol kenar aynı hizada). Türkçe heceleme (html lang="tr")
-      kelime aralarının açılmasını önler; son satır her zaman sola yaslı kalır. Kart içi kısa metinler ve
-      başlıklar etkilenmez. */
+      kelime aralarının açılmasını önler; son satır her zaman sola yaslı kalır. Kart içi kısa metinler,
+      başlıklar ve büyük puntolu "Hedefimiz" metni (dar satırda boşluklar açılıyordu) etkilenmez. */
 .about-intro,
 .about-copy > p,
 .prose p,
-.about-goal-text,
 .pillar p {
   text-align: justify;
   -webkit-hyphens: auto;
   hyphens: auto;
   hyphenate-limit-chars: 7 3 3;
   text-wrap: pretty;
+}
+
+/* 3) Hakkımızda girişi: masaüstünde metin solda, künye kartı sağda (sağ taraf boş kalmasın) */
+.about-intro-grid {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.about-facts {
+  margin: 0;
+  padding: 0.25rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line-light);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.about-facts > div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line-light);
+}
+
+.about-facts > div:last-child {
+  border-bottom: 0;
+}
+
+.about-facts dt {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.about-facts dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+@media (min-width: 56em) {
+  .about-intro-grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .about-intro-grid .about-intro {
+    max-width: none;
+    font-size: 1.125rem;
+  }
+}
+
+/* 4) Altı kartlı ızgaralar (makine kiralama) geniş ekranda 4+2 yerine 3+3 dizilir */
+@media (min-width: 72em) {
+  .card-grid:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

@@ -11,7 +11,7 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
   masaüstünde ilk 600 px'ten sonra yazı kısmı kapanıp yalnızca ikon kalır (hover/odakta açılır); "yukarı çık"
   (yalnızca masaüstü) sayfa yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
 -->
-<div class="floating-actions" data-floating>
+<aside class="floating-actions" data-floating aria-label="Hızlı iletişim">
   <button class="to-top" type="button" data-to-top aria-label="Sayfanın başına çık">
     <Icon name="arrowUp" />
   </button>
@@ -33,4 +33,4 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
       </WhatsAppButton>
     )
   }
-</div>
+</aside>
