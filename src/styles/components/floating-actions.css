@@ -1,20 +1,29 @@
-/* ---------- Masaüstü yüzen düğmeler ---------- */
-
+/* ---------- Yüzen düğmeler (tüm genişlikler) ----------
+   Sağ altta WhatsApp; masaüstünde üstünde "yukarı çık". Telefonda yalnızca WhatsApp: ilk belirişte birkaç saniye
+   "Teklif için yazın" yazısıyla açık durur, sonra yuvarlak ikona kapanır (floating-actions.js). */
 .floating-actions {
-  display: none;
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  --focus: var(--accent);
 }
 
 @media (min-width: 48em) {
   .floating-actions {
-    position: fixed;
     right: 1.5rem;
     bottom: 1.5rem;
-    z-index: 45;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.75rem;
-    --focus: var(--accent);
+  }
+}
+
+/* Telefonda yalnızca WhatsApp düğmesi */
+@media (max-width: 47.99em) {
+  .floating-actions .to-top {
+    display: none;
   }
 }
 

@@ -20,8 +20,6 @@ body {
   background: var(--sand);
   overflow-x: hidden;
   overflow-x: clip; /* sticky header'ı bozmadan yatay taşmayı keser */
-  /* Sabit alt çubuğun içeriği kapatmaması için */
-  padding-bottom: calc(var(--bar-height) + env(safe-area-inset-bottom, 0px));
 }
 
 img,

@@ -1,8 +1,11 @@
 /**
- * Masaüstü yüzen düğmeler: WhatsApp (hero görünürken gizli, aşağı inince belirir) ve
- * "yukarı çık" (sayfa yarıdan sonra). Her sayfa yüklenişinde page-init.js çağırır;
- * dönen fonksiyon dinleyicileri temizler.
+ * Yüzen düğmeler: WhatsApp (hero görünürken gizli, aşağı inince belirir; hero'suz sayfada telefonda hemen) ve
+ * masaüstünde "yukarı çık" (sayfa yarıdan sonra). Telefonda WhatsApp ilk belirişte PEEK_MS boyunca yazılı
+ * ("Teklif için yazın"), sonra yuvarlak ikona kapanır. Her sayfa yüklenişinde page-init.js çağırır;
+ * dönen fonksiyon dinleyicileri ve zamanlayıcıyı temizler.
  */
+const PEEK_MS = 4000;
+
 export function initFloatingActions() {
   const root = document.querySelector('[data-floating]');
   if (!root) return null;
@@ -13,6 +16,9 @@ export function initFloatingActions() {
   let heroVisible = Boolean(hero);
   let ticking = false;
   let pulsed = false;
+  const phone = window.matchMedia('(max-width: 47.99em)');
+  let firstShownAt = 0;
+  let peekTimer = 0;
 
   const update = () => {
     ticking = false;
@@ -20,10 +26,16 @@ export function initFloatingActions() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     // Hero olan sayfalarda hero görünürken gizli; hero olmayan sayfalarda biraz kaydırınca belirir
     if (whatsapp) {
-      const shown = hero ? !heroVisible : y > 240;
+      // Hero'lu sayfada hero görünürken gizli; hero'suz sayfada masaüstünde 240 px sonra, telefonda hemen
+      const shown = hero ? !heroVisible : phone.matches || y > 240;
       whatsapp.classList.toggle('is-shown', shown);
-      // İlk 600 px'ten sonra yazı kısmı kapanır, yalnızca ikon kalır (hover/odakta açılır)
-      whatsapp.classList.toggle('is-compact', y > 600);
+      if (shown && !firstShownAt) {
+        firstShownAt = Date.now();
+        peekTimer = window.setTimeout(update, PEEK_MS + 50); // telefonda yazılı hâl kendiliğinden kapansın
+      }
+      // Masaüstü: 600 px'ten sonra yalnızca ikon. Telefon: ilk belirişten sonraki PEEK_MS boyunca yazılı, sonra ikon.
+      const peeking = firstShownAt > 0 && Date.now() - firstShownAt < PEEK_MS;
+      whatsapp.classList.toggle('is-compact', phone.matches ? !peeking : y > 600);
       // Halka nabzı: ilk görünüşte tek sefer (2 tekrar), sonra durur
       if (shown && !pulsed) {
         pulsed = true;
@@ -69,5 +81,6 @@ export function initFloatingActions() {
     window.removeEventListener('resize', onScroll);
     if (toTop) toTop.removeEventListener('click', onTopClick);
     if (observer) observer.disconnect();
+    window.clearTimeout(peekTimer);
   };
 }

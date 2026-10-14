@@ -405,13 +405,13 @@ main > .not-found {
     color: var(--on-dark-muted);
   }
 
-  /* Menü açıkken sayfa kaydırılmaz; alt sabit çubuk gizlenir */
+  /* Menü açıkken sayfa kaydırılmaz; yüzen WhatsApp düğmesi gizlenir */
   html.menu-open,
   html.menu-open body {
     overflow: hidden;
   }
 
-  html.menu-open .call-bar {
+  html.menu-open .floating-actions {
     display: none;
   }
 }

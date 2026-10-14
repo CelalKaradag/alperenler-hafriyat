@@ -20,7 +20,6 @@ const lazyModules = [
   ['[data-hero-media]', () => import('./hero-video.js'), (m) => m.initHeroVideo()],
   ['[data-map-card]', () => import('./map-card.js'), (m) => m.initMapCards()],
   ['[data-floating]', () => import('./floating-actions.js'), (m) => m.initFloatingActions()],
-  ['.call-bar', () => import('./call-bar.js'), (m) => m.initCallBar()],
   ['[data-lightbox-root]', () => import('./lightbox.js'), (m) => m.initLightbox(), true],
   ['[data-gallery-grid="home"]', () => import('./gallery-carousel.js'), (m) => m.initGalleryCarousel(), true],
   ['[data-gallery-filters]', () => import('./gallery-filter.js'), (m) => m.initGalleryFilters(), true],

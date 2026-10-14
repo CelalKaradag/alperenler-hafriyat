@@ -847,8 +847,8 @@ test.describe('mobil 390x844', () => {
     );
     expect(hitHero, 'hero butonu menünün altında tıklanamaz olmalı').toBe(false);
 
-    // Alt sabit çubuk gizli, gövde kaydırması kilitli
-    await expect(page.locator('.call-bar')).toBeHidden();
+    // Yüzen WhatsApp düğmesi gizli, gövde kaydırması kilitli
+    await expect(page.locator('.floating-actions')).toBeHidden();
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
 
     // Linkler büyük: ≥ 56 px satır, ≈ 22 px yazı; altta büyük "Hemen Ara" + adres
@@ -864,7 +864,7 @@ test.describe('mobil 390x844', () => {
     await expect(header).not.toHaveClass(/is-open/);
     await expect(toggle).toBeFocused();
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
-    await expect(page.locator('.call-bar')).toBeVisible();
+    await expect(page.locator('.floating-actions')).toHaveCSS('display', 'flex');
   });
 
   test('mobil ana sayfa: header en üstte şeffaf (y=0), hero y≈0, logo kartı 56 px; kaydırınca koyu', async ({
@@ -1022,7 +1022,7 @@ test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile })
     await page.goto(path);
     const small: string[] = [];
     for (const handle of await page
-      .locator('.btn, button, .nav-toggle, .call-bar a, .site-footer a')
+      .locator('.btn, button, .nav-toggle, .wa-float, .site-footer a')
       .elementHandles()) {
       const box = await handle.boundingBox();
       if (!box || !(await handle.isVisible())) continue;
@@ -1032,7 +1032,7 @@ test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile })
         return (
           el.tagName === 'A' &&
           Boolean(el.closest('p, li, dd, address')) &&
-          !el.closest('footer, nav, header, .call-bar') &&
+          !el.closest('footer, nav, header, .floating-actions') &&
           !el.matches('.btn, button')
         );
       });
@@ -1050,10 +1050,9 @@ test('dokunma hedefleri ≥ 44px (mobil cihazlarda)', async ({ page, isMobile })
   }
 });
 
-test('mobil: odaklanan sihirbaz alanı sabit alt çubuğun altında kalmaz', async ({ page, isMobile }) => {
+test('mobil: odaklanan sihirbaz alanı ekranın altında kalmaz', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'yalnızca mobil cihaz projeleri');
   await page.goto('/teklif/');
-  await expect(page.locator('.call-bar')).toBeVisible();
   const choices = page.locator('.choice');
   if ((await choices.count()) > 0) await choices.first().click();
   else await page.locator('#wizard-job-text').fill('Temel kazısı');
@@ -1061,10 +1060,9 @@ test('mobil: odaklanan sihirbaz alanı sabit alt çubuğun altında kalmaz', asy
   await page.locator('#wizard-place').focus(); // odak, alanı scroll-margin ile görünüme kaydırır
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   const field = (await page.locator('#wizard-place').boundingBox()) as { y: number; height: number };
-  const bar = (await page.locator('.call-bar').boundingBox()) as { y: number };
-  expect(field.y + field.height, 'alan alt çubuğun altında kalmamalı').toBeLessThanOrEqual(bar.y + 1);
-  // Çubuk odakla kaybolup tekrar çıkmaz (dokunuşun ortasında düğmeyi örtüp tıklamayı yutmasın)
-  await expect(page.locator('.call-bar')).toBeVisible();
+  expect(field.y + field.height, 'alan ekranın altında kalmamalı').toBeLessThanOrEqual(
+    (page.viewportSize() as { height: number }).height,
+  );
 });
 
 test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kaydırınca ikona daralır, hover\'da açılır', async ({
@@ -1092,11 +1090,30 @@ test('masaüstü yüzen WhatsApp düğmesi: görünür, wa.me bağlantılı, kay
   await expect.poll(async () => ((await wa.boundingBox()) as { width: number }).width).toBeGreaterThan(120);
 });
 
-test('mobilde yüzen düğmeler yok, alt çubukta WhatsApp bağlantısı var', async ({ page }) => {
+test('telefonda yüzen WhatsApp: alt çubuk yok, hero sonrası belirir, ilk anda yazılı sonra ikon, /iletisim/da hemen görünür', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.locator('.floating-actions')).toBeHidden();
-  await expect(page.locator('.call-bar a[href^="https://wa.me/"]')).toBeVisible();
+  await expect(page.locator('.call-bar')).toHaveCount(0);
+  const wa = page.locator('.wa-float');
+  await expect(wa).toHaveAttribute('href', /^https:\/\/wa\.me\//);
+  await expect(page.locator('.to-top')).toBeHidden();
+  await page.waitForTimeout(600);
+  await expect(wa).not.toHaveClass(/is-shown/);
+
+  await page.evaluate(() => window.scrollTo(0, window.innerHeight * 1.5));
+  await expect(wa).toHaveClass(/is-shown/);
+  await expect(wa).not.toHaveClass(/is-compact/);
+  await expect(wa.locator('.wa-float-big')).toHaveText('Teklif için yazın');
+  await expect(wa).toHaveClass(/is-compact/, { timeout: 7000 });
+  await expect.poll(async () => Math.round(((await wa.boundingBox()) as { width: number }).width)).toBeLessThanOrEqual(60);
+  const box = (await wa.boundingBox()) as { x: number; y: number; width: number; height: number };
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(box.x + box.width).toBeLessThanOrEqual(390);
+  expect(box.y + box.height).toBeLessThanOrEqual(844);
+  expect(box.x).toBeGreaterThanOrEqual(0);
+
+  await page.goto('/iletisim/');
+  await expect(page.locator('.wa-float')).toHaveClass(/is-shown/);
 });
 
 test.describe('masaüstü header tek satır', () => {
@@ -1464,7 +1481,7 @@ test.describe('telefon düzeni (mobile.css)', () => {
     [360, 740],
     [390, 844],
   ] as const) {
-    test(`${width}x${height}: header tek satır, hero butonu ekranda, alt çubuk hero'da saklı, kaydırınca görünür`, async ({ page }) => {
+    test(`${width}x${height}: header tek satır, hero butonu ekranda, alt çubuk yok`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto('/');
       await page.waitForTimeout(800);
@@ -1472,16 +1489,7 @@ test.describe('telefon düzeni (mobile.css)', () => {
       expect(header!.height, 'header yüksekliği (Menü alt satıra düşmez)').toBeLessThanOrEqual(73);
       const btn = await page.locator('.hero .btn-primary').first().boundingBox();
       expect(btn!.y + btn!.height, 'hero butonu ilk ekranda').toBeLessThanOrEqual(height);
-      // hero düğmeleri ekrandayken çubuk ekranın dışında (saklı)
-      await expect.poll(async () => (await page.locator('.call-bar').boundingBox())!.y).toBeGreaterThanOrEqual(height);
-      await page.evaluate((y) => window.scrollTo(0, y), Math.round(height * 1.5));
-      await expect(page.locator('.call-bar')).toHaveClass(/is-shown/);
-      await expect
-        .poll(async () => {
-          const box = await page.locator('.call-bar').boundingBox();
-          return box!.y + box!.height;
-        })
-        .toBeLessThanOrEqual(height + 0.5);
+      await expect(page.locator('.call-bar')).toHaveCount(0);
     });
   }
 

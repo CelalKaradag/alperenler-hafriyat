@@ -6,10 +6,10 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
 ---
 
 <!--
-  Masaüstü (48em üstü) yüzen düğmeler. Mobilde yok (alt çubuk var).
+  Yüzen düğmeler (tüm genişlikler). Telefonda yalnızca WhatsApp: ilk belirişte birkaç saniye yazılı durur, sonra ikona kapanır.
   Görünürlüğü src/scripts/floating-actions.js yönetir: WhatsApp hero görünürken gizli, aşağı inince belirir;
-  ilk 600 px'ten sonra yazı kısmı kapanıp yalnızca ikon kalır (hover/odakta açılır); "yukarı çık" sayfa
-  yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
+  masaüstünde ilk 600 px'ten sonra yazı kısmı kapanıp yalnızca ikon kalır (hover/odakta açılır); "yukarı çık"
+  (yalnızca masaüstü) sayfa yarıdan sonra görünür. WhatsApp numarası yoksa WhatsApp düğmesi basılmaz.
 -->
 <div class="floating-actions" data-floating>
   <button class="to-top" type="button" data-to-top aria-label="Sayfanın başına çık">
