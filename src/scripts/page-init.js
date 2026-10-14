@@ -7,6 +7,7 @@
  * (hero video, harita, lightbox, galeri filtre/şerit, teklif sihirbazı, yüzen düğmeler) yalnızca
  * ilgili öğe sayfada varsa dinamik import ile yüklenir; böylece ilgisiz sayfalar bu kodu indirmez.
  */
+import { initHyphenate } from './hyphenate-tr.js';
 import { initReveal } from './reveal.js';
 import { initUiEffects } from './ui-effects.js';
 
@@ -74,6 +75,7 @@ function run() {
   }
   firstRun = false;
 
+  initHyphenate(); // iki yana yaslı paragraflara Türkçe yumuşak tireler (typography.css)
   cleanups = [initReveal(), initUiEffects()].filter(Boolean);
 
   for (const [selector, load, start, deferred] of lazyModules) {

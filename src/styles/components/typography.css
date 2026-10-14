@@ -1,0 +1,33 @@
+/*
+ * ---------- Yazı düzeni: daha sakin başlık ölçeği + iki yana yaslı metinler ----------
+ * mobile.css'ten SONRA yüklenir. Telefon ölçeği mobile.css'te; burada yalnızca ≥ 48em başlık ölçeği küçülür.
+ */
+
+/* 1) Masaüstü/tablet başlıkları bir kademe küçük (önceki üst sınırlar: h1 5.25rem, h2 3.25rem) */
+@media (min-width: 48em) {
+  :root {
+    --fs-h1: clamp(2.25rem, 1.35rem + 3.4vw, 4.25rem);
+    --fs-h2: clamp(1.9rem, 1.35rem + 1.9vw, 2.75rem);
+    --fs-lead: clamp(1.05rem, 1rem + 0.3vw, 1.2rem);
+  }
+
+  /* Ana sayfa "Biz Kimiz" başlığı uzun bir cümle: diğer h2'lerden bir kademe küçük */
+  .about-copy h2 {
+    font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  }
+}
+
+/* 2) Uzun metin paragrafları iki yana yaslı (sağ ve sol kenar aynı hizada). Türkçe heceleme (html lang="tr")
+      kelime aralarının açılmasını önler; son satır her zaman sola yaslı kalır. Kart içi kısa metinler ve
+      başlıklar etkilenmez. */
+.about-intro,
+.about-copy > p,
+.prose p,
+.about-goal-text,
+.pillar p {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 7 3 3;
+  text-wrap: pretty;
+}

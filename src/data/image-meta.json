@@ -318,7 +318,7 @@
     "key": "hero-poster-720",
     "width": 720,
     "height": 1280,
-    "color": "#a88888",
+    "color": "#a88868",
     "widths": [
       480,
       720
@@ -328,7 +328,7 @@
     "key": "hero-poster",
     "width": 1920,
     "height": 1080,
-    "color": "#b89888",
+    "color": "#181818",
     "widths": [
       480,
       960,

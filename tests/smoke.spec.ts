@@ -31,6 +31,7 @@ test('tüm sayfalar: 200, konsolda hata yok, tek H1', async ({ page }) => {
 });
 
 test('iç bağlantılar 404 vermiyor', async ({ page, request }) => {
+  test.setTimeout(120_000); // tüm sayfaları dolaşır; yavaş makinede 45 sn sınırına yaklaşıyordu
   const pages = await crawl(page);
   const links = new Set<string>();
   for (const path of pages) {
@@ -1201,6 +1202,7 @@ test.describe('masaüstü header tek satır', () => {
   }
 
   test("iç sayfalarda (hero yok) başlık header'ın altında kalmaz (normal build: tüm onaylı sayfalar)", async ({ page }) => {
+    test.setTimeout(120_000); // tüm sayfaları dolaşır; yavaş makinede 45 sn sınırına yaklaşıyordu
     await expectH1BelowHeader(
       page,
       [
@@ -1304,6 +1306,7 @@ for (const width of [360, 390, 768, 1366]) {
 }
 
 test('kuruluş yılı 2008 her yerde; harita bağlantıları, TikTok ve JSON-LD (foundingDate, hasMap, sameAs)', async ({ page }) => {
+  test.setTimeout(120_000); // tüm sayfaları dolaşır; yavaş makinede 45 sn sınırına yaklaşıyordu
   const TIKTOK = 'https://www.tiktok.com/@kaptanblacck';
   const PLACE = 'https://maps.app.goo.gl/U4xZsNWxEhQWsY3x6';
   const pages = await crawl(page);
