@@ -1,6 +1,6 @@
 /**
- * Müşteri yorumları (Google'dan ELLE girilen, statik liste). ŞİMDİLİK BOŞ: yorum UYDURULMAZ, örnek yorum
- * eklenmez. Liste boşken ana sayfada "Müşterilerimiz ne diyor" bölümü HİÇ render edilmez (başlık, boşluk yok).
+ * Müşteri yorumları (Google'dan ELLE girilen, statik liste). Yorum UYDURULMAZ, örnek yorum eklenmez.
+ * Liste boşken ana sayfada "Müşterilerimiz ne diyor" bölümü HİÇ render edilmez (başlık, boşluk yok).
  *
  * Dış script/iframe/API YOKTUR; bölüm hiçbir ağ isteği yapmaz. schema.org Review/AggregateRating işaretlemesi
  * EKLENMEZ (Google, işletmenin kendi sitesindeki yorumların işaretlenmesini kabul etmiyor).
@@ -23,7 +23,41 @@ export interface Review {
   googleUrl?: string;
 }
 
-export const reviews: Review[] = [];
+// Google İşletme Profili'nden 15.10.2026'da birebir aktarıldı (metinler yazıldığı gibi). Tarih, Google'daki
+// "x ay önce" bilgisinden ay olarak hesaplandı. Firma çalışanlarının ve site geliştiricisinin kendi yorumları
+// ile metinsiz (yalnızca yıldız) yorumlar listeye alınmaz. Kullanıcı adı takma ad olan yorumda ad gösterilmez.
+export const reviews: Review[] = [
+  {
+    author: 'Bayram K.',
+    rating: 5,
+    text: "Yaptıkları işin arkasında duran dürüst ve deneyimli insanlardır işinin ehli Turgut aydın'a teşekkürler ederiz",
+    date: '2026-05',
+  },
+  {
+    author: 'Okan G.',
+    rating: 5,
+    text: 'Bizde alt yapı taahhüt işini verdik Çok memnunuz cık tecrübeliler',
+    date: '2026-05',
+  },
+  {
+    author: 'Google kullanıcısı',
+    rating: 5,
+    text: 'deneyimli ve çözüm üreten operatörlere sahip hafriyat firması',
+    date: '2026-05',
+  },
+  {
+    author: 'Murat K.',
+    rating: 5,
+    text: "Çok deneyimli oparatörleri ile işimizi gününde teslim ettiler elemanların tecrübeli ahlaklı güler yüzlü olmasından dolayı Turgut Aydın'a ve muhammed bayrağa teşekkür ederiz.",
+    date: '2026-03',
+  },
+  {
+    author: 'Canpolat K.',
+    rating: 5,
+    text: "Malatya'da güvenebileceğiniz en iyi firma",
+    date: '2026-03',
+  },
+];
 
 /** "2026-03" → "Mart 2026" (tarih ayrıştırılamazsa olduğu gibi) */
 export function formatReviewDate(date: string): string {

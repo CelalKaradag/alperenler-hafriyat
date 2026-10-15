@@ -16,6 +16,10 @@ interface Props {
 const { variant = 'hero' } = Astro.props;
 ---
 
+{
+  /* Sayfa başlığı deseni ilk ekranın en büyük öğesi (LCP): CSS'i beklemeden indirilsin */
+  variant === 'soft' && <link rel="preload" as="image" href="/topo/soft.svg" />
+}
 <div
   class:list={['topo-art', `topo-art--${variant}`, variant !== 'hero' && 'topo-art--soft']}
   aria-hidden="true"

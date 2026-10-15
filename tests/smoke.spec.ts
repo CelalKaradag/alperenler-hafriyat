@@ -1286,10 +1286,27 @@ test.describe('masaüstü header tek satır', () => {
   });
 });
 
-test('yorumlar listesi boşken ana sayfada yorum bölümü hiç yok', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('[data-reviews]')).toHaveCount(0);
-  await expect(page.getByText('Müşterilerimiz ne diyor')).toHaveCount(0);
+test('Google yorumları ana sayfada: 5 gerçek yorum, 5 yıldız, Google bağlantıları, yatay taşma yok', async ({ page }) => {
+  for (const width of [360, 1366]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/');
+    const section = page.locator('[data-reviews]');
+    await expect(section).toHaveCount(1);
+    await expect(section.getByRole('heading', { name: 'Müşterilerimiz ne diyor' })).toBeVisible();
+    await expect(section.locator('.review-card')).toHaveCount(5);
+    await expect(section.getByRole('img', { name: '5 üzerinden 5' })).toHaveCount(5);
+    await expect(section.locator('.review-author').first()).toHaveText('Bayram K.');
+    await expect(section.getByRole('link', { name: /Google'da tüm yorumlar/ })).toHaveAttribute(
+      'href',
+      'https://g.page/r/CUW_reguN3B4EBE',
+    );
+    await expect(section.getByRole('link', { name: /Google'da yorum yazın/ })).toHaveAttribute(
+      'href',
+      'https://g.page/r/CUW_reguN3B4EBE/review',
+    );
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `${width}px yatay taşma`).toBeLessThanOrEqual(0);
+  }
 });
 
 test('Google Maps engellenirse harita kartı bozuk iframe göstermez; adres ve butonlar kalır', async ({ page }) => {

@@ -19,6 +19,16 @@
   display: none;
 }
 
+/* JavaScript açıksa (html.js, <head>'de hemen eklenir) sihirbaz betik yüklenmeden görünür: yedek kutudan
+   sihirbaza geçerken sayfa aşağı kaymaz (CLS). Betiksiz tarayıcıda yedek kutu kalır. */
+html.js .wizard-fallback {
+  display: none;
+}
+
+html.js .wizard-app[hidden] {
+  display: block;
+}
+
 .wizard-progress {
   margin-bottom: 1.5rem;
 }
