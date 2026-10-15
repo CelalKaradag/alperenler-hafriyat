@@ -243,7 +243,10 @@ const description = service
                   <p class="eyebrow">Makine kiralama</p>
                   <h2 id="makine-baslik">Operatörlü makine kiralama</h2>
                 </div>
-                <div class="card-grid">
+                <p class="rail-hint" aria-hidden="true">
+                  Kaydırarak tüm makineleri görün<span class="rail-hint-arrow">→</span>
+                </p>
+                <div class="card-grid card-grid--rail">
                   {visibleMachines.map((machine, i) => (
                     <ServiceCard service={machine} index={i + 1} basePath="/makine-kiralama/" />
                   ))}

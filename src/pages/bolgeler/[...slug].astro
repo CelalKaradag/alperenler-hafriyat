@@ -137,7 +137,10 @@ const quoteNeeds = [
                   <p class="eyebrow">Hizmetler</p>
                   <h2 id="bolge-hizmet-baslik">Hizmetlerimiz</h2>
                 </div>
-                <div class="card-grid">
+                <p class="rail-hint" aria-hidden="true">
+                  Kaydırarak tüm hizmetleri görün<span class="rail-hint-arrow">→</span>
+                </p>
+                <div class="card-grid card-grid--rail">
                   {visibleServices.map((service, i) => (
                     <ServiceCard service={service} index={i + 1} />
                   ))}

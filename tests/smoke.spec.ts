@@ -1618,3 +1618,34 @@ test('makine kiralama ızgarası: 1366 px 3+3, 768 px 2 sütun', async ({ page }
     .evaluate((el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length);
   expect(cols).toBe(2);
 });
+
+test('telefon 360x740: bölge ve hizmetler sayfalarında tek hizmet/makine şeridi kayar; galeri filtreleri tek satır', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  for (const path of ['/bolgeler/yesilyurt/', '/hizmetler/']) {
+    await page.goto(path);
+    const rail = page.locator('.card-grid--rail');
+    await expect(rail, `${path} şerit sayısı`).toHaveCount(1);
+    await rail.scrollIntoViewIfNeeded();
+    const info = await rail.evaluate((el) => ({
+      overflowX: getComputedStyle(el).overflowX,
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    expect(info.overflowX, `${path} overflow-x`).toBe('auto');
+    expect(info.scrollWidth, `${path} kaydırılabilir`).toBeGreaterThan(info.clientWidth + 50);
+    expect(info.pageOverflow, `${path} sayfa taşması`).toBeLessThanOrEqual(0);
+  }
+
+  await page.goto('/galeri/');
+  const buttons = page.locator('.gallery-filters button');
+  expect(await buttons.count()).toBeGreaterThan(1);
+  const boxes = (await buttons.evaluateAll((nodes) =>
+    nodes.map((n) => {
+      const r = n.getBoundingClientRect();
+      return { top: Math.round(r.top), right: r.right };
+    }),
+  )) as { top: number; right: number }[];
+  expect(new Set(boxes.map((b) => b.top)).size, 'filtre düğmeleri aynı satırda').toBe(1);
+  expect(boxes[boxes.length - 1].right, 'sonuncunun sağ kenarı ekran içinde').toBeLessThanOrEqual(360);
+});
