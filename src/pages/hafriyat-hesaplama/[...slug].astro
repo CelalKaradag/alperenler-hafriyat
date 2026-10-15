@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ExcavationCalculator from '../../components/ExcavationCalculator.astro';
+import Icon from '../../components/Icon.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import TopoArt from '../../components/TopoArt.astro';
+import { calculator, calculatorVisible } from '../../data/calculator';
+import { breadcrumbSchema } from '../../utils/schema';
+
+// /hafriyat-hesaplama/ yalnızca onaylıysa veya showDrafts (dev / önizleme build’i) iken üretilir.
+export function getStaticPaths() {
+  return calculatorVisible ? [{ params: { slug: undefined } }] : [];
+}
+
+const fmt = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 });
+const steps = [
+  {
+    icon: 'ruler',
+    title: 'Kazı hacmi',
+    text: 'Uzunluk × genişlik × derinlik. Örneğin 20 m × 12 m × 3 m = 720 m³ yerinde (sıkı) toprak.',
+  },
+  {
+    icon: 'soil',
+    title: 'Kabarma',
+    text: `Kazılan malzeme gevşer ve hacmi artar. Hesapta ${calculator.soils
+      .map((soil) => `${soil.label.toLocaleLowerCase('tr-TR')} için yaklaşık %${Math.round((soil.swell - 1) * 100)}`)
+      .join(', ')} kabarma alınır.`,
+  },
+  {
+    icon: 'truck',
+    title: 'Kamyon seferi',
+    text: `Kabarmış hacim, kamyon başına ${fmt.format(calculator.truckM3)} m³ ile bölünür ve yukarı yuvarlanır.`,
+  },
+] as const;
+---
+
+<BaseLayout title={calculator.seoTitle} description={calculator.description} noindex={!calculator.onaylandi}>
+  <Fragment slot="head">
+    {
+      calculator.onaylandi && Astro.site && (
+        <JsonLd
+          data={breadcrumbSchema(
+            [
+              { name: 'Ana Sayfa', path: '/' },
+              { name: 'Hafriyat hesaplama', path: '/hafriyat-hesaplama/' },
+            ],
+            Astro.site,
+          )}
+        />
+      )
+    }
+  </Fragment>
+
+  <section class="page-head on-dark">
+    <TopoArt variant="soft" />
+    <div class="container narrow">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Ana Sayfa</a></li>
+          <li aria-current="page">Hafriyat hesaplama</li>
+        </ol>
+      </nav>
+      <h1>{calculator.title}</h1>
+      <p class="lead">{calculator.lead}</p>
+      {!calculator.onaylandi && <p><span class="draft-badge">TASLAK</span></p>}
+    </div>
+  </section>
+
+  <section class="section section-paper" aria-label="Hesaplayıcı">
+    <div class="container">
+      <ExcavationCalculator />
+    </div>
+  </section>
+
+  <section class="section section-light" aria-labelledby="hesap-nasil-baslik">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Hesap yöntemi</p>
+        <h2 id="hesap-nasil-baslik">Nasıl hesaplanır?</h2>
+      </div>
+      <ol class="calc-method">
+        {
+          steps.map((step, i) => (
+            <li>
+              <span class="calc-method-n" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <Icon name={step.icon} />
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="calc-method-note">
+        Şev (yamaç) payı, çalışma boşluğu ve sahaya erişim hacmi artırabilir. Kesin miktar ve fiyat,
+        sahayı gördükten sonra verilir.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

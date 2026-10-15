@@ -1,0 +1,131 @@
+---
+import { calculator } from '../data/calculator';
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+
+// Hiçbir veri saklanmaz veya gönderilmez: hesap tarayıcıda yapılır; WhatsApp mesajını kullanıcı gönderir.
+const waBase = site.whatsappNumber ? `https://wa.me/${site.whatsappNumber.replace(/\D/g, '')}` : '';
+const defaults = { length: 20, width: 12, depth: 3 };
+const fields = [
+  { name: 'length', label: 'Uzunluk', hint: 'Alanın boyu', max: 1000 },
+  { name: 'width', label: 'Genişlik', hint: 'Alanın eni', max: 1000 },
+  { name: 'depth', label: 'Derinlik', hint: 'Ortalama derinlik', max: 50 },
+] as const;
+// Betik yüklenmeden önce (ve betiksiz) varsayılan ölçülerin sonucu görünür
+const fmt = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 });
+const bank = defaults.length * defaults.width * defaults.depth;
+const loose = bank * calculator.soils[0].swell;
+const trips = Math.ceil(loose / calculator.truckM3 - 1e-9);
+---
+
+<div
+  class="calc"
+  data-calculator
+  data-wa-base={waBase}
+  data-truck={calculator.truckM3}
+  data-service={calculator.serviceTitle}
+>
+  <form class="calc-form" novalidate data-calc-form>
+    <fieldset class="calc-group">
+      <legend class="calc-legend"><span class="calc-step">1</span>Kazı ölçüleri</legend>
+      <div class="calc-fields">
+        {
+          fields.map((field) => (
+            <div class="calc-field">
+              <label for={`calc-${field.name}`}>{field.label}</label>
+              <div class="calc-input">
+                <input
+                  id={`calc-${field.name}`}
+                  name={field.name}
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value={String(defaults[field.name])}
+                  data-max={field.max}
+                  aria-describedby={`calc-${field.name}-hint`}
+                />
+                <span class="calc-unit" aria-hidden="true">m</span>
+              </div>
+              <p class="calc-hint" id={`calc-${field.name}-hint`}>{field.hint}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="wizard-error" role="alert" data-calc-error hidden></p>
+    </fieldset>
+
+    <fieldset class="calc-group">
+      <legend class="calc-legend"><span class="calc-step">2</span>Zemin türü</legend>
+      <div class="pill-group">
+        {
+          calculator.soils.map((soil, i) => (
+            <label class="pill">
+              <input type="radio" name="soil" value={String(soil.swell)} data-label={soil.label} checked={i === 0} />
+              <span>{soil.label}</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <figure class="calc-figure" aria-hidden="true">
+      <svg viewBox="0 0 420 230" role="presentation">
+        <defs>
+          <pattern id="calc-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <path d="M0 0v8" stroke="currentColor" stroke-width="1.4" opacity=".28"></path>
+          </pattern>
+        </defs>
+        <!-- zemin -->
+        <path class="calc-ground" d="M14 92 210 22 406 92 210 162z"></path>
+        <!-- kazı çukuru: üst ağız, iç duvarlar -->
+        <path class="calc-pit-wall" d="M84 92 210 47v74L84 166z" fill="url(#calc-hatch)"></path>
+        <path class="calc-pit-wall calc-pit-wall--light" d="M210 47l126 45v74L210 121z"></path>
+        <path class="calc-pit-floor" d="M84 166 210 121 336 166 210 211z"></path>
+        <path class="calc-pit-edge" d="M84 92 210 47 336 92 210 137z"></path>
+        <!-- ölçü çizgileri -->
+        <path class="calc-dim" d="M76 102 202 147M218 147 344 102M352 92v74"></path>
+        <text class="calc-dim-text" x="118" y="146" transform="rotate(19.6 118 146)" data-fig="length">{defaults.length} m</text>
+        <text class="calc-dim-text" x="270" y="140" transform="rotate(-19.6 270 140)" data-fig="width">{defaults.width} m</text>
+        <text class="calc-dim-text" x="360" y="134" data-fig="depth">{defaults.depth} m</text>
+      </svg>
+    </figure>
+  </form>
+
+  <div class="calc-result on-dark" aria-live="polite" data-calc-result>
+    <p class="calc-result-eyebrow">Yaklaşık sonuç</p>
+    <dl class="calc-stats">
+      <div class="calc-stat calc-stat--main">
+        <dt>Kazılacak hacim</dt>
+        <dd><span data-out="bank">{fmt.format(bank)}</span><small>m³</small></dd>
+      </div>
+      <div class="calc-stat">
+        <dt>Kamyona yüklenecek hacim <span class="calc-dt-note">(kabarmış)</span></dt>
+        <dd><span data-out="loose">{fmt.format(loose)}</span><small>m³</small></dd>
+      </div>
+      <div class="calc-stat">
+        <dt>Yaklaşık kamyon seferi</dt>
+        <dd><Icon name="truck" /><span data-out="trips">{fmt.format(trips)}</span><small>sefer</small></dd>
+      </div>
+    </dl>
+    <p class="calc-assume">
+      Sefer sayısı, kamyon başına {calculator.truckM3} m³ gevşek malzemeyle hesaplanır.
+    </p>
+    <div class="calc-actions">
+      {
+        waBase && (
+          <a class="btn btn-wa btn-lg" href={waBase} target="_blank" rel="noopener" data-calc-wa>
+            <WhatsAppIcon />
+            Bu ölçülerle teklif iste
+          </a>
+        )
+      }
+      <a class="btn btn-outline-light" href="/teklif/" data-calc-wizard>Teklif formuna aktar</a>
+      <a class="btn btn-primary" href={site.phone.href}>Hemen Ara</a>
+    </div>
+    <p class="calc-disclaimer">
+      Hesap yaklaşıktır: şev payı, zemin ve saha koşulları dahil değildir. Kesin miktar keşifte
+      belirlenir. Fiyat, işi öğrendikten sonra verilir.
+    </p>
+  </div>
+</div>

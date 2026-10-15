@@ -77,6 +77,9 @@ test('taslak bayrağı kapalı build\'de taslak sayfalar ve şerit yok', async (
   await expect(page.locator('.draft-badge')).toHaveCount(0);
   // Footer'da taslak rehber bağlantısı görünmemeli; onaylı bölgeler/makineler görünür
   await expect(page.locator('footer a[href="/rehber/"]')).toHaveCount(0);
+  // Firma onaylı hafriyat hesaplama normal build'de var
+  await expect(page.locator('footer a[href="/hafriyat-hesaplama/"]')).toHaveCount(1);
+  expect((await request.get('/hafriyat-hesaplama/')).status()).toBe(200);
   await expect(page.locator('footer a[href="/bolgeler/"]')).toHaveCount(1);
 });
 

@@ -1,0 +1,20 @@
+---
+import { calculatorVisible, calculator } from '../data/calculator';
+import Icon from './Icon.astro';
+// "Hafriyat hesaplama" sayfasına kısa bağlantı kartı; sayfa üretilmiyorsa hiçbir şey basılmaz.
+---
+
+{
+  calculatorVisible && (
+    <a class="calc-promo" href="/hafriyat-hesaplama/">
+      <Icon name="ruler" />
+      <span>
+        <strong>
+          Hafriyat hesaplama{!calculator.onaylandi && <span class="draft-badge">TASLAK</span>}
+        </strong>
+        <span>Ölçüleri girin: kaç m³ toprak çıkar, kaç kamyon tutar?</span>
+      </span>
+      <Icon class="link-list-arrow" name="arrow" />
+    </a>
+  )
+}

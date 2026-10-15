@@ -1,4 +1,5 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
+import { calculator } from '../data/calculator';
 import { guides } from '../data/guides';
 import { machines } from '../data/machines';
 import { priceGuide } from '../data/price-guide';
@@ -41,6 +42,7 @@ export const GET: APIRoute = ({ site: base }) => {
   }
 
   if (priceGuide.onaylandi) paths.add('/hafriyat-fiyatlari/');
+  if (calculator.onaylandi) paths.add('/hafriyat-hesaplama/');
 
   const approvedRegions = regions.filter((item) => item.onaylandi);
   if (approvedRegions.length > 0) {

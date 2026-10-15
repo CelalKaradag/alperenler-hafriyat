@@ -221,3 +221,74 @@ for (const width of [360, 390, 1366]) {
     expect(external, `dış istekler:\n${external.join('\n')}`).toEqual([]);
   });
 }
+
+// ---- Hafriyat hesaplama (firma onaylı) ----
+test('hafriyat hesaplama: virgüllü ölçü, zemin seçimi, sonuç, WhatsApp mesajı ve teklif formuna aktarım', async ({ page }) => {
+  const errors = watchErrors(page);
+  const response = await page.goto('/hafriyat-hesaplama/');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('h1')).toHaveText('Hafriyat Hesaplama');
+  await expect(page.locator('.draft-badge')).toHaveCount(0);
+
+  // Varsayılan 20 × 12 × 3, toprak (%25), 16 m³ kamyon → 720 / 900 / 57
+  await expect(page.locator('[data-out="bank"]')).toHaveText('720');
+  await expect(page.locator('[data-out="loose"]')).toHaveText('900');
+  await expect(page.locator('[data-out="trips"]')).toHaveText('57');
+
+  await page.fill('#calc-length', '25,5');
+  await page.fill('#calc-depth', '4');
+  await page.locator('.calc .pill', { hasText: 'Taşlık / kayalık' }).click();
+  await expect(page.locator('[data-out="bank"]')).toHaveText('1.224');
+  await expect(page.locator('[data-out="loose"]')).toHaveText('1.836');
+  await expect(page.locator('[data-out="trips"]')).toHaveText('115');
+  await expect(page.locator('[data-fig="length"]')).toHaveText('25,5 m');
+
+  const wa = decodeURIComponent((await page.locator('[data-calc-wa]').getAttribute('href')) ?? '');
+  expect(wa).toContain('wa.me/905392527058');
+  expect(wa).toContain('Hafriyat ve Temel Kazısı için teklif almak istiyorum');
+  expect(wa).toContain('25,5 m × 12 m × 4 m');
+  expect(wa).toContain('1.224 m³');
+  expect(wa).toContain('zemin: taşlık / kayalık');
+
+  // Geçersiz değer: hata mesajı, alan işaretli
+  await page.fill('#calc-width', 'abc');
+  await expect(page.locator('[data-calc-error]')).toBeVisible();
+  await expect(page.locator('#calc-width')).toHaveAttribute('aria-invalid', 'true');
+  await page.fill('#calc-width', '12');
+  await expect(page.locator('[data-calc-error]')).toBeHidden();
+
+  // Teklif formuna aktar: iş türü seçili, açıklama ölçülerle dolu
+  await page.locator('[data-calc-wizard]').click();
+  await expect(page).toHaveURL(/\/teklif\/\?is=/);
+  await expect(page.locator('input[name="job"][value="Hafriyat ve Temel Kazısı"]')).toBeChecked();
+  await expect(page.locator('#wizard-note')).toHaveValue(/25,5 m × 12 m × 4 m/);
+  expect(errors, `konsol/sayfa hataları:\n${errors.join('\n')}`).toEqual([]);
+});
+
+for (const width of [360, 390, 1366]) {
+  test(`hafriyat hesaplama ${width}px: üç ölçü tek satır, taşma yok, sonuç kartı görünür`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/hafriyat-hesaplama/');
+    const tops = await page
+      .locator('.calc-input input')
+      .evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size, 'ölçü alanları aynı satırda').toBe(1);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    await page.locator('[data-calc-result]').scrollIntoViewIfNeeded();
+    await expect(page.locator('[data-out="trips"]')).toBeVisible();
+    const box = (await page.locator('[data-calc-result]').boundingBox()) as { x: number; width: number };
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
+  });
+}
+
+test('hafriyat hesaplama bağlantıları: footer, teklif sayfası, ana sayfa fiyat bölümü, hafriyat hizmeti', async ({ page }) => {
+  for (const path of ['/', '/teklif/', '/hizmetler/hafriyat-ve-temel-kazisi/']) {
+    await page.goto(path);
+    await expect(page.locator('footer a[href="/hafriyat-hesaplama/"]'), `${path} footer`).toHaveCount(1);
+    await expect(page.locator('main a.calc-promo[href="/hafriyat-hesaplama/"]'), `${path} kart`).toHaveCount(1);
+  }
+  // Hesaplamanın anlamsız olduğu hizmette kart yok
+  await page.goto('/hizmetler/kaya-kirma-ve-kirici-isleri/');
+  await expect(page.locator('a.calc-promo')).toHaveCount(0);
+});

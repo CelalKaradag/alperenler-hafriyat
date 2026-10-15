@@ -1,6 +1,7 @@
 ---
 import { guideVisible } from '../data/price-guide';
 import { defaultPriceFactors } from '../data/services';
+import CalcPromo from './CalcPromo.astro';
 import Icon from './Icon.astro';
 import QuoteWizard from './QuoteWizard.astro';
 
@@ -51,6 +52,7 @@ const { tone = 'light' } = Astro.props;
             </p>
           )
         }
+        <CalcPromo />
       </div>
 
       <QuoteWizard />

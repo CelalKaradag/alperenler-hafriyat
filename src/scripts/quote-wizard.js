@@ -37,6 +37,16 @@ function setup(root) {
   const prefill = new URLSearchParams(window.location.search).get('yer');
   if (prefill && !placeInput.value) placeInput.value = clean(prefill, MAX_PLACE);
 
+  // Hafriyat hesaplayıcıdan gelen ?is=<hizmet>&not=<ölçüler>: iş türü seçili, açıklama ön-dolu gelir
+  const query = new URLSearchParams(window.location.search);
+  const presetJob = query.get('is');
+  if (presetJob && !textOnly) {
+    const option = Array.from(app.querySelectorAll('input[name="job"]')).find((input) => input.value === presetJob);
+    if (option) option.checked = true;
+  }
+  const presetNote = query.get('not');
+  if (presetNote && !noteInput.value) noteInput.value = clean(presetNote, MAX_NOTE);
+
   let index = 0; // 0..2 adım, 3 sonuç
 
   const selected = (name) => {

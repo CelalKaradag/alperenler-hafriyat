@@ -1,4 +1,5 @@
 ---
+import { calculatorVisible } from '../data/calculator';
 import { navItems } from '../data/nav';
 import { visibleGuides } from '../data/guides';
 import { visibleMachines } from '../data/machines';
@@ -81,6 +82,13 @@ const hasServices = visibleServices.length > 0;
               visibleMachines.length > 0 && (
                 <li>
                   <a href="/makine-kiralama/">Makine kiralama</a>
+                </li>
+              )
+            }
+            {
+              calculatorVisible && (
+                <li>
+                  <a href="/hafriyat-hesaplama/">Hafriyat hesaplama</a>
                 </li>
               )
             }
