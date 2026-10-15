@@ -390,3 +390,29 @@
     font-size: 0.9rem;
   }
 }
+
+/* Telefonda açılan menü: bağlantılar ve düğmeler daha sakin ölçüde (önceden 22 px yazı, 56 px satır);
+   dokunma satırı yine ≥ 48 px. Tablet (48–84em) menüsü değişmez. */
+@media (max-width: 47.99em) {
+  .site-nav ul a {
+    min-height: 3rem;
+    padding: 0.8rem 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.4rem;
+  }
+
+  .site-nav .nav-extra {
+    padding-top: 1.25rem;
+  }
+
+  .site-nav .nav-extra .btn-lg {
+    min-height: 3rem;
+    padding-block: 0.7rem;
+    font-size: 1rem;
+  }
+
+  .site-nav .nav-address {
+    font-size: 0.875rem;
+  }
+}

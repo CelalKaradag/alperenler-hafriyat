@@ -856,11 +856,13 @@ test.describe('mobil 390x844', () => {
     await expect(page.locator('.floating-actions')).toBeHidden();
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
 
-    // Linkler büyük: ≥ 56 px satır, ≈ 22 px yazı; altta büyük "Hemen Ara" + adres
+    // Telefonda linkler sakin ölçüde: ≥ 48 px dokunma satırı, 16–19 px yazı; altta "Hemen Ara" + adres
     const link = page.locator('#site-nav ul a').first();
     const linkBox = (await link.boundingBox()) as { height: number };
-    expect(linkBox.height).toBeGreaterThanOrEqual(55.5);
-    expect(parseFloat(await link.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(21.5);
+    expect(linkBox.height).toBeGreaterThanOrEqual(47.5);
+    const linkFont = parseFloat(await link.evaluate((el) => getComputedStyle(el).fontSize));
+    expect(linkFont).toBeGreaterThanOrEqual(16);
+    expect(linkFont).toBeLessThanOrEqual(19);
     await expect(page.locator('#site-nav .nav-extra .btn-primary')).toBeVisible();
     await expect(page.locator('#site-nav .nav-address')).toContainText('Yeşilyurt');
 
