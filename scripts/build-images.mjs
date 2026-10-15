@@ -28,6 +28,10 @@ const WIDTHS = [480, 960, 1600];
 const WEBP_QUALITY = 78;
 const JPEG_QUALITY = 80;
 const VERSION = 1; // türev ayarları değişince artırılır
+// Açılıştaki en büyük görsel (LCP) olan hero posterleri için ek AVIF türevi: aynı görünüm, webp'nin ~yarısı.
+// Hero.astro bunları <source type="image/avif"> ve önyüklemede kullanır.
+const AVIF_KEYS = new Set(['hero-poster', 'hero-poster-720']);
+const AVIF_QUALITY = 50;
 
 const toHex = (n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
 
@@ -97,12 +101,16 @@ async function main() {
     const key = keys.get(file);
     try {
       const info = await stat(file);
-      const signature = `${VERSION}:${info.size}:${Math.round(info.mtimeMs)}:${key}`;
+      const avif = AVIF_KEYS.has(key);
+      const signature = `${VERSION}:${info.size}:${Math.round(info.mtimeMs)}:${key}${avif ? ':avif' : ''}`;
       const cached = cache[publicPath];
 
       const outputsExist = (widths) =>
         widths.every(
-          (w) => existsSync(path.join(outDir, `${key}-${w}.webp`)) && existsSync(path.join(outDir, `${key}-${w}.jpg`)),
+          (w) =>
+            existsSync(path.join(outDir, `${key}-${w}.webp`)) &&
+            existsSync(path.join(outDir, `${key}-${w}.jpg`)) &&
+            (!avif || existsSync(path.join(outDir, `${key}-${w}.avif`))),
         );
 
       if (cached && cached.signature === signature && outputsExist(cached.meta.widths)) {
@@ -133,6 +141,10 @@ async function main() {
           .jpeg({ quality: JPEG_QUALITY, mozjpeg: true })
           .toFile(path.join(outDir, `${key}-${w}.jpg`));
         bytes += webp.size + jpg.size;
+        if (avif) {
+          const out = await base().avif({ quality: AVIF_QUALITY }).toFile(path.join(outDir, `${key}-${w}.avif`));
+          bytes += out.size;
+        }
       }
 
       const entry = { key, width, height, color, widths };

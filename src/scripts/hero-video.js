@@ -6,6 +6,9 @@
  * - Kesintisiz döngü için iki video üst üste kullanılır; biri bitmeye ~0,7 sn kala diğeri baştan
  *   başlar ve crossfade yapılır. Süre çok kısaysa veya ikinci video hata verirse tek video + native loop.
  * - Hareket azaltma, Save-Data, ekran dışı ve gizli sekmede video yüklenmez/duraklatılır.
+ * - Video indirmesi sayfa tamamen yüklenip tarayıcı boşa çıkınca başlar (telefonda ek START_DELAY_PHONE_MS);
+ *   ilk dokunuş/tuşta hemen başlar. Böylece video (≈3 MB) ilk açılışta poster, yazı ve fontlarla
+ *   bant genişliği ve işlemci için yarışmaz; poster ilk karedir, geçiş fark edilmez.
  * - Kullanıcı tercihi (durdur/oynat) localStorage'da saklanır; erişilemezse sessizce yok sayılır.
  *
  * Videolar sunucu tarafında basılmaz: tarayıcı hiçbir şey indirmeden önce bu betik karar verir.
@@ -16,6 +19,8 @@ const FADE_IN_MS = 400;
 const CROSSFADE_MS = 600;
 const LEAD_SECONDS = 0.7;
 const STORE_KEY = 'hero-video';
+const START_DELAY_PHONE_MS = 1500;
+const START_DELAY_WIDE_MS = 300;
 
 let media = null;
 
@@ -312,6 +317,7 @@ function init() {
 
   function start() {
     if (started || !canRun()) return;
+    cancelSchedule();
     started = true;
     const first = buildVideo(variants, false);
     attach(first);
@@ -362,11 +368,50 @@ function init() {
   };
   if (reducedQuery.addEventListener) reducedQuery.addEventListener('change', onReducedChange);
 
+  // Ertelenmiş başlangıç: load → (telefonda 1,5 sn) → tarayıcı boşta; ilk dokunuş/tuş beklemeden başlatır
+  const KICK_EVENTS = ['pointerdown', 'keydown'];
+  let delayTimer = 0;
+  let idleHandle = 0;
+  let scheduled = false;
+  function cancelSchedule() {
+    if (!scheduled) return;
+    scheduled = false;
+    window.removeEventListener('load', afterLoad);
+    KICK_EVENTS.forEach((name) => window.removeEventListener(name, kickNow, true));
+    window.clearTimeout(delayTimer);
+    if (idleHandle && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleHandle);
+    else window.clearTimeout(idleHandle);
+  }
+  function kickNow() {
+    cancelSchedule();
+    if (canRun() && !userPaused) start();
+  }
+  function afterLoad() {
+    const phone = window.matchMedia('(max-width: 47.99em)').matches;
+    delayTimer = window.setTimeout(
+      () => {
+        idleHandle =
+          'requestIdleCallback' in window
+            ? window.requestIdleCallback(kickNow, { timeout: 2000 })
+            : window.setTimeout(kickNow, 50);
+      },
+      phone ? START_DELAY_PHONE_MS : START_DELAY_WIDE_MS,
+    );
+  }
+  function scheduleStart() {
+    if (scheduled || started || !canRun() || userPaused) return;
+    scheduled = true;
+    KICK_EVENTS.forEach((name) => window.addEventListener(name, kickNow, { capture: true, passive: true }));
+    if (document.readyState === 'complete') afterLoad();
+    else window.addEventListener('load', afterLoad, { once: true });
+  }
+
   setToggleUi();
-  if (canRun() && !userPaused) start();
+  scheduleStart();
 
   // Sayfa geçişinde çağrılır: dinleyicileri bırakır, videoları durdurup kaldırır (indirme kesilir).
   return () => {
+    cancelSchedule();
     document.removeEventListener('visibilitychange', sync);
     if (observer) observer.disconnect();
     if (reducedQuery.removeEventListener) reducedQuery.removeEventListener('change', onReducedChange);

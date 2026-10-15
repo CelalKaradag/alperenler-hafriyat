@@ -22,9 +22,12 @@ export interface Responsive {
   widths: number[];
   webpSet: string;
   jpgSet: string;
+  /** Yalnızca AVIF türevi üretilen görsellerde (hero posterleri; build-images.mjs AVIF_KEYS) */
+  avifSet?: string;
 }
 
-const derivative = (key: string, width: number, ext: 'webp' | 'jpg') => `/images/_r/${key}-${width}.${ext}`;
+const derivative = (key: string, width: number, ext: 'webp' | 'jpg' | 'avif') =>
+  `/images/_r/${key}-${width}.${ext}`;
 
 /**
  * Görselin duyarlı türevleri varsa (meta + dosyalar diskte) srcset bilgisini döndürür;
@@ -37,8 +40,9 @@ export function getResponsive(src: string): Responsive | null {
     (w) => publicFileExists(derivative(entry.key, w, 'webp')) && publicFileExists(derivative(entry.key, w, 'jpg')),
   );
   if (!complete) return null;
-  const set = (ext: 'webp' | 'jpg') =>
+  const set = (ext: 'webp' | 'jpg' | 'avif') =>
     entry.widths.map((w) => `${derivative(entry.key, w, ext)} ${w}w`).join(', ');
+  const hasAvif = entry.widths.every((w) => publicFileExists(derivative(entry.key, w, 'avif')));
   return {
     key: entry.key,
     width: entry.width,
@@ -47,6 +51,7 @@ export function getResponsive(src: string): Responsive | null {
     widths: entry.widths,
     webpSet: set('webp'),
     jpgSet: set('jpg'),
+    ...(hasAvif ? { avifSet: set('avif') } : {}),
   };
 }
 

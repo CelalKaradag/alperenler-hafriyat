@@ -42,8 +42,10 @@ const mainSize = mainPoster ? getImageSize(mainPoster) : null;
 // Mobilde ayrı dikey poster varsa (ve ana poster farklıysa) media'lı <source>
 const useMobileSource = Boolean(posterMobile && poster && posterMobile !== mainPoster);
 // <link rel="preload"> için tür tanımlı olmayan öznitelikler (imagesrcset/imagesizes/fetchpriority)
+// AVIF türevi varsa önyükleme AVIF'i alır (type ile: desteklemeyen tarayıcı atlar, <picture> yine yükler)
 const preloadExtras = (resp: ReturnType<typeof getResponsive>) => ({
-  imagesrcset: resp?.webpSet,
+  imagesrcset: resp?.avifSet ?? resp?.webpSet,
+  type: resp?.avifSet ? 'image/avif' : undefined,
   imagesizes: resp ? '100vw' : undefined,
   fetchpriority: 'high' as const,
 });
@@ -75,12 +77,16 @@ const videoExtras = { disablepictureinpicture: true, disableremoteplayback: true
   {
     mainPoster && (
       <picture class="hero-poster" aria-hidden="true">
+        {useMobileSource && mobileResp?.avifSet && (
+          <source type="image/avif" srcset={mobileResp.avifSet} sizes="100vw" media={MOBILE} />
+        )}
         {useMobileSource && mobileResp && (
           <source type="image/webp" srcset={mobileResp.webpSet} sizes="100vw" media={MOBILE} />
         )}
         {useMobileSource && posterMobile && !mobileResp && (
           <source srcset={posterMobile} media={MOBILE} />
         )}
+        {mainResp?.avifSet && <source type="image/avif" srcset={mainResp.avifSet} sizes="100vw" />}
         {mainResp && <source type="image/webp" srcset={mainResp.webpSet} sizes="100vw" />}
         <img
           src={mainPoster}
