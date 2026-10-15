@@ -188,7 +188,7 @@ test('header logosu yüklenir (naturalWidth > 0), orijinal oranda ve kırpılmam
     .toBeGreaterThan(0);
   // Header'da logo dekoratif (bağlantının adı aria-label'da); footer'daki logo alt metnini korur
   await expect(logo).toHaveAttribute('alt', '');
-  await expect(page.locator('.site-header .brand')).toHaveAccessibleName(/Alperenler\s*Hafriyat\s*– Ana Sayfa/i);
+  await expect(page.locator('.site-header .brand')).toHaveAccessibleName(/Alperenler\s*Hafriyat\s*İnşaat\s*Taahhüt\s*– Ana Sayfa/i);
   await expect(page.locator('.site-footer .brand-logo img')).toHaveAttribute('alt', 'Alperenler Hafriyat İnşaat Taahhüt Ltd. Şti. logosu');
   await expect(logo).toHaveAttribute('decoding', 'async');
   await expect(logo).toHaveAttribute('loading', 'eager');
@@ -1124,39 +1124,38 @@ test('telefonda yüzen WhatsApp: alt çubuk yok, hero sonrası belirir, ilk anda
   await expect(page.locator('.wa-float')).toHaveClass(/is-shown/);
 });
 
-test('telefon header: sarı "Ara" ikonu + menü ikonu (☰/✕); 360 ve 390 px tek satır; menü açıkken Ara ikonu gizli', async ({
+test('header yazısı logodaki gibi (ALPERENLER / HAFRİYAT İNŞAAT TAAHHÜT), iki satır aynı genişlikte; telefonda Ara ikonu yok, menü ikonu var', async ({
   page,
 }) => {
   for (const [width, height] of [
     [360, 740],
     [390, 844],
+    [1366, 768],
   ]) {
     await page.setViewportSize({ width, height });
     await page.goto('/iletisim/');
-    const call = page.locator('.header-call-icon');
-    await expect(call).toBeVisible();
-    await expect(call).toHaveAttribute('href', PHONE_HREF);
-    await expect(call).toHaveAccessibleName(/Hemen arayın/);
-    const callBox = (await call.boundingBox()) as { x: number; width: number; height: number };
-    expect(callBox.width).toBeGreaterThanOrEqual(44);
-    expect(callBox.height).toBeGreaterThanOrEqual(44);
-    const toggle = page.locator('.nav-toggle');
-    const toggleBox = (await toggle.boundingBox()) as { x: number; width: number; height: number };
-    expect(toggleBox.width).toBeGreaterThanOrEqual(44);
-    expect(callBox.x + callBox.width, 'Ara ikonu menü düğmesinin solunda').toBeLessThan(toggleBox.x);
-    expect(toggleBox.x + toggleBox.width, "menü düğmesi sağ kenar boşluğunu yemez").toBeLessThanOrEqual(width - 12);
-    const header = (await page.locator('.site-header').boundingBox()) as { height: number };
-    expect(header.height, `${width}: header tek satır`).toBeLessThanOrEqual(73);
-    await expect(toggle).toHaveAccessibleName('Menü');
-    await toggle.click();
-    await expect(toggle).toHaveAccessibleName('Kapat');
-    await expect(call).toBeHidden(); // menünün içinde büyük "Hemen Ara" var
-    await page.keyboard.press('Escape');
-    await expect(call).toBeVisible();
+    const top = page.locator('.site-header .brand-top');
+    const bottom = page.locator('.site-header .brand-bottom');
+    await expect(top).toHaveText('Alperenler');
+    await expect(bottom).toHaveText('Hafriyat İnşaat Taahhüt');
+    const t = (await top.boundingBox()) as { x: number; width: number };
+    const b = (await bottom.boundingBox()) as { x: number; width: number };
+    expect(Math.abs(t.x - b.x), `${width}: iki satır aynı soldan başlar`).toBeLessThanOrEqual(1);
+    expect(Math.abs(t.width - b.width), `${width}: iki satır aynı genişlikte biter`).toBeLessThanOrEqual(2);
+    const bottomFont = parseFloat(await bottom.evaluate((el) => getComputedStyle(el).fontSize));
+    expect(bottomFont, `${width}: alt satır okunur`).toBeGreaterThanOrEqual(9.5);
+    await expect(page.locator('.header-call-icon')).toHaveCount(0);
+    if (width < 768) {
+      const toggle = page.locator('.nav-toggle');
+      await expect(toggle).toHaveAccessibleName('Menü');
+      const toggleBox = (await toggle.boundingBox()) as { x: number; width: number };
+      expect(toggleBox.width).toBeGreaterThanOrEqual(44);
+      expect(toggleBox.x + toggleBox.width, 'menü düğmesi sağ kenar boşluğunu yemez').toBeLessThanOrEqual(width - 12);
+      expect(b.x + b.width, 'yazı menü düğmesine değmez').toBeLessThan(toggleBox.x - 8);
+      const header = (await page.locator('.site-header').boundingBox()) as { height: number };
+      expect(header.height, `${width}: header tek satır`).toBeLessThanOrEqual(73);
+    }
   }
-  // Tablet/masaüstünde ikon yok (orada "Hemen Ara" düğmesi var)
-  await page.setViewportSize({ width: 1024, height: 768 });
-  await expect(page.locator('.header-call-icon')).toBeHidden();
 });
 
 test.describe('masaüstü header tek satır', () => {

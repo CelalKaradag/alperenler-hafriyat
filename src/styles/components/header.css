@@ -50,8 +50,12 @@
 }
 
 .brand-text {
-  display: flex;
-  flex-direction: column;
+  /* Logodaki yazıyla aynı: üstte ALPERENLER, altta HAFRİYAT İNŞAAT TAAHHÜT. İki satır aynı genişlikte biter
+     (alt satır iki yana yaslı). Boyutlar em ile: yalnızca .brand-text font-size değişince oran korunur. */
+  display: inline-grid;
+  grid-template-columns: max-content;
+  row-gap: 0.3em;
+  font-size: 1.3rem;
 }
 
 /*
@@ -100,17 +104,20 @@
 .brand-top {
   font-family: var(--font-display);
   font-stretch: 118%;
-  font-size: 1.3rem;
+  font-size: 1em;
   font-weight: 850;
+  line-height: 1;
   letter-spacing: 0.14em;
 }
 
 .brand-bottom {
-  margin-top: 0.3rem;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 0.5em;
   font-weight: 700;
-  letter-spacing: 0.52em;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-align: justify;
+  text-align-last: justify;
   color: var(--accent);
 }
 
@@ -214,8 +221,8 @@ main > .not-found {
     gap: 0.6rem;
   }
 
-  .brand-top {
-    font-size: clamp(0.95rem, 4vw, 1.3rem);
+  .brand-text {
+    font-size: clamp(0.95rem, 4.6vw, 1.3rem);
   }
 }
 
