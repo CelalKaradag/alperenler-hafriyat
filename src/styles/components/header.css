@@ -180,6 +180,15 @@
   backdrop-filter: none;
 }
 
+/* Hero üzerindeki şeffaf başlangıç, tam ekran menü açılınca panel zeminine taşmamalı. */
+.js .over-hero .site-header.is-open {
+  background: var(--bg);
+  box-shadow: 0 1px 0 var(--line-dark);
+  transition: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 .js .over-hero .hero {
   padding-top: calc(var(--header-h) + 2rem);
 }

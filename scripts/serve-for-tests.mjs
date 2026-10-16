@@ -15,6 +15,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
+const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 const base = { ...process.env };
 delete base.PUBLIC_SHOW_DRAFTS;
 delete base.PUBLIC_TEST_FIXTURES;
@@ -25,7 +26,7 @@ function build(outDir, drafts) {
     env.PUBLIC_SHOW_DRAFTS = 'true';
     env.PUBLIC_TEST_FIXTURES = 'true'; // yalnız test build'inde: src/pages/test-fixtures/ sayfaları üretilir
   }
-  const result = spawnSync('npx', ['astro', 'build'], { stdio: 'inherit', shell: true, env });
+  const result = spawnSync(npx, ['astro', 'build'], { stdio: 'inherit', env });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
@@ -49,9 +50,8 @@ const children = [
   ['dist-test', '4321'],
   ['dist-test-drafts', '4322'],
 ].map(([outDir, port]) =>
-  spawn('npx', ['astro', 'preview', '--host', '127.0.0.1', '--port', port], {
+  spawn(npx, ['astro', 'preview', '--ignore-lock', '--host', '127.0.0.1', '--port', port], {
     stdio: 'inherit',
-    shell: true,
     env: { ...base, ASTRO_OUT_DIR: outDir },
   }),
 );
