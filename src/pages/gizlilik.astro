@@ -1,9 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { showDrafts } from '../data/drafts';
 import { site } from '../data/site';
 import EmailText from '../components/EmailText.astro';
 
-// Firma/uzman incelemesi sonrası yayına hazırlandı. Barındırma sağlayıcısı: Cloudflare, Inc.
+// Firma tarafından doldurulacak alanlar (uydurma bilgi yok). Ticari unvan ve e-posta ONAYLANDI (site.ts); vergi no,
+// son güncelleme tarihi hâlâ firmadan beklenir (barındırma sağlayıcısı: Cloudflare, Inc.).
+const TODO = '[firma tarafından doldurulacak]';
+const isDraft = showDrafts;
 ---
 
 <BaseLayout
@@ -20,6 +24,14 @@ import EmailText from '../components/EmailText.astro';
 
   <section class="section section-light">
     <div class="container narrow prose legal">
+      {
+        isDraft && (
+          <p class="draft-notice" role="note">
+            <span class="draft-badge">TASLAK</span> Hukuki metin taslağı – firma/uzman onaylamalı
+          </p>
+        )
+      }
+
       <h2>Özet</h2>
       <p>
         Bu sitede form, üyelik veya yorum alanı yoktur. Site, ziyaretçilerden kişisel veri toplamaz
@@ -104,7 +116,7 @@ import EmailText from '../components/EmailText.astro';
         </div>
         <div>
           <dt>Son güncelleme</dt>
-          <dd>16 Ekim 2026</dd>
+          <dd><mark class="todo">{TODO}</mark></dd>
         </div>
       </dl>
     </div>
