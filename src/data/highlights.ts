@@ -15,10 +15,10 @@ export interface Highlight {
 }
 
 export const highlights: Highlight[] = [
-  { text: 'Operatörlü makine', icon: 'machine', onaylandi: false },
-  { text: 'Yerinde keşif ve teklif', icon: 'quote', onaylandi: false },
-  { text: "Telefon ve WhatsApp’tan hızlı iletişim", icon: 'phone', onaylandi: false },
-  { text: 'Yeşilyurt / Malatya merkezli', icon: 'pin', onaylandi: false },
+  { text: 'Operatörlü makine', icon: 'machine', onaylandi: true },
+  { text: 'Yerinde keşif ve teklif', icon: 'quote', onaylandi: true },
+  { text: "Telefon ve WhatsApp’tan hızlı iletişim", icon: 'phone', onaylandi: true },
+  { text: 'Yeşilyurt / Malatya merkezli', icon: 'pin', onaylandi: true },
 ];
 
 /** Yayında yalnızca onaylılar; showDrafts (dev veya önizleme build’i) iken taslaklar da. */
